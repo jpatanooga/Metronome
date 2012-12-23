@@ -1,0 +1,17 @@
+*.class
+*.jpage
+.classpath
+.settings
+.project
+app.properties
+log4j.properties
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Generated stuff
+target/
+testData/
+build/
