@@ -22,6 +22,18 @@ import org.apache.mahout.math.VectorWritable;
 //import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
 //import com.cloudera.knittingboar.utils.Utils;
 
+/**
+ * 
+ * TODO
+ * - add new functions for "classify" that instead produce a value of the regression
+ * 
+ * 
+ * 
+ * 
+ * 
+ * @author josh
+ *
+ */
 public class ParallelOnlineLinearRegression extends
 		AbstractOnlineLogisticRegression implements Writable {
 
