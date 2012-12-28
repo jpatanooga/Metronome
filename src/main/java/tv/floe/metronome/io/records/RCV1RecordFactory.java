@@ -63,7 +63,7 @@ public class RCV1RecordFactory implements RecordFactory {
   public static void ScanFile(String file, int debug_break_cnt)
       throws IOException {
     
-    ConstantValueEncoder encoder_test = new ConstantValueEncoder("test");
+    //ConstantValueEncoder encoder_test = new ConstantValueEncoder("test");
     
     BufferedReader reader = null;
     // Collection<String> words
@@ -173,17 +173,18 @@ public class RCV1RecordFactory implements RecordFactory {
    * 
    * @throws Exception
    */
-  public int processLine(String line, Vector v) throws Exception {
+  public double processLineNew(String line, Vector v) throws Exception {
     
     // p.269 ---------------------------------------------------------
     // Map<String, Set<Integer>> traceDictionary = new TreeMap<String,
     // Set<Integer>>();
     
-    int actual = 0;
+    double actual = 0;
     
     String[] parts = line.split(" ");
     
-    actual = Integer.parseInt(parts[0]);
+    //actual = Integer.parseInt(parts[0]);
+    actual = Double.parseDouble(parts[0]);
     
     // dont know what to do the the "namespace" "f"
     
@@ -225,5 +226,11 @@ public class RCV1RecordFactory implements RecordFactory {
     return out;
     
   }
+
+@Override
+public int processLine(String line, Vector featureVector) throws Exception {
+	// TODO Auto-generated method stub
+	return 0;
+}
   
 }
