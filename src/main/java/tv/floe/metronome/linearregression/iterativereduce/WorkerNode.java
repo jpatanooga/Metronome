@@ -13,9 +13,13 @@ import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
+import tv.floe.metronome.io.records.RCV1RecordFactory;
+import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.linearregression.ModelParameters;
 import tv.floe.metronome.linearregression.ParallelOnlineLinearRegression;
+import tv.floe.metronome.linearregression.ParameterVector;
 import tv.floe.metronome.linearregression.SquaredErrorLossFunction;
+import tv.floe.metronome.metrics.Metrics;
 
 import com.cloudera.iterativereduce.ComputableWorker;
 import com.cloudera.iterativereduce.io.RecordParser;
@@ -54,7 +58,7 @@ public class WorkerNode extends NodeBase implements
 	private int CurrentIteration = 0;
 
 	// basic stats tracking
-	POLRMetrics metrics = new POLRMetrics();
+	Metrics metrics = new Metrics();
 
 	double averageLineCount = 0.0;
 	int k = 0;
@@ -148,7 +152,7 @@ public class WorkerNode extends NodeBase implements
 				// is the hypothesis value for the currnet instance
 				double hypothesis_value = v.dot(this.polr.getBeta().viewRow(0));
 				
-				double instance_loss_value = this.loss_function.Calc(hypothesis_value, actual)
+				double instance_loss_value = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 
 //				metrics.AvgLogLikelihood = metrics.AvgLogLikelihood
 //						+ (ll - metrics.AvgLogLikelihood) / mu;
@@ -215,10 +219,10 @@ public class WorkerNode extends NodeBase implements
 		this.polr.SetBeta(global_update.parameter_vector);
 
 		// update global count
-		this.GlobalBatchCountForIteration = global_update.GlobalPassCount;
+//		this.GlobalBatchCountForIteration = global_update.GlobalPassCount;
 
 		// flush the local gradient delta buffer ("gamma")
-		this.polr.FlushGamma();
+		//this.polr.FlushGamma();
 
 		/*
 		 * if (global_update.IterationComplete == 0) { this.IterationComplete =
@@ -343,7 +347,7 @@ public class WorkerNode extends NodeBase implements
 		if (RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY
 				.equals(this.RecordFactoryClassname)) {
 
-			this.VectorFactory = new TwentyNewsgroupsRecordFactory("\t");
+//			this.VectorFactory = new TwentyNewsgroupsRecordFactory("\t");
 
 		} else if (RecordFactory.RCV1_RECORDFACTORY
 				.equals(this.RecordFactoryClassname)) {
@@ -353,13 +357,13 @@ public class WorkerNode extends NodeBase implements
 		} else {
 
 			// it defaults to the CSV record factor, but a custom one
-
+/*
 			this.VectorFactory = new CSVBasedDatasetRecordFactory(
 					this.TargetVariableName, polr_modelparams.getTypeMap());
 
 			((CSVBasedDatasetRecordFactory) this.VectorFactory)
 					.firstLine(this.ColumnHeaderNames);
-
+*/
 		}
 
 		polr_modelparams.setTargetCategories(this.VectorFactory
@@ -367,7 +371,7 @@ public class WorkerNode extends NodeBase implements
 
 		// ----- this normally is generated from the POLRModelParams ------
 
-		this.polr = new ParallelOnlineLogisticRegression(this.num_categories,
+		this.polr = new ParallelOnlineLinearRegression(
 				this.FeatureVectorSize, new UniformPrior()).alpha(1)
 				.stepOffset(1000).decayExponent(0.9).lambda(this.Lambda)
 				.learningRate(this.LearningRate);
@@ -387,17 +391,17 @@ public class WorkerNode extends NodeBase implements
 	 * to implement this. - this is currently a legacy artifact
 	 */
 	@Override
-	public ParameterVectorGradientUpdatable compute(
-			List<ParameterVectorGradientUpdatable> records) {
+	public ParameterVectorGradientUpdateable compute(
+			List<ParameterVectorGradientUpdateable> records) {
 		// TODO Auto-generated method stub
 		return compute();
 	}
 
 	public static void main(String[] args) throws Exception {
 		TextRecordParser parser = new TextRecordParser();
-		POLRWorkerNode pwn = new POLRWorkerNode();
-		ApplicationWorker<ParameterVectorGradientUpdatable> aw = new ApplicationWorker<ParameterVectorGradientUpdatable>(
-				parser, pwn, ParameterVectorGradientUpdatable.class);
+		WorkerNode pwn = new WorkerNode();
+		ApplicationWorker<ParameterVectorGradientUpdateable> aw = new ApplicationWorker<ParameterVectorGradientUpdateable>(
+				parser, pwn, ParameterVectorGradientUpdateable.class);
 
 		ToolRunner.run(aw, args);
 	}

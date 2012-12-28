@@ -78,15 +78,18 @@ public class ParallelOnlineLinearRegression extends
 	 * @param numFeatures
 	 * @param prior
 	 */
-	public ParallelOnlineLinearRegression(int numCategories, int numFeatures,
+	public ParallelOnlineLinearRegression(int numFeatures,
 			PriorFunction prior) {
-		this.numCategories = numCategories;
+		//this.numCategories = numCategories;
 		this.prior = prior;
 
 		updateSteps = new DenseVector(numFeatures);
 		updateCounts = new DenseVector(numFeatures)
 				.assign(perTermAnnealingOffset);
-		beta = new DenseMatrix(numCategories - 1, numFeatures);
+		
+		// we only need a 1 row matrix in this case
+		// actually we could change beta over to a Vector but I'm lazy now.
+		beta = new DenseMatrix(1, numFeatures);
 
 		// brand new factor for parallelization
 	//	this.gamma = new GradientBuffer(numCategories, numFeatures);
@@ -161,8 +164,12 @@ public class ParallelOnlineLinearRegression extends
 
 	public ParallelOnlineLinearRegression copy() {
 		close();
+
+//		ParallelOnlineLinearRegression r = new ParallelOnlineLinearRegression(
+//				numCategories(), numFeatures(), prior);
 		ParallelOnlineLinearRegression r = new ParallelOnlineLinearRegression(
-				numCategories(), numFeatures(), prior);
+		numFeatures(), prior);
+
 		r.copyFrom(this);
 		return r;
 	}
@@ -230,8 +237,8 @@ public class ParallelOnlineLinearRegression extends
 	 * 
 	 * 
 	 */
-	@Override
-	public void train(long trackingKey, String groupKey, double actual_value,
+	// long trackingKey, String groupKey, 
+	public void train(double actual_value,
 			Vector instance) {
 		unseal();
 		double learningRate = currentLearningRate();
@@ -258,6 +265,8 @@ public class ParallelOnlineLinearRegression extends
 			// then we apply the gradientBase to the resulting element.
 			Iterator<Vector.Element> nonZeros = instance.iterateNonZero();
 
+			// new: we only want to update the first row of beta
+			
 			while (nonZeros.hasNext()) {
 				Vector.Element updateLocation = nonZeros.next();
 				int j = updateLocation.index();
@@ -267,24 +276,11 @@ public class ParallelOnlineLinearRegression extends
 
 				// double old_beta = beta.getQuick(i, j);
 
-				double newValue = beta.getQuick(i, j) + gradientBase
+				double newValue = beta.getQuick(0, j) + gradientBase
 						* learningRate * perTermLearningRate(j)
 						* instance.get(j);
-				beta.setQuick(i, j, newValue);
+				beta.setQuick(0, j, newValue);
 
-				// now update gamma --- we only want the gradient since the last
-				// time
-
-				//double old_gamma = gamma.getCell(i, j);
-				//double new_gamma = old_gamma + gradient_to_add; // gradientBase
-																// *
-																// learningRate
-																// *
-																// perTermLearningRate(j)
-																// *
-																// instance.get(j);
-
-				//gamma.setCell(i, j, new_gamma);
 
 			}
 		//}
@@ -325,8 +321,8 @@ public class ParallelOnlineLinearRegression extends
 	 */
 	public void Debug_PrintGamma() {
 
-		System.out.println("# Debug_PrintGamma > Beta: ");
-		Utils.PrintVectorSectionNonZero(this.noReallyGetBeta().viewRow(0), 10);
+//		System.out.println("# Debug_PrintGamma > Beta: ");
+//		Utils.PrintVectorSectionNonZero(this.noReallyGetBeta().viewRow(0), 10);
 
 	}
 
@@ -334,7 +330,7 @@ public class ParallelOnlineLinearRegression extends
 	 * Reset all values in Gamma (gradient buffer) back to zero
 	 * 
 	 */
-	public void FlushGamma() {
+/*	public void FlushGamma() {
 
 		this.gamma.Reset();
 
@@ -343,5 +339,6 @@ public class ParallelOnlineLinearRegression extends
 	public GradientBuffer getGamma() {
 		return this.gamma;
 	}
-
+*/
+	
 }
