@@ -15,6 +15,7 @@ import org.apache.mahout.math.Vector;
 
 import tv.floe.metronome.linearregression.ModelParameters;
 import tv.floe.metronome.linearregression.ParallelOnlineLinearRegression;
+import tv.floe.metronome.linearregression.SquaredErrorLossFunction;
 
 import com.cloudera.iterativereduce.ComputableWorker;
 import com.cloudera.iterativereduce.io.RecordParser;
@@ -44,6 +45,8 @@ public class WorkerNode extends NodeBase implements
 
 	public String internalID = "0";
 	private RecordFactory VectorFactory = null;
+	
+	private SquaredErrorLossFunction loss_function = new SquaredErrorLossFunction();
 
 	private TextRecordParser lineParser = null;
 
@@ -138,32 +141,40 @@ public class WorkerNode extends NodeBase implements
 				// calc stats ---------
 
 				double mu = Math.min(k + 1, 200);
-				double ll = this.polr.logLikelihood(actual, v);
+				
+				//double ll = this.polr.logLikelihood(actual, v);
+				
+				// the dot product of the parameter vector and the current instance
+				// is the hypothesis value for the currnet instance
+				double hypothesis_value = v.dot(this.polr.getBeta().viewRow(0));
+				
+				double instance_loss_value = this.loss_function.Calc(hypothesis_value, actual)
 
-				metrics.AvgLogLikelihood = metrics.AvgLogLikelihood
-						+ (ll - metrics.AvgLogLikelihood) / mu;
+//				metrics.AvgLogLikelihood = metrics.AvgLogLikelihood
+//						+ (ll - metrics.AvgLogLikelihood) / mu;
 
-				if (Double.isNaN(metrics.AvgLogLikelihood)) {
-					metrics.AvgLogLikelihood = 0;
-				}
+//				if (Double.isNaN(metrics.AvgLogLikelihood)) {
+//					metrics.AvgLogLikelihood = 0;
+//				}
 
 				
-				
+/*				
 				Vector p = new DenseVector(this.num_categories);
 				this.polr.classifyFull(p, v);
 				int estimated = p.maxValueIndex();
 				int correct = (estimated == actual ? 1 : 0);
 				metrics.AvgCorrect = metrics.AvgCorrect
 						+ (correct - metrics.AvgCorrect) / mu;
-				
+*/				
 				
 				// ####### where we train ############
+				// update the parameter vector with the actual value and the instance data
 				this.polr.train(actual, v);
 
 				
 				
 				k++;
-				metrics.TotalRecordsProcessed = k;
+//				metrics.TotalRecordsProcessed = k;
 
 
 				this.polr.close();

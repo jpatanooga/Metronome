@@ -26,7 +26,9 @@ import org.apache.mahout.math.VectorWritable;
  * 
  * TODO
  * - add new functions for "classify" that instead produce a value of the regression
+ * 	-	use classifyNoLink() instead
  * 
+ * - 
  * 
  * 
  * 
@@ -57,10 +59,12 @@ public class ParallelOnlineLinearRegression extends
 
 	// ####### This is NEW ######################
 	// that is (numCategories-1) x numFeatures
-	protected GradientBuffer gamma; // this is the saved updated gradient we
+	//protected GradientBuffer gamma; // this is the saved updated gradient we
 									// merge
 									// at the super step
 
+	
+	
 	public ParallelOnlineLinearRegression() {
 		// private constructor available for serialization, but not normal use
 	}
@@ -85,7 +89,7 @@ public class ParallelOnlineLinearRegression extends
 		beta = new DenseMatrix(numCategories - 1, numFeatures);
 
 		// brand new factor for parallelization
-		this.gamma = new GradientBuffer(numCategories, numFeatures);
+	//	this.gamma = new GradientBuffer(numCategories, numFeatures);
 	}
 
 	/**
@@ -216,7 +220,6 @@ public class ParallelOnlineLinearRegression extends
 	 * 
 	 * #### TODO #######################
 	 * 
-	 * - need to alter this method for a new hypothesis, loss, and update function
 	 * 
 	 * - instead of "actual" class, we need to pass in a float as the actual value
 	 * 
@@ -228,7 +231,7 @@ public class ParallelOnlineLinearRegression extends
 	 * 
 	 */
 	@Override
-	public void train(long trackingKey, String groupKey, int actual,
+	public void train(long trackingKey, String groupKey, double actual_value,
 			Vector instance) {
 		unseal();
 		double learningRate = currentLearningRate();
@@ -238,11 +241,18 @@ public class ParallelOnlineLinearRegression extends
 
 		// basically this only gets the results for each classification
 		// update each row of coefficients according to result
-		Vector gradient = this.default_gradient.apply(groupKey, actual,
-				instance, this);
-		for (int i = 0; i < numCategories - 1; i++) {
+		
+		// gives us an array of dot products, one for each classification
+		
+//		Vector gradient = this.default_gradient.apply(groupKey, actual,
+//				instance, this);
+	
+		
+		double dot_product = this.beta.viewRow(0).dot(instance);
+		
+//		for (int i = 0; i < numCategories - 1; i++) {
 
-			double gradientBase = gradient.get(i);
+			double gradientBase = dot_product; //gradient.get(i);
 
 			// we're only going to look at the non-zero elements of the vector
 			// then we apply the gradientBase to the resulting element.
@@ -265,8 +275,8 @@ public class ParallelOnlineLinearRegression extends
 				// now update gamma --- we only want the gradient since the last
 				// time
 
-				double old_gamma = gamma.getCell(i, j);
-				double new_gamma = old_gamma + gradient_to_add; // gradientBase
+				//double old_gamma = gamma.getCell(i, j);
+				//double new_gamma = old_gamma + gradient_to_add; // gradientBase
 																// *
 																// learningRate
 																// *
@@ -274,10 +284,10 @@ public class ParallelOnlineLinearRegression extends
 																// *
 																// instance.get(j);
 
-				gamma.setCell(i, j, new_gamma);
+				//gamma.setCell(i, j, new_gamma);
 
 			}
-		}
+		//}
 
 		// remember that these elements got updated
 		Iterator<Vector.Element> i = instance.iterateNonZero();
