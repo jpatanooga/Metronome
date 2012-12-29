@@ -52,11 +52,11 @@ import com.google.common.collect.Multiset;
 public class RCV1RecordFactory implements RecordFactory {
   
   public static final int FEATURES = 10000;
-  ConstantValueEncoder encoder = null;
+  //ConstantValueEncoder encoder = null;
   
   public RCV1RecordFactory() {
     
-    this.encoder = new ConstantValueEncoder("body_values");
+    //this.encoder = new ConstantValueEncoder("body_values");
     
   }
   

@@ -12,5 +12,13 @@ public class Metrics {
 	  
 	  public double AvgLogLikelihood = 0.0;
 	  public double AvgCorrect = 0.0;
+	  
+	  
+	  
+	  public void UpdateOnlineAvgCorrect(  ) {
+		  
+		  
+		  
+	  }
 
 }
