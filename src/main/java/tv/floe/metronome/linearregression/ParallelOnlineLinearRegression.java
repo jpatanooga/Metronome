@@ -265,7 +265,7 @@ public class ParallelOnlineLinearRegression extends
 		
 			double gradientBase = dot_product - actual_value; //gradient.get(i);
 
-			System.out.println("gradient (aka 'y'): " + gradientBase + " =  " + dot_product + " - " + actual_value);
+			//System.out.println("gradient (aka 'y'): " + gradientBase + " =  " + dot_product + " - " + actual_value);
 
 			// we're only going to look at the non-zero elements of the vector
 			// then we apply the gradientBase to the resulting element.
@@ -277,27 +277,16 @@ public class ParallelOnlineLinearRegression extends
 				Vector.Element updateLocation = nonZeros.next();
 				int j = updateLocation.index();
 
-//				double gradient_to_add = gradientBase * learningRate
-//						* perTermLearningRate(j) * instance.get(j);
-
-				// double old_beta = beta.getQuick(i, j);
 
 /*				double newValue = beta.getQuick(0, j) - gradientBase
 						* learningRate * perTermLearningRate(j)
 						* instance.get(j);
 */
 				double newValue = beta.getQuick(0, j) - (gradientBase
-						* learningRate
+						* learningRate * perTermLearningRate(j)
 						* instance.get(j));
 				
-				System.out.println( "beta.set: " + newValue + " = \t" + beta.getQuick(0, j) + " - \t" + gradientBase + " * \t" + learningRate + " * \t" + instance.get(j) );
-				
 				beta.setQuick(0, j, newValue);
-
-				
-				//System.out.println( "lr: " + learningRate );
-				//System.out.println( "ptlr: " + perTermLearningRate(j) );
-				//System.out.println( "inst: " + instance.get(j) );
 
 			}
 		//}
