@@ -8,6 +8,8 @@ import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 import org.junit.Test;
 
+import tv.floe.metronome.utils.Utils;
+
 public class TestVectorMathStuff {
 
 	@Test
@@ -68,6 +70,33 @@ public class TestVectorMathStuff {
 //		System.out.println("> c1: " + v2.get(1) );
 		
 		
+		
+	}
+	
+	@Test
+	public void TestAvg() {
+		
+		Vector v = new DenseVector(2);
+		v.set(0, 0.1);
+		v.set(1, 0.1);
+
+		Vector v2 = new DenseVector(2);
+		v2.set(0, 0.40);
+		v2.set(1, 0.20);
+		
+		Vector v_out = v.plus(v2);
+		
+		Utils.PrintVector(v_out);
+		
+		Vector vec_d = v_out.divide(2);
+	
+		Utils.PrintVector(vec_d);
+		
+		Vector v_assign = new DenseVector(2);
+		v_assign.set(0, 20);
+		v_assign.assign(vec_d);
+		
+		Utils.PrintVector(v_assign);
 		
 	}
 

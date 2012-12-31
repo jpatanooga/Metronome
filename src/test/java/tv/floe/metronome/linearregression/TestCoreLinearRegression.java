@@ -47,12 +47,12 @@ public class TestCoreLinearRegression {
 		ParallelOnlineLinearRegression polr = new ParallelOnlineLinearRegression(
 				2, new UniformPrior()).alpha(1)
 				.stepOffset(1000).decayExponent(0.9).lambda(3.0e-5)
-				.learningRate(3);
+				.learningRate(17);
 		
 		RCV1RecordFactory factory = new RCV1RecordFactory();
 
 		
-		for ( int x = 0; x < 100; x++ ) {
+		for ( int x = 0; x < 1000; x++ ) {
 			
 			
 			BufferedReader reader = new BufferedReader(new FileReader(file_name));
@@ -73,15 +73,18 @@ public class TestCoreLinearRegression {
 					rec_count++;
 	
 					Vector vec = new RandomAccessSparseVector(2);
+					
 				    
 				    double actual = factory.processLineNew(line, vec);
+
+				    //Utils.PrintVector(vec);
 					
 				    // we're only looking at the first row or the matrix because 
 				    // the original code was for multinomial log regression
 				    // but here we only need a single parameter vector
 				    double hypothesis_value = polr.getBeta().viewRow(0).dot(vec);
 				    
-				    double error = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
+				    double error = Math.abs( hypothesis_value - actual ); // SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 				    error_sum += error;
 				    
 				    polr.train(actual, vec);
@@ -97,7 +100,8 @@ public class TestCoreLinearRegression {
 
 			} // while
 			
-			System.out.println("> " + x + " Avg Err: " + ( error_sum / ((x+1)*rec_count) ) );
+			//" + error_sum + " / " + rec_count + " = 
+			System.out.println("> " + x + " Avg Err: " + ( error_sum / (rec_count) ) );
 			
 			// reader.reset();
 			System.out.println("----------------------- ");			

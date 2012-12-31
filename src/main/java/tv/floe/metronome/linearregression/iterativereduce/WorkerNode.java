@@ -71,28 +71,28 @@ public class WorkerNode extends NodeBase implements
 	 * parameter vectors to the master - this method plugs the local parameter
 	 * vector into the message
 	 */
-	public ParameterVectorUpdateable GenerateUpdate() {
+	public ParameterVector GenerateUpdate() {
 
-		ParameterVector gradient = new ParameterVector();
-		gradient.parameter_vector = this.polr.getBeta().clone(); // this.polr.getGamma().getMatrix().clone();
-		gradient.SrcWorkerPassCount = this.LocalBatchCountForIteration;
+		ParameterVector vector = new ParameterVector();
+		vector.parameter_vector = this.polr.getBeta().clone(); // this.polr.getGamma().getMatrix().clone();
+//		gradient.SrcWorkerPassCount = this.LocalBatchCountForIteration;
 
 		if (this.lineParser.hasMoreRecords()) {
-			gradient.IterationComplete = 0;
+			vector.IterationComplete = 0;
 		} else {
-			gradient.IterationComplete = 1;
+			vector.IterationComplete = 1;
 		}
 
-		gradient.CurrentIteration = this.CurrentIteration;
+		vector.CurrentIteration = this.CurrentIteration;
 
-		gradient.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood))
+//		vector.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood))
+//				.floatValue();
+		vector.PercentCorrect = (new Double(metrics.AvgCorrect * 100))
 				.floatValue();
-		gradient.PercentCorrect = (new Double(metrics.AvgCorrect * 100))
-				.floatValue();
-		gradient.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
+		vector.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
 				.intValue();
 
-		return gradient;
+		return vector;
 
 	}
 
@@ -391,8 +391,8 @@ public class WorkerNode extends NodeBase implements
 	 * to implement this. - this is currently a legacy artifact
 	 */
 	@Override
-	public ParameterVectorGradientUpdateable compute(
-			List<ParameterVectorGradientUpdateable> records) {
+	public ParameterVectorUpdateable compute(
+			List<ParameterVectorUpdateable> records) {
 		// TODO Auto-generated method stub
 		return compute();
 	}
@@ -400,8 +400,8 @@ public class WorkerNode extends NodeBase implements
 	public static void main(String[] args) throws Exception {
 		TextRecordParser parser = new TextRecordParser();
 		WorkerNode pwn = new WorkerNode();
-		ApplicationWorker<ParameterVectorGradientUpdateable> aw = new ApplicationWorker<ParameterVectorGradientUpdateable>(
-				parser, pwn, ParameterVectorGradientUpdateable.class);
+		ApplicationWorker<ParameterVectorUpdateable> aw = new ApplicationWorker<ParameterVectorUpdateable>(
+				parser, pwn, ParameterVectorUpdateable.class);
 
 		ToolRunner.run(aw, args);
 	}
@@ -424,9 +424,9 @@ public class WorkerNode extends NodeBase implements
 		this.lineParser.reset();
 
 		System.out.println("IncIteration > " + this.CurrentIteration + ", "
-				+ this.NumberPasses);
+				+ this.NumberIterations);
 
-		if (this.CurrentIteration >= this.NumberPasses) {
+		if (this.CurrentIteration >= this.NumberIterations) {
 			System.out.println("POLRWorkerNode: [ done with all iterations ]");
 			return false;
 		}

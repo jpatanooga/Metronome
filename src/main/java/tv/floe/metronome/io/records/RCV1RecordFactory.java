@@ -187,11 +187,12 @@ public class RCV1RecordFactory implements RecordFactory {
     actual = Double.parseDouble(parts[0]);
     
     // dont know what to do the the "namespace" "f"
+    v.set(0, 1.0);
     
     for (int x = 2; x < parts.length; x++) {
       
       String[] feature = parts[x].split(":");
-      int index = Integer.parseInt(feature[0]) % FEATURES;
+      int index = (Integer.parseInt(feature[0]) + 1) % FEATURES;
       double val = Double.parseDouble(feature[1]);
       
       if (index < FEATURES) {
