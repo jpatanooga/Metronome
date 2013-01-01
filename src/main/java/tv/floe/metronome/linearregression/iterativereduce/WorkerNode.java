@@ -100,7 +100,19 @@ public class WorkerNode extends NodeBase implements
 	 * The IR::Compute method - this is where we do the next batch of records
 	 * for SGD
 	 * 
-	 * TODO: Jason adjusts the LinearRegression training code
+	 * TODO: massive review work here
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * 
 	 */
 	@Override

@@ -11,6 +11,9 @@ import org.apache.mahout.math.Vector;
  * TODO:
  * -	add a base interface?
  * 
+ * given that the update function uses the derivative of this function, 
+ * having a class of this serves no real purpose
+ * 
  * @author josh
  *
  */
