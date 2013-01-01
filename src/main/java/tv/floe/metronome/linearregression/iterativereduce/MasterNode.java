@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.classifier.sgd.UniformPrior;
+import org.apache.mahout.math.DenseMatrix;
 
 import tv.floe.metronome.io.records.RCV1RecordFactory;
 import tv.floe.metronome.io.records.RecordFactory;
@@ -63,6 +64,10 @@ public class MasterNode extends NodeBase implements
 	    // reset
 	    //this.Global_Min_IterationCount = this.NumberPasses;
 	    boolean iterationComplete = true;
+	    
+	    
+	    //i.get().parameter_vector.viewRow(0).
+	    this.global_parameter_vector.parameter_vector = new DenseMatrix(1, this.FeatureVectorSize);
 
 	    for (ParameterVectorUpdateable i : workerUpdates) {
 	      
@@ -288,6 +293,7 @@ public class MasterNode extends NodeBase implements
 	*/      
 	    }
 	    
+	    // just set something here
 	    polr_modelparams.setTargetCategories(this.VectorFactory
 	        .getTargetCategories());
 	    

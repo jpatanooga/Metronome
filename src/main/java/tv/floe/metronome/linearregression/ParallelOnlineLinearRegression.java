@@ -55,7 +55,7 @@ public class ParallelOnlineLinearRegression extends
 	private int perTermAnnealingOffset = 20;
 
 	// had to add this because its private in the base class
-	private Gradient default_gradient = new DefaultGradient();
+	//private Gradient default_gradient = new DefaultGradient();
 
 	// ####### This is NEW ######################
 	// that is (numCategories-1) x numFeatures
