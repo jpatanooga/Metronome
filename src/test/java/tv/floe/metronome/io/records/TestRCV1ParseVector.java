@@ -29,7 +29,7 @@ public class TestRCV1ParseVector {
 	    
 	    Vector v = new RandomAccessSparseVector(RCV1RecordFactory.FEATURES);
 	    
-	    double actual = factory.processLineNew(training_rec_0, v);
+	    double actual = factory.processLineAlt(training_rec_0, v);
 	    
 	    assertEquals( 0.657, actual, 0.001 );
 	    assertEquals( .043696374, v.get(7), 0.001 );
@@ -39,7 +39,7 @@ public class TestRCV1ParseVector {
 	    
 	    Vector v2 = new RandomAccessSparseVector(RCV1RecordFactory.FEATURES);
 	    
-	    double actual2 = factory.processLineNew(training_rec_1, v2);
+	    double actual2 = factory.processLineAlt(training_rec_1, v2);
 	    
 	    assertEquals( 1, actual2, 0.001);
 	    assertEquals( .030852484, v2.get(69), 0.001 );
@@ -48,7 +48,7 @@ public class TestRCV1ParseVector {
 	    
 	    Vector v3 = new RandomAccessSparseVector(2);
 	    
-	    double actual3 = factory.processLineNew(training_rec_2, v3);
+	    double actual3 = factory.processLineAlt(training_rec_2, v3);
 	    
 	    assertEquals( 4, actual3, 0.001);
 	    assertEquals( 390, v3.get(0), 0.001 );

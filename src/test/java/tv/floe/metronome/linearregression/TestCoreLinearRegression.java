@@ -75,7 +75,7 @@ public class TestCoreLinearRegression {
 					Vector vec = new RandomAccessSparseVector(2);
 					
 				    
-				    double actual = factory.processLineNew(line, vec);
+				    double actual = factory.processLineAlt(line, vec);
 
 				    //Utils.PrintVector(vec);
 					

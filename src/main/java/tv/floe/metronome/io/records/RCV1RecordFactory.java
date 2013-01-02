@@ -173,7 +173,8 @@ public class RCV1RecordFactory implements RecordFactory {
    * 
    * @throws Exception
    */
-  public double processLineNew(String line, Vector v) throws Exception {
+  @Override
+  public double processLineAlt(String line, Vector v) throws Exception {
     
     // p.269 ---------------------------------------------------------
     // Map<String, Set<Integer>> traceDictionary = new TreeMap<String,

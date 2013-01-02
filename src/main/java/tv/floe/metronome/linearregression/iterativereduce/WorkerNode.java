@@ -137,11 +137,14 @@ public class WorkerNode extends NodeBase implements
 				long startTime = System.currentTimeMillis();
 
 				Vector v = new RandomAccessSparseVector(this.FeatureVectorSize);
-				int actual = -1;
+				double actual = 0.0;
 				try {
+					
+				    
+//				    double actual = factory.processLineNew(line, vec);
 
 					actual = this.VectorFactory
-							.processLine(value.toString(), v);
+							.processLineAlt(value.toString(), v);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -190,7 +193,7 @@ public class WorkerNode extends NodeBase implements
 				
 				
 				k++;
-//				metrics.TotalRecordsProcessed = k;
+				metrics.TotalRecordsProcessed = k;
 
 
 				this.polr.close();
@@ -203,7 +206,7 @@ public class WorkerNode extends NodeBase implements
 
 		} // for 
 
-		System.err
+		System.out
 				.printf("Worker %s:\t Iteration: %s, Trained Recs: %10d, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
 						this.internalID, this.CurrentIteration, k,
 						metrics.AvgLogLikelihood, metrics.AvgCorrect * 100,

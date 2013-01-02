@@ -40,6 +40,7 @@ public interface RecordFactory {
   public static String CSV_RECORDFACTORY = "com.cloudera.knittingboar.records.CSVRecordFactory";
   
   public int processLine(String line, Vector featureVector) throws Exception;
+  public double processLineAlt(String line, Vector v) throws Exception;
   
   public String GetClassnameByID(int id);
   
