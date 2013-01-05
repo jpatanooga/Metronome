@@ -25,6 +25,7 @@ public class TestSimulateLinearRegressionIterativeReduce {
 		
 		MasterNode master = (MasterNode) polr_ir.getMaster();
 		
+		System.out.println("\n\nComplete: ");
 		Utils.PrintVector( master.polr.getBeta().viewRow(0) );
 		
 	}

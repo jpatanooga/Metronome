@@ -24,8 +24,8 @@ public class ParameterVector {
 	  public int CurrentIteration = 0;
 	  
 	  public int TrainedRecords = 0;
-	  public float AvgLogLikelihood = 0;
-	  public float PercentCorrect = 0;
+	  //public float AvgLogLikelihood = 0;
+	  public float AvgError = 0;
 	  
 	  public byte[] Serialize() throws IOException {
 	    
@@ -42,8 +42,8 @@ public class ParameterVector {
 	    d.writeInt(this.CurrentIteration);
 	    
 	    d.writeInt(this.TrainedRecords);
-	    d.writeFloat(this.AvgLogLikelihood);
-	    d.writeFloat(this.PercentCorrect);
+	    //d.writeFloat(this.AvgLogLikelihood);
+	    d.writeFloat(this.AvgError);
 	    // buf.write
 	    // MatrixWritable.writeMatrix(d, this.worker_gradient.getMatrix());
 	    MatrixWritable.writeMatrix(d, this.parameter_vector);
@@ -65,8 +65,8 @@ public class ParameterVector {
 	    this.CurrentIteration = in.readInt();
 	    
 	    this.TrainedRecords = in.readInt(); // d.writeInt(this.TrainedRecords);
-	    this.AvgLogLikelihood = in.readFloat(); // d.writeFloat(this.AvgLogLikelihood);
-	    this.PercentCorrect = in.readFloat(); // d.writeFloat(this.PercentCorrect);
+	    //this.AvgLogLikelihood = in.readFloat(); // d.writeFloat(this.AvgLogLikelihood);
+	    this.AvgError = in.readFloat(); // d.writeFloat(this.PercentCorrect);
 	    
 	    this.parameter_vector = MatrixWritable.readMatrix(in);
 	    

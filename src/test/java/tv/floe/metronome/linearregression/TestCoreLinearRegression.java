@@ -52,7 +52,7 @@ public class TestCoreLinearRegression {
 		RCV1RecordFactory factory = new RCV1RecordFactory();
 
 		
-		for ( int x = 0; x < 1000; x++ ) {
+		for ( int x = 0; x < 100; x++ ) {
 			
 			
 			BufferedReader reader = new BufferedReader(new FileReader(file_name));

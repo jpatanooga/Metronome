@@ -20,6 +20,7 @@ import tv.floe.metronome.linearregression.ParallelOnlineLinearRegression;
 import tv.floe.metronome.linearregression.ParameterVector;
 import tv.floe.metronome.linearregression.SquaredErrorLossFunction;
 import tv.floe.metronome.metrics.Metrics;
+import tv.floe.metronome.utils.Utils;
 
 import com.cloudera.iterativereduce.ComputableWorker;
 import com.cloudera.iterativereduce.io.RecordParser;
@@ -87,7 +88,7 @@ public class WorkerNode extends NodeBase implements
 
 //		vector.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood))
 //				.floatValue();
-		vector.PercentCorrect = (new Double(metrics.AvgCorrect * 100))
+		vector.AvgError = (new Double(metrics.AvgError * 100))
 				.floatValue();
 		vector.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
 				.intValue();
@@ -121,6 +122,8 @@ public class WorkerNode extends NodeBase implements
 		Text value = new Text();
 		long batch_vec_factory_time = 0;
 
+		double err_buf = 0;
+		
 		boolean result = true;
 
 		while (this.lineParser.hasMoreRecords()) {
@@ -167,11 +170,14 @@ public class WorkerNode extends NodeBase implements
 				// is the hypothesis value for the currnet instance
 				double hypothesis_value = v.dot(this.polr.getBeta().viewRow(0));
 				
-				double instance_loss_value = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
+				//double instance_loss_value = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
+				double error = Math.abs( hypothesis_value - actual );
 
-//				metrics.AvgLogLikelihood = metrics.AvgLogLikelihood
-//						+ (ll - metrics.AvgLogLikelihood) / mu;
+//				metrics.AvgError = metrics.AvgError
+//						+ (error - metrics.AvgError) / mu;
 
+				err_buf += error;
+				
 //				if (Double.isNaN(metrics.AvgLogLikelihood)) {
 //					metrics.AvgLogLikelihood = 0;
 //				}
@@ -205,13 +211,17 @@ public class WorkerNode extends NodeBase implements
 			} // if
 
 		} // for 
-
+		
+		err_buf = err_buf / k;
+		metrics.AvgError = err_buf;
+		
+/*
 		System.out
-				.printf("Worker %s:\t Iteration: %s, Trained Recs: %10d, AvgLL: %10.3f, Percent Correct: %10.2f, VF: %d\n",
+				.printf("Worker %s:\t Iteration: %s, Trained Recs: %10d, Avg Error: %10.2f, VF: %d\n",
 						this.internalID, this.CurrentIteration, k,
-						metrics.AvgLogLikelihood, metrics.AvgCorrect * 100,
+						 metrics.AvgError * 100,
 						batch_vec_factory_time);
-
+*/
 		return new ParameterVectorUpdateable(this.GenerateUpdate());
 	}
 
@@ -230,6 +240,9 @@ public class WorkerNode extends NodeBase implements
 		// masterTotal = t.get();
 		ParameterVector global_update = t.get();
 
+//		System.out.println("Worker::update()");
+//		Utils.PrintVector(global_update.parameter_vector.viewRow(0));
+		
 		// set the local parameter vector to the global aggregate ("beta")
 		this.polr.SetBeta(global_update.parameter_vector);
 
@@ -388,8 +401,13 @@ public class WorkerNode extends NodeBase implements
 
 		this.polr = new ParallelOnlineLinearRegression(
 				this.FeatureVectorSize, new UniformPrior()).alpha(1)
-				.stepOffset(1000).decayExponent(0.9).lambda(this.Lambda)
+				.stepOffset(1000).decayExponent(0.9).lambda(3.0e-5)
 				.learningRate(this.LearningRate);
+		
+		System.out.println("LearningRate: " + this.LearningRate);
+		
+//		.alpha(1)
+//		.stepOffset(1000).decayExponent(0.9).lambda(3.0e-5)
 
 		polr_modelparams.setPOLR(polr);
 
@@ -438,8 +456,8 @@ public class WorkerNode extends NodeBase implements
 		this.IterationComplete = false;
 		this.lineParser.reset();
 
-		System.out.println("IncIteration > " + this.CurrentIteration + ", "
-				+ this.NumberIterations);
+//		System.out.println("IncIteration > " + this.CurrentIteration + ", "
+//				+ this.NumberIterations);
 
 		if (this.CurrentIteration >= this.NumberIterations) {
 			System.out.println("POLRWorkerNode: [ done with all iterations ]");

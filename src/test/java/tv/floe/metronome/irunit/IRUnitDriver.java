@@ -67,7 +67,8 @@ public class IRUnitDriver<T> {
 		String[] props_to_copy = {
 				"app.iteration.count",
 				"com.cloudera.knittingboar.setup.FeatureVectorSize",
-				"com.cloudera.knittingboar.setup.RecordFactoryClassname"
+				"com.cloudera.knittingboar.setup.RecordFactoryClassname",
+				"com.cloudera.knittingboar.setup.LearningRate"
 		};
 		
 
@@ -305,8 +306,21 @@ public class IRUnitDriver<T> {
 			for (int worker_id = 0; worker_id < workers.size(); worker_id++) {
 
 				workers.get(worker_id).update(master_result);
+				workers.get(worker_id).IncrementIteration();
 
 			}
+/*			
+		      if (master_result.get().IterationComplete == 1) {
+		          
+		          System.out.println( " -------- end of pass ------- " );
+
+		        // simulates framework checking this and iterating
+		          for ( int worker_id = 0; worker_id < workers.size(); worker_id++ ) {
+		            
+		            bContinuePass = workers.get(worker_id).IncrementIteration();
+
+		          } // for
+			*/
 
 		} // for
 		

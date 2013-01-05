@@ -58,7 +58,7 @@ public class MasterNode extends NodeBase implements
 	      Collection<ParameterVectorUpdateable> workerUpdates,
 	      Collection<ParameterVectorUpdateable> masterUpdates) {
 	    
-	    System.out.println("\nMaster Compute: SuperStep - Worker Info ----- ");
+	    //System.out.println("\nMaster Compute: SuperStep - Worker Info ----- ");
 	    int x = 0;
 
 	    // reset
@@ -69,6 +69,8 @@ public class MasterNode extends NodeBase implements
 	    //i.get().parameter_vector.viewRow(0).
 	    this.global_parameter_vector.parameter_vector = new DenseMatrix(1, this.FeatureVectorSize);
 
+	    float avg_err = 0;
+	    
 	    for (ParameterVectorUpdateable i : workerUpdates) {
 	      
 	      // not sure we still need this ---------------
@@ -84,16 +86,19 @@ public class MasterNode extends NodeBase implements
 	        //this.Global_Min_IterationCount = i.get().IterationCount;
 	        iterationComplete = false;
 	        
-	      }      
+	      }
 	      
-	      System.out.println("[Master] WorkerReport[" + x + "]: I: " + i.get().CurrentIteration + ", IC: " + i.get().IterationComplete + " Trained Recs: "
-	          + i.get().TrainedRecords + " AvgLogLikelihood: "
-	          + i.get().AvgLogLikelihood + " PercentCorrect: "
-	          + i.get().PercentCorrect);
+	      avg_err += i.get().AvgError;
+	      
+/*	      System.out.println("[Master] WorkerReport[" + x + "]: I: " + i.get().CurrentIteration + ", IC: " + i.get().IterationComplete + " Trained Recs: "
+	          + i.get().TrainedRecords
+	          + " AvgError: "
+	          + i.get().AvgError);
 	   
 	      if ( i.get().IterationComplete == 1) {
 	        System.out.println( "> worker " + x + " is done with current iteration" );
 	      }
+*/
 	      x++;
 	      // accumulate gradient of parameter vectors
 	      //this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
@@ -101,12 +106,19 @@ public class MasterNode extends NodeBase implements
 	      
 	    }
 	    
+	    avg_err = avg_err / workerUpdates.size();
+	
+	      System.out.println("[Master] " 
+		          + " AvgError: "
+		          + avg_err );
+			    
+	    
 	    // now average the parameter vectors together
 	    //this.global_parameter_vector.AverageAccumulations(workerUpdates.size());
 	    this.global_parameter_vector.AverageVectors(workerUpdates.size());
 	    
-	    LOG.debug("Master node accumulating and averaging " + workerUpdates.size()
-	        + " worker updates.");
+//	    LOG.debug("Master node accumulating and averaging " + workerUpdates.size()
+//	        + " worker updates.");
 	    
 	    
 	    
@@ -138,7 +150,7 @@ public class MasterNode extends NodeBase implements
 	  
 	  @Override
 	  public ParameterVectorUpdateable getResults() {
-	    System.out.println(">>> getResults() - null!!!");
+	    System.err.println(">>> getResults() - null!!!");
 	    return null;
 	  }
 	  
@@ -219,13 +231,13 @@ public class MasterNode extends NodeBase implements
 	    } catch (Exception e) {
 	      // TODO Auto-generated catch block
 	      e.printStackTrace();
-	      System.out.println(">> Error loading conf!");
+	      System.err.println(">> Error loading conf!");
 	    }
 	    
-	    System.out.println( "-----------------------------------------" );
-	    System.out.println( "# Master Conf #" );
+//	    System.out.println( "-----------------------------------------" );
+//	    System.out.println( "# Master Conf #" );
 //	    System.out.println( "Number Iterations: " + this.NumberPasses );
-	    System.out.println( "-----------------------------------------\n\n" );
+//	    System.out.println( "-----------------------------------------\n\n" );
 	    
 	    this.SetupPOLR();
 	    
