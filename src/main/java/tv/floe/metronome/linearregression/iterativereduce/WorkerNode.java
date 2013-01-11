@@ -172,12 +172,17 @@ public class WorkerNode extends NodeBase implements
 				
 				//double instance_loss_value = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 				double error = Math.abs( hypothesis_value - actual );
-
+//System.out.println("err: " + error + ", actual: " + actual + ", hyp: " + hypothesis_value);
 //				metrics.AvgError = metrics.AvgError
 //						+ (error - metrics.AvgError) / mu;
 
+
+if (Double.POSITIVE_INFINITY == error) { 
+	
+} else {
 				err_buf += error;
-				
+}
+
 //				if (Double.isNaN(metrics.AvgLogLikelihood)) {
 //					metrics.AvgLogLikelihood = 0;
 //				}

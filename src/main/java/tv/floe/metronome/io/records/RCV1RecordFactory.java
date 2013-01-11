@@ -46,6 +46,8 @@ import com.google.common.collect.Multiset;
  * RecordFactory for
  * https://github.com/JohnLangford/vowpal_wabbit/wiki/Rcv1-example
  * 
+ * TODO: handle the case of the intercept as the 0 index slot
+ * 
  * @author jpatterson
  * 
  */
@@ -102,7 +104,7 @@ public class RCV1RecordFactory implements RecordFactory {
           int index = Integer.parseInt(feature[0]) % FEATURES;
           double val = Double.parseDouble(feature[1]);
           
-          // System.out.println( feature[1] + " = " + val );
+          System.out.println( feature[1] + " = " + val );
           
           if (index < FEATURES) {
             v.set(index, val);
@@ -195,6 +197,8 @@ public class RCV1RecordFactory implements RecordFactory {
       String[] feature = parts[x].split(":");
       int index = (Integer.parseInt(feature[0]) + 1) % FEATURES;
       double val = Double.parseDouble(feature[1]);
+      
+//      System.out.println(index + " -> " + feature[1] + " = " + val );
       
       if (index < FEATURES) {
         v.set(index, val);
