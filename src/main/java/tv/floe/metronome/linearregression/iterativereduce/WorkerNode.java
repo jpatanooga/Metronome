@@ -239,29 +239,10 @@ public class WorkerNode extends NodeBase implements
 	public void update(ParameterVectorUpdateable t) {
 		// masterTotal = t.get();
 		ParameterVector global_update = t.get();
-
-//		System.out.println("Worker::update()");
-//		Utils.PrintVector(global_update.parameter_vector.viewRow(0));
 		
 		// set the local parameter vector to the global aggregate ("beta")
 		this.polr.SetBeta(global_update.parameter_vector);
 
-		// update global count
-//		this.GlobalBatchCountForIteration = global_update.GlobalPassCount;
-
-		// flush the local gradient delta buffer ("gamma")
-		//this.polr.FlushGamma();
-
-		/*
-		 * if (global_update.IterationComplete == 0) { this.IterationComplete =
-		 * false; } else { this.IterationComplete = true;
-		 * 
-		 * 
-		 * // when this happens, it will trip the ApplicationWorkerService loop
-		 * and iteration will increment
-		 * 
-		 * }
-		 */
 	}
 
 	@Override
@@ -403,11 +384,6 @@ public class WorkerNode extends NodeBase implements
 				this.FeatureVectorSize, new UniformPrior()).alpha(1)
 				.stepOffset(1000).decayExponent(0.9).lambda(3.0e-5)
 				.learningRate(this.LearningRate);
-		
-		System.out.println("LearningRate: " + this.LearningRate);
-		
-//		.alpha(1)
-//		.stepOffset(1000).decayExponent(0.9).lambda(3.0e-5)
 
 		polr_modelparams.setPOLR(polr);
 
