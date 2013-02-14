@@ -60,6 +60,7 @@ public class TestRCV1ParseVector {
 	    assertEquals( 390, v3.get(1), 0.001 );
 	    
 	    Vector v4 = new RandomAccessSparseVector(2);
+	    //Vector v4 = new RandomAccessSparseVector(2);
 	    
 	    double actual4 = factory.processLineAlt(training_rec_3, v4);
 	    
@@ -69,7 +70,8 @@ public class TestRCV1ParseVector {
 	    assertEquals( 118, v4.get(1), 0.001 );
 	    
 	    //RCV1RecordFactory.ScanFile("src/test/resources/linear_regression_sample_data.txt", 3);
-	    
+
+//	    factory.processLine(training_rec_3, featureVector)
 	    
 	    
 	  }	

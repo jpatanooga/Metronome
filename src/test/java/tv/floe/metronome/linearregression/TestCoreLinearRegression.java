@@ -25,6 +25,10 @@ import com.google.common.collect.Multiset;
  * Current Issues: 
  * - needs a bias term
  * 
+ * 
+ * 
+ * http://mathbits.com/MathBits/TIsection/Statistics2/linear.htm
+ * 
  * @author josh
  * 
  */
@@ -52,7 +56,7 @@ public class TestCoreLinearRegression {
 		RCV1RecordFactory factory = new RCV1RecordFactory();
 
 		
-		for ( int x = 0; x < 100; x++ ) {
+		for ( int x = 0; x < 3000; x++ ) {
 			
 			
 			BufferedReader reader = new BufferedReader(new FileReader(file_name));

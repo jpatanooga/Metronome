@@ -217,6 +217,139 @@ public class ParallelOnlineLinearRegression extends
 		}
 
 	}
+	
+	
+	/**
+	 * Training method to support the mini batch method of training SGD
+	 * 
+	 * after b samples seen, the parent/governing training algorithm will:
+	 * 		- multiply the per term learning rate times the batch buffer slot divided by b (batch size)
+	 * 			and update the parameter vector
+	 * 
+	 * 
+	 * QUESTIONS
+	 * 
+	 * 		-	how does regularization play with mini batch?
+	 * 
+	 * 
+	 * 
+	 * @param actual_value
+	 * @param training_instance
+	 * @param batch_vec_buffer
+	 */
+	public void trainMiniBatch(double actual_value, Vector training_instance, Vector batch_vec_buffer) {
+		
+//		System.out.println( "trainMiniBatch ---- ");
+		
+		unseal();
+		double learningRate = currentLearningRate();
+
+		// push coefficients back to zero based on the prior
+		//regularize(training_instance);
+
+		
+		double dot_product = this.beta.viewRow(0).dot(training_instance);
+		
+		
+			double gradientBase = dot_product - actual_value; //gradient.get(i);
+
+			// we're only going to look at the non-zero elements of the vector
+			// then we apply the gradientBase to the resulting element.
+			Iterator<Vector.Element> nonZeros = training_instance.iterateNonZero();
+
+			// new: we only want to update the first row of beta
+			
+			while (nonZeros.hasNext()) {
+				Vector.Element updateLocation = nonZeros.next();
+				int j = updateLocation.index();
+
+/*
+				double newValue = beta.getQuick(0, j) - (gradientBase
+						* learningRate * perTermLearningRate(j)
+						* training_instance.get(j));
+				
+				beta.setQuick(0, j, newValue);
+*/
+				
+				// calc: actual - instance_value * term_value
+				double addition = gradientBase * training_instance.get(j);
+				double curVal = batch_vec_buffer.get(j);
+				batch_vec_buffer.set(j, addition + curVal );
+				
+			}
+		
+/*
+		// remember that these elements got updated
+		Iterator<Vector.Element> i = instance.iterateNonZero();
+		while (i.hasNext()) {
+			Vector.Element element = i.next();
+			int j = element.index();
+			updateSteps.setQuick(j, getStep());
+			updateCounts.setQuick(j, updateCounts.getQuick(j) + 1);
+		}
+		
+			
+			
+		nextStep();
+		*/
+		
+	}
+	
+	/**
+	 * The batch buffer should already have the gradient base for each parameter multipled into the sum
+	 * 
+	 * @param batchSize
+	 * @param batch_buffer
+	 * @param gradient_base
+	 */
+	public void miniBatchUpdateParameterVector(int batchSize, Vector batch_buffer) {
+		
+		System.out.println( " miniBatchUpdateParameterVector ------------- " );
+		
+		regularize(batch_buffer);
+		
+		Iterator<Vector.Element> nonZeros = batch_buffer.iterateNonZero();
+		
+		while (nonZeros.hasNext()) {
+			Vector.Element updateLocation = nonZeros.next();
+			int j = updateLocation.index();
+
+			double avg_gradient_update = (batch_buffer.get(j) / batchSize );
+			
+			double newValue = beta.getQuick(0, j) - ( avg_gradient_update * learningRate * perTermLearningRate(j) );
+			
+/*
+			double newValue = beta.getQuick(0, j) - (gradientBase
+					* learningRate * perTermLearningRate(j)
+					* training_instance.get(j));
+*/			
+			beta.setQuick(0, j, newValue);
+
+			Vector.Element element = nonZeros.next();
+			//int j = element.index();
+			updateSteps.setQuick(j, getStep());
+			updateCounts.setQuick(j, updateCounts.getQuick(j) + 1);
+			
+		}	
+		
+		
+/*
+		// remember that these elements got updated
+		Iterator<Vector.Element> i = instance.iterateNonZero();
+		while (i.hasNext()) {
+			Vector.Element element = i.next();
+			int j = element.index();
+			updateSteps.setQuick(j, getStep());
+			updateCounts.setQuick(j, updateCounts.getQuick(j) + 1);
+		}
+		*/
+			
+			
+		nextStep();
+				
+		
+	}
+	
 
 	/**
 	 * Custom training for POLR based around accumulating gradient to send to

@@ -1,5 +1,6 @@
 package tv.floe.metronome.linearregression.iterativereduce;
 
+
 import java.io.IOException;
 import java.util.List;
 
@@ -38,10 +39,10 @@ import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
 
 import com.google.common.collect.Lists;
 
-public class WorkerNode extends NodeBase implements
+public class MiniBatchWorkerNode extends NodeBase implements
 		ComputableWorker<ParameterVectorUpdateable> {
 
-	private static final Log LOG = LogFactory.getLog(WorkerNode.class);
+	private static final Log LOG = LogFactory.getLog(MiniBatchWorkerNode.class);
 
 	int masterTotal = 0;
 
@@ -119,14 +120,20 @@ public class WorkerNode extends NodeBase implements
 	@Override
 	public ParameterVectorUpdateable compute() {
 
+		//System.out.println( "MiniBatchWorker 00000" );
+		
 		Text value = new Text();
 		long batch_vec_factory_time = 0;
 
 		double err_buf = 0;
-		int records_seen_this_pass = 0;
 		
 		boolean result = true;
+		int batch_count = 0;
+		int batch_limit = 5;
+		Vector miniBatchBuffer = new RandomAccessSparseVector(this.FeatureVectorSize);
 
+		int run_count = 0;
+		
 		while (this.lineParser.hasMoreRecords()) {
 
 			try {
@@ -173,9 +180,6 @@ public class WorkerNode extends NodeBase implements
 				
 				//double instance_loss_value = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 				double error = Math.abs( hypothesis_value - actual );
-//System.out.println("err: " + error + ", actual: " + actual + ", hyp: " + hypothesis_value);
-//				metrics.AvgError = metrics.AvgError
-//						+ (error - metrics.AvgError) / mu;
 
 
 if (Double.POSITIVE_INFINITY == error) { 
@@ -183,30 +187,34 @@ if (Double.POSITIVE_INFINITY == error) {
 } else {
 				err_buf += error;
 }
-
-//				if (Double.isNaN(metrics.AvgLogLikelihood)) {
-//					metrics.AvgLogLikelihood = 0;
-//				}
-
-				
-/*				
-				Vector p = new DenseVector(this.num_categories);
-				this.polr.classifyFull(p, v);
-				int estimated = p.maxValueIndex();
-				int correct = (estimated == actual ? 1 : 0);
-				metrics.AvgCorrect = metrics.AvgCorrect
-						+ (correct - metrics.AvgCorrect) / mu;
-*/				
 				
 				// ####### where we train ############
 				// update the parameter vector with the actual value and the instance data
-				this.polr.train(actual, v);
-
+//				this.polr.train(actual, v);
+				this.polr.trainMiniBatch(actual, v, miniBatchBuffer);
 				
-				records_seen_this_pass++;
+				batch_count++;
+				
+				if ( batch_count >= batch_limit ) {
+					
+				//	System.out.println( "process batch ******" );
+					
+					// 1. update all of the coefficients with the average update
+					
+					this.polr.miniBatchUpdateParameterVector(batch_limit, miniBatchBuffer);
+					
+				//	Utils.PrintVector(miniBatchBuffer);
+					
+					// reset batch buffer --- best way to do this?
+					miniBatchBuffer = miniBatchBuffer.like();
+				//	Utils.PrintVector(miniBatchBuffer);
+					
+					batch_count = 0;
+				}
+				
+				run_count++;
 				k++;
 				metrics.TotalRecordsProcessed = k;
-
 
 				this.polr.close();
 
@@ -216,9 +224,9 @@ if (Double.POSITIVE_INFINITY == error) {
 
 			} // if
 
-		} // for 
+		} // while
 		
-		err_buf = err_buf / records_seen_this_pass;
+		err_buf = err_buf / run_count;
 		metrics.AvgError = err_buf;
 		
 /*
@@ -414,7 +422,7 @@ if (Double.POSITIVE_INFINITY == error) {
 
 	public static void main(String[] args) throws Exception {
 		TextRecordParser parser = new TextRecordParser();
-		WorkerNode pwn = new WorkerNode();
+		MiniBatchWorkerNode pwn = new MiniBatchWorkerNode();
 		ApplicationWorker<ParameterVectorUpdateable> aw = new ApplicationWorker<ParameterVectorUpdateable>(
 				parser, pwn, ParameterVectorUpdateable.class);
 
