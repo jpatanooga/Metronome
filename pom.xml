@@ -99,7 +99,7 @@
           </excludes>
         </configuration>
       </plugin>
-      
+<!--      
       <plugin>
         <groupId>org.apache.avro</groupId>
         <artifactId>avro-maven-plugin</artifactId>
@@ -122,6 +122,9 @@
           </execution>
         </executions>
       </plugin>
+-->
+
+
     </plugins>
   </build>
   
@@ -289,7 +292,7 @@
 
     <dependency>
       <groupId>com.cloudera</groupId>
-      <artifactId>iterativereduce</artifactId>
+      <artifactId>IterativeReduce</artifactId>
       <version>0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>

@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import tv.floe.metronome.linearregression.ParameterVector;
 
 import com.cloudera.iterativereduce.Updateable;
-//import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
 
 public class ParameterVectorUpdateable implements
 		Updateable<ParameterVector> {
@@ -31,6 +30,7 @@ public class ParameterVectorUpdateable implements
 		try {
 			this.param_msg = new ParameterVector();
 			this.param_msg.Deserialize(b.array());
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

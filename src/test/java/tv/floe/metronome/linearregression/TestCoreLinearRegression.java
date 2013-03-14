@@ -33,35 +33,65 @@ import com.google.common.collect.Multiset;
  * 
  */
 public class TestCoreLinearRegression {
+	
 
 	// lr: 0.003
 	//private static String file_name = "src/test/resources/linear_regression_sample_data.txt";
 	
 	// lr: 3
-	private static String file_name = "src/test/resources/sat_scores_svmlight.txt";
-	//private static String file_name = "src/test/resources/two_points.txt";
-	//private static String file_name = "src/test/resources/big_points.txt";
-	//private static String file_name = "src/test/resources/normalized_points.txt";
+//	private static String file_name = "src/test/resources/data/SAT_Scores/sat_scores_svmlight.txt";
+
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/SAT_Scores/sat_scores_svmlight.txt", 17, 3000 );
+
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/R_synth_data_10032013_v1.csv", 0.0002, 1000 );
 	
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_data_meh.csv", 0.5, 3000 );
 	
+	// beta:  0.09412438653921235, 4.051704052081415 ----- Final R-Squared: 0.9962182306267638
+	//QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/temp/temp.txt", 0.02, 3000 );
+	
+	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_20_10p5_var4.csv", 20, 300, 2 );
+
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_20_10p5_var10.csv", 20, 300 );
+	
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_2_10_var.csv", 20, 300 );
+
+	// R_m4_synth_20_10p5_var4.csv
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_m4_synth_20_10p5_var4.csv", 20, 300 );
+	
+	//R_synth_multi_4coef_test.csv
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_multi_4coef_test.csv", 5, 3000, 5 );
 	
 	@Test
 	public void test() throws Exception {
 		
 		ParallelOnlineLinearRegression polr = new ParallelOnlineLinearRegression(
-				2, new UniformPrior()).alpha(1)
+				qtf.feature_size, new UniformPrior()).alpha(1)
 				.stepOffset(1000).decayExponent(0.9).lambda(3.0e-5)
-				.learningRate(17);
+				.learningRate(qtf.learningRate);
 		
 		RCV1RecordFactory factory = new RCV1RecordFactory();
 
+
+		double y_partial_sum = 0;
+		double y_bar = 0;
+	    double SSyy_partial_sum = 0;
+	    double SSE_partial_sum = 0;
+	    
+	    
+	    
 		
-		for ( int x = 0; x < 3000; x++ ) {
+		for ( int x = 0; x < qtf.iterations; x++ ) {
 			
+			RegressionStatistics regStats = new RegressionStatistics();
 			
-			BufferedReader reader = new BufferedReader(new FileReader(file_name));
+			BufferedReader reader = new BufferedReader(new FileReader(qtf.fileName));
 			double error_sum = 0;
 			int rec_count = 0;
+			
+		    SSyy_partial_sum = 0;
+		    SSE_partial_sum = 0;
+			
 			
 			String line = reader.readLine();
 			while (line != null && line.length() > 0) {
@@ -76,13 +106,16 @@ public class TestCoreLinearRegression {
 					
 					rec_count++;
 	
-					Vector vec = new RandomAccessSparseVector(2);
+					Vector vec = new RandomAccessSparseVector(qtf.feature_size);
 					
 				    
 				    double actual = factory.processLineAlt(line, vec);
-
-				    //Utils.PrintVector(vec);
-					
+/*
+				    Utils.PrintVector(vec);
+				    System.out.println( "y: " + actual );
+				    
+				    Utils.PrintVector(polr.getBeta().viewRow(0));
+	*/				
 				    // we're only looking at the first row or the matrix because 
 				    // the original code was for multinomial log regression
 				    // but here we only need a single parameter vector
@@ -91,14 +124,29 @@ public class TestCoreLinearRegression {
 				    double error = Math.abs( hypothesis_value - actual ); // SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 				    error_sum += error;
 				    
-				    polr.train(actual, vec);
+//System.out.println( "hypothesis_value - actual: " + hypothesis_value + " - " + actual );				    
 
 
-/*					String[] ar = line.split(" |f 0:");
-					//System.out.println(ar.length);
-					System.out.println( ar[2] + " |f 0:" + ar[0] );
-	*/			    
-				}
+					polr.train(actual, vec);
+
+				    // now calc Regression Stats stuff ----
+				    
+				    if ( x == 0 ) {
+				    	
+				    	// calc the avg stuff
+				    	y_partial_sum += actual;
+				    	
+				    } else {
+				    	
+				    	// calc the ongoing r-squared
+					    SSyy_partial_sum += Math.pow( (actual - y_bar), 2 );
+					    
+					    SSE_partial_sum += Math.pow( (actual - hypothesis_value), 2 );
+				    	
+				    	
+				    }
+
+				} // if
 				
 				line = reader.readLine();
 
@@ -106,6 +154,28 @@ public class TestCoreLinearRegression {
 			
 			//" + error_sum + " / " + rec_count + " = 
 			System.out.println("> " + x + " Avg Err: " + ( error_sum / (rec_count) ) );
+
+			// setup the avg'd y-bar data
+		    if ( x == 0 ) {
+		    	
+		    	System.out.println( "y-sum: " + y_partial_sum + ", rec-count: " + rec_count );
+		    	
+		    	regStats.AddPartialSumForY(y_partial_sum, rec_count);
+		    	y_bar = regStats.ComputeYAvg();
+		    	
+		    	System.out.println( "y-bar: " + y_bar );
+		    	
+		    } else {
+		    	
+				regStats.AccumulateSSEPartialSum(SSE_partial_sum);
+				regStats.AccumulateSSyyPartialSum(SSyy_partial_sum);
+			    
+				double r_squared = regStats.CalculateRSquared();
+				
+				System.out.println( "> " + x + " R-Squared: " + r_squared );
+		    	
+		    	
+		    }
 			
 			// reader.reset();
 			System.out.println("----------------------- ");			
@@ -114,6 +184,51 @@ public class TestCoreLinearRegression {
 		    System.out.print( "beta: ");
 		    Utils.PrintVector(polr.getBeta().viewRow(0));
 		
+		    // now simulate the post-pass ------------------------------------
+		    
+		    SSyy_partial_sum = 0;
+		    SSE_partial_sum = 0;
+		    
+			RegressionStatistics regStats = new RegressionStatistics();
+			
+			BufferedReader reader = new BufferedReader(new FileReader(qtf.fileName));
+		    
+		    String line = reader.readLine();
+			while (line != null && line.length() > 0) {
+
+				
+				if (null == line || line.trim().equals("")) {
+					
+				} else {
+		
+					Vector vec = new RandomAccessSparseVector(qtf.feature_size);
+				    
+				    double y_observed = factory.processLineAlt(line, vec);
+				    double y_predicted = polr.getBeta().viewRow(0).dot(vec);
+				    
+				    SSyy_partial_sum += Math.pow( (y_observed - y_bar), 2 );
+				    
+				    SSE_partial_sum += Math.pow( (y_observed - y_predicted), 2 );
+				    
+					
+				} // if
+				
+				
+				line = reader.readLine();
+				
+				
+			} // while
+				    
+			regStats.AccumulateSSEPartialSum(SSE_partial_sum);
+			regStats.AccumulateSSyyPartialSum(SSyy_partial_sum);
+			
+			reader.close();
+		    
+			double r_squared = regStats.CalculateRSquared();
+			
+			System.out.println( "Final R-Squared: " + r_squared );		    
+
+			polr.Debug();
 
 	}
 

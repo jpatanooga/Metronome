@@ -17,6 +17,7 @@ import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.linearregression.ModelParameters;
 import tv.floe.metronome.linearregression.ParallelOnlineLinearRegression;
 import tv.floe.metronome.linearregression.ParameterVector;
+import tv.floe.metronome.linearregression.RegressionStatistics;
 
 import com.cloudera.iterativereduce.ComputableMaster;
 //import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorUpdateable;
@@ -46,12 +47,21 @@ public class MasterNode extends NodeBase implements
 	  
 //	  private int GlobalMaxPassCount = 0;
 	  
-	  private int Global_Min_IterationCount = 0;
+//	  private int Global_Min_IterationCount = 0;
+
+	  private long total_record_count = 0;
+	  private double y_sum = 0;
+	  private double y_avg = 0;
+	  
+	
+	  
+	  
 	  
 	  // these are only used for saving the model
 	  public ParallelOnlineLinearRegression polr = null;
 	  public ModelParameters polr_modelparams;
 	  private RecordFactory VectorFactory = null;
+	  int iteration_count = 0;
 	  
 	  @Override
 	  public ParameterVectorUpdateable compute(
@@ -60,16 +70,23 @@ public class MasterNode extends NodeBase implements
 	    
 	    //System.out.println("\nMaster Compute: SuperStep - Worker Info ----- ");
 	    int x = 0;
+	    
+	    // gets recomputed each time
+	    RegressionStatistics regStats = new RegressionStatistics();
 
 	    // reset
 	    //this.Global_Min_IterationCount = this.NumberPasses;
 	    boolean iterationComplete = true;
 	    
+	    double SSyy_partial_sum = 0;
+	    double SSE_partial_sum = 0;
 	    
 	    //i.get().parameter_vector.viewRow(0).
 	    this.global_parameter_vector.parameter_vector = new DenseMatrix(1, this.FeatureVectorSize);
 
 	    float avg_err = 0;
+	    
+	    
 	    
 	    for (ParameterVectorUpdateable i : workerUpdates) {
 	      
@@ -89,22 +106,65 @@ public class MasterNode extends NodeBase implements
 	      }
 	      
 	      avg_err += i.get().AvgError;
+
+	      iteration_count = i.get().CurrentIteration;
 	      
-/*	      System.out.println("[Master] WorkerReport[" + x + "]: I: " + i.get().CurrentIteration + ", IC: " + i.get().IterationComplete + " Trained Recs: "
-	          + i.get().TrainedRecords
-	          + " AvgError: "
-	          + i.get().AvgError);
-	   
-	      if ( i.get().IterationComplete == 1) {
-	        System.out.println( "> worker " + x + " is done with current iteration" );
-	      }
-*/
+		    if ( 0 == i.get().CurrentIteration ) {
+		    	
+		    	
+//		    	System.out.println( "y-sum: " + i.get().y_partial_sum + ", rec-count: " + i.get().TrainedRecords );
+		    	
+
+		    	//regStats.AddPartialSumForY(i.get().y_partial_sum, i.get().TrainedRecords);
+		    	this.y_sum += i.get().y_partial_sum;
+		    	this.total_record_count += i.get().TrainedRecords;
+		    	
+		    } else {
+		    	
+		    	SSE_partial_sum += i.get().SSE_partial_sum;
+		    	SSyy_partial_sum += i.get().SSyy_partial_sum;
+		    	
+		    }	      
+
+		    
+		    
 	      x++;
 	      // accumulate gradient of parameter vectors
 	      //this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
 	      this.global_parameter_vector.AccumulateVector(i.get().parameter_vector.viewRow(0));
 	      
 	    }
+	    
+	    System.out.println( "[MASTER] ----- Iteration " + this.iteration_count + " -------" );
+	    
+	    if ( iteration_count == 0 ) {
+	    	
+	    	// we want to cache this for later
+	    	regStats.AddPartialSumForY(this.y_sum, this.total_record_count);
+	    	
+	    	this.global_parameter_vector.y_avg = regStats.ComputeYAvg();
+	    	//System.out.println( "y-bar: " + this.global_parameter_vector.y_avg );
+
+	    	this.y_avg = regStats.ComputeYAvg();
+	    	
+	    	System.out.println("[Master] " 
+			          + " Computed Y Average: "
+			          + this.global_parameter_vector.y_avg );
+	    	
+	    } else {
+	    	
+			regStats.AccumulateSSEPartialSum(SSE_partial_sum);
+			regStats.AccumulateSSyyPartialSum(SSyy_partial_sum);
+		    
+			double r_squared = regStats.CalculateRSquared();
+			
+			System.out.println( "> " + x + " R-Squared: " + r_squared );
+	    	
+	    	
+	    }
+    	
+    	
+	    
 	    
 	    avg_err = avg_err / workerUpdates.size();
 	
@@ -135,6 +195,10 @@ public class MasterNode extends NodeBase implements
 	    */
 	    vec_msg.parameter_vector = this.global_parameter_vector.parameter_vector
 	        .clone();
+	    
+	    if ( iteration_count == 0 ) {
+	    	vec_msg.y_avg = this.global_parameter_vector.y_avg;
+	    }
 	    
 	    ParameterVectorUpdateable return_msg = new ParameterVectorUpdateable();
 	    return_msg.set(vec_msg);
@@ -310,6 +374,8 @@ public class MasterNode extends NodeBase implements
 	        .getTargetCategories());
 	    
 	    // ----- this normally is generated from the POLRModelParams ------
+	    
+	    System.out.println( "Debug: Learning Rate: " + this.LearningRate );
 	    
 	    this.polr = new ParallelOnlineLinearRegression(
 	        this.FeatureVectorSize, new UniformPrior()).alpha(1).stepOffset(1000)

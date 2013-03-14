@@ -6,14 +6,14 @@ numObservations = 100
 
 # Set the maximum number of values we can choose (randomly)
 # for x. Chosen to be 1/4 of the number of observations.
-maxValueForX = floor(numObservations/4)
+maxValueForX = floor(numObservations/10)
 
 # Intercept and coefficent
 intercept = 45
 x1coef = 0.15
 
 # The variance on the response variable
-variance = 100
+variance = 10
 
 # The filename to use. Will not print if NULL
 outputFilename = "lrdata.txt"
@@ -44,19 +44,22 @@ g <- function(x) { rnorm(1,f(x),variance) }
 ############################################################
 ### Create and output the data
 output = file(outputFilename,"w")
-blocksize = 1000
-numblocks = numObservations/blocksize
-for (i in 1:numblocks) {
+### blocksize = 1000
+### numblocks = numObservations/blocksize
+
+print(numObservations)
+
+#for (i in 1: numObservations) {
 
   # Generate random x values
-  xvals = floor(runif(blocksize,0,maxValueForX))
+  xvals = floor(runif(numObservations,0,maxValueForX))
 
   # Given the x values, generate y values according to g
   yvals = sapply(xvals,g)
 
-  for (j in 1:blocksize) {
+  for (j in 1: numObservations) {
     cat(yvals[j]," |f 0:", xvals[j],"\n",sep="",file=output)
   }
   flush(output)
-}
+#}
 close(output)

@@ -51,13 +51,19 @@ public class WorkerNode extends NodeBase implements
 	public String internalID = "0";
 	private RecordFactory VectorFactory = null;
 	
-	private SquaredErrorLossFunction loss_function = new SquaredErrorLossFunction();
+//	private SquaredErrorLossFunction loss_function = new SquaredErrorLossFunction();
 
 	private TextRecordParser lineParser = null;
 
 	private boolean IterationComplete = false;
 	private int CurrentIteration = 0;
 
+	double y_partial_sum = 0;
+	double y_bar = 0;
+    double SSyy_partial_sum = 0;
+    double SSE_partial_sum = 0;
+	
+	
 	// basic stats tracking
 	Metrics metrics = new Metrics();
 
@@ -92,6 +98,10 @@ public class WorkerNode extends NodeBase implements
 				.floatValue();
 		vector.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
 				.intValue();
+		
+		vector.SSE_partial_sum = this.SSE_partial_sum;
+		vector.SSyy_partial_sum = this.SSyy_partial_sum;
+		vector.y_partial_sum = this.y_partial_sum;
 
 		return vector;
 
@@ -124,6 +134,14 @@ public class WorkerNode extends NodeBase implements
 
 		double err_buf = 0;
 		int records_seen_this_pass = 0;
+		
+//		System.out.println( "[ WORKER ] y-avg: " + this.y_bar );
+		
+		// reset these
+		this.SSE_partial_sum = 0;
+		
+		// do we need to recompute this every time???
+		this.SSyy_partial_sum = 0;
 		
 		boolean result = true;
 
@@ -163,7 +181,7 @@ public class WorkerNode extends NodeBase implements
 				
 				// calc stats ---------
 
-				double mu = Math.min(k + 1, 200);
+//				double mu = Math.min(k + 1, 200);
 				
 				//double ll = this.polr.logLikelihood(actual, v);
 				
@@ -171,11 +189,7 @@ public class WorkerNode extends NodeBase implements
 				// is the hypothesis value for the currnet instance
 				double hypothesis_value = v.dot(this.polr.getBeta().viewRow(0));
 				
-				//double instance_loss_value = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 				double error = Math.abs( hypothesis_value - actual );
-//System.out.println("err: " + error + ", actual: " + actual + ", hyp: " + hypothesis_value);
-//				metrics.AvgError = metrics.AvgError
-//						+ (error - metrics.AvgError) / mu;
 
 
 if (Double.POSITIVE_INFINITY == error) { 
@@ -183,20 +197,6 @@ if (Double.POSITIVE_INFINITY == error) {
 } else {
 				err_buf += error;
 }
-
-//				if (Double.isNaN(metrics.AvgLogLikelihood)) {
-//					metrics.AvgLogLikelihood = 0;
-//				}
-
-				
-/*				
-				Vector p = new DenseVector(this.num_categories);
-				this.polr.classifyFull(p, v);
-				int estimated = p.maxValueIndex();
-				int correct = (estimated == actual ? 1 : 0);
-				metrics.AvgCorrect = metrics.AvgCorrect
-						+ (correct - metrics.AvgCorrect) / mu;
-*/				
 				
 				// ####### where we train ############
 				// update the parameter vector with the actual value and the instance data
@@ -207,6 +207,23 @@ if (Double.POSITIVE_INFINITY == error) {
 				k++;
 				metrics.TotalRecordsProcessed = k;
 
+			    if ( 0 == this.CurrentIteration ) {
+			    	
+			    	// calc the avg stuff
+			    	y_partial_sum += actual;
+			    	
+			    } else {
+			    	
+			    	// calc the ongoing r-squared
+			    	
+			    	// SSyy doesnt change. do we re-calc every time?
+				    SSyy_partial_sum += Math.pow( (actual - y_bar), 2 );
+				    
+				    // this changes everytime we update the parameter
+				    SSE_partial_sum += Math.pow( (actual - hypothesis_value), 2 );
+			    	
+			    	
+			    }				
 
 				this.polr.close();
 
@@ -243,10 +260,25 @@ if (Double.POSITIVE_INFINITY == error) {
 	 */
 	@Override
 	public void update(ParameterVectorUpdateable t) {
+		
+		//System.out.println( "[Update]" );
+		
 		// masterTotal = t.get();
 		ParameterVector global_update = t.get();
-		
+/*		
+		System.out.println("---- update ----" );
+		System.out.println("beta:" );
+		Utils.PrintVector(this.polr.getBeta().viewRow(0));
+
+		System.out.println("new beta:" );
+		Utils.PrintVector(global_update.parameter_vector.viewRow(0));
+	*/	
 		// set the local parameter vector to the global aggregate ("beta")
+		
+		if ( 0 == this.CurrentIteration ) {
+			this.y_bar = global_update.y_avg;
+		}
+		
 		this.polr.SetBeta(global_update.parameter_vector);
 
 	}
@@ -393,6 +425,8 @@ if (Double.POSITIVE_INFINITY == error) {
 
 		polr_modelparams.setPOLR(polr);
 
+		//
+		
 		// this.bSetup = true;
 	}
 
@@ -433,6 +467,9 @@ if (Double.POSITIVE_INFINITY == error) {
 	 */
 	@Override
 	public boolean IncrementIteration() {
+		
+		
+		//System.out.println( "[IncIteration]" );
 
 		this.CurrentIteration++;
 		this.IterationComplete = false;

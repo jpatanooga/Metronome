@@ -464,6 +464,13 @@ public class ParallelOnlineLinearRegression extends
 //		Utils.PrintVectorSectionNonZero(this.noReallyGetBeta().viewRow(0), 10);
 
 	}
+	
+	public void Debug() {
+		
+		System.out.println("# POLR Debug > Beta: ");
+		System.out.println("# Learning Rate: " + this.learningRate );
+		
+	}
 
 	/**
 	 * Reset all values in Gamma (gradient buffer) back to zero

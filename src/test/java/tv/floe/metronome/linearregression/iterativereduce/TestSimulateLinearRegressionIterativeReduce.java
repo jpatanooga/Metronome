@@ -19,8 +19,10 @@ public class TestSimulateLinearRegressionIterativeReduce {
 	@Test
 	public void test() {
 		//fail("Not yet implemented");
-		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/app.unit_test.properties");
+		//IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/app.unit_test.SATScores_3splits.properties");
+		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/app.unit_test.Rsynth.2_10_var2.properties");
 		polr_ir.Setup();
+
 		polr_ir.SimulateRun();
 		
 		MasterNode master = (MasterNode) polr_ir.getMaster();

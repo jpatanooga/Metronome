@@ -13,12 +13,8 @@ import org.apache.mahout.math.MatrixWritable;
 import org.apache.mahout.math.Vector;
 
 public class ParameterVector {
-
-	  // worker stuff to send out
-//	  public int SrcWorkerPassCount = 0;
 	  
 	  public Matrix parameter_vector = null;
-//	  public int GlobalPassCount = 0; // what pass should the worker dealing with?
 	  
 	  public int IterationComplete = 0; // 0 = no, 1 = yes
 	  public int CurrentIteration = 0;
@@ -26,6 +22,17 @@ public class ParameterVector {
 	  public int TrainedRecords = 0;
 	  //public float AvgLogLikelihood = 0;
 	  public float AvgError = 0;
+
+		// ### The partial components needed to compute R-squared ###
+		
+		// partial sum of y (observations) for computing y-avg at master
+		public double y_partial_sum = 0;
+		public double y_avg = 0;
+		//public long record_count = 0;
+		public double SSyy_partial_sum = 0;
+		public double SSE_partial_sum = 0;
+		
+	  
 	  
 	  public byte[] Serialize() throws IOException {
 	    
@@ -33,10 +40,12 @@ public class ParameterVector {
 	    
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    DataOutput d = new DataOutputStream(out);
-	    
-	    // d.writeUTF(src_host);
-//	    d.writeInt(this.SrcWorkerPassCount);
-//	    d.writeInt(this.GlobalPassCount);
+	    	    
+	    d.writeDouble(this.y_partial_sum);
+	    d.writeDouble(this.y_avg);
+	    //d.writeLong(this.record_count);
+	    d.writeDouble(this.SSyy_partial_sum);
+	    d.writeDouble(this.SSE_partial_sum);
 	    
 	    d.writeInt(this.IterationComplete);
 	    d.writeInt(this.CurrentIteration);
@@ -57,9 +66,13 @@ public class ParameterVector {
 	    
 	    ByteArrayInputStream b = new ByteArrayInputStream(bytes);
 	    DataInput in = new DataInputStream(b);
-	    // this.src_host = in.readUTF();
-//	    this.SrcWorkerPassCount = in.readInt();
-//	    this.GlobalPassCount = in.readInt();
+
+		this.y_partial_sum = in.readDouble();
+		this.y_avg = in.readDouble();
+	//	this.record_count = in.readLong();
+		this.SSyy_partial_sum = in.readDouble();
+		this.SSE_partial_sum = in.readDouble();
+	    
 	    
 	    this.IterationComplete = in.readInt();
 	    this.CurrentIteration = in.readInt();

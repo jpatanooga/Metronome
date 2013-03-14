@@ -6,14 +6,23 @@ numObservations = 100
 
 # Set the maximum number of values we can choose (randomly)
 # for x. Chosen to be 1/4 of the number of observations.
-maxValueForX = floor(numObservations/4)
+maxValueForX = floor(numObservations/10)
 
 # Intercept and coefficent
-intercept = 45
-x1coef = 0.15
+
+intercept = 2
+
+x1coef = 1
+
+x2coef = 5
+
+x3coef = 3
+
+x4coef = 4
+
 
 # The variance on the response variable
-variance = 100
+variance = 10
 
 # The filename to use. Will not print if NULL
 outputFilename = "lrdata.txt"
@@ -32,10 +41,10 @@ if (length(args) == 5) {
 ### Functions
 
 # The linear function that we'll reconstruct
-f <- function(x) { intercept + x1coef*x }
+f <- function(x1, x2, x3, x4) { intercept + x1coef*x1 + x2coef*x2 + x3coef*x3 + x4coef*x4 }
 
 # A function to add the Gaussian error to the output of f
-g <- function(x) { rnorm(1,f(x),variance) }
+g <- function(x1, x2, x3, x4) { rnorm(1,f(x1, x2, x3, x4),variance) }
 
 ############################################################
 ### Create data
@@ -44,19 +53,31 @@ g <- function(x) { rnorm(1,f(x),variance) }
 ############################################################
 ### Create and output the data
 output = file(outputFilename,"w")
-blocksize = 1000
-numblocks = numObservations/blocksize
-for (i in 1:numblocks) {
+### blocksize = 1000
+### numblocks = numObservations/blocksize
+
+print(numObservations)
+
+#for (i in 1: numObservations) {
 
   # Generate random x values
-  xvals = floor(runif(blocksize,0,maxValueForX))
+  x1vals = floor(runif(numObservations,0,maxValueForX))
+  x2vals = floor(runif(numObservations,0,maxValueForX))
+  x3vals = floor(runif(numObservations,0,maxValueForX))
+  x4vals = floor(runif(numObservations,0,maxValueForX))
 
   # Given the x values, generate y values according to g
-  yvals = sapply(xvals,g)
+#  yvals = sapply(x1vals,x2vals,x3vals,x4vals,g)
 
-  for (j in 1:blocksize) {
-    cat(yvals[j]," |f 0:", xvals[j],"\n",sep="",file=output)
+x1vals
+
+x2vals
+
+  for (j in 1: numObservations) {
+#  	y = g(x1vals,x2vals,x3vals,x4vals)
+#    cat(yvals[j]," |f 0:", x1vals[j]," 1:", x2vals[j]," 2:", x3vals[j]," 3:", x4vals[j],"\n",sep="",file=output)
+    cat(g(x1vals[j],x2vals[j],x3vals[j],x4vals[j])," |f 0:", x1vals[j]," 1:", x2vals[j]," 2:", x3vals[j]," 3:", x4vals[j],"\n",sep="",file=output)
   }
   flush(output)
-}
+#}
 close(output)
