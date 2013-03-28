@@ -54,40 +54,32 @@ import com.google.common.collect.Multiset;
 public class RCV1RecordFactory implements RecordFactory {
   
   public static final int FEATURES = 10000;
-  //ConstantValueEncoder encoder = null;
   
   public RCV1RecordFactory() {
     
-    //this.encoder = new ConstantValueEncoder("body_values");
     
   }
   
   public static void ScanFile(String file, int debug_break_cnt)
       throws IOException {
     
-    //ConstantValueEncoder encoder_test = new ConstantValueEncoder("test");
     
     BufferedReader reader = null;
-    // Collection<String> words
     int line_count = 0;
     
     Multiset<String> class_count = ConcurrentHashMultiset.create();
     Multiset<String> namespaces = ConcurrentHashMultiset.create();
     
     try {
-      // System.out.println( newsgroup );
       reader = new BufferedReader(new FileReader(file));
       
       String line = reader.readLine();
       
       while (line != null && line.length() > 0) {
         
-        // shard_writer.write(line + "\n");
-        // out += line;
         
         String[] parts = line.split(" ");
         
-        // System.out.println( "Class: " + parts[0] );
         
         class_count.add(parts[0]);
         namespaces.add(parts[1]);
@@ -98,8 +90,6 @@ public class RCV1RecordFactory implements RecordFactory {
         Vector v = new RandomAccessSparseVector(FEATURES);
         
         for (int x = 2; x < parts.length; x++) {
-          // encoder_test.addToVector(parts[x], v);
-          // System.out.println( parts[x] );
           String[] feature = parts[x].split(":");
           int index = Integer.parseInt(feature[0]) % FEATURES;
           double val = Double.parseDouble(feature[1]);
@@ -117,7 +107,6 @@ public class RCV1RecordFactory implements RecordFactory {
           
         }
         
-//        Utils.PrintVectorSectionNonZero(v, 10);
         System.out.println("###");
         
         if (line_count > debug_break_cnt) {
@@ -144,25 +133,14 @@ public class RCV1RecordFactory implements RecordFactory {
             + " ");
       }
       
-      /*
-       * TokenStream ts = analyzer.tokenStream("text", reader);
-       * ts.addAttribute(CharTermAttribute.class);
-       * 
-       * // for each word in the stream, minus non-word stuff, add word to
-       * collection while (ts.incrementToken()) { String s =
-       * ts.getAttribute(CharTermAttribute.class).toString();
-       * //System.out.print( " " + s ); //words.add(s); out += s + " "; }
-       */
 
     } finally {
       reader.close();
     }
     
-    // return out + "\n";
     
   }
   
-  // doesnt really do anything in a 2 class dataset
   @Override
   public String GetClassnameByID(int id) {
     return String.valueOf(id); // this.newsGroups.values().get(id);
@@ -178,15 +156,10 @@ public class RCV1RecordFactory implements RecordFactory {
   @Override
   public double processLineAlt(String line, Vector v) throws Exception {
     
-    // p.269 ---------------------------------------------------------
-    // Map<String, Set<Integer>> traceDictionary = new TreeMap<String,
-    // Set<Integer>>();
-    
     double actual = 0;
     
     String[] parts = line.split(" ");
     
-    //actual = Integer.parseInt(parts[0]);
     actual = Double.parseDouble(parts[0]);
     
     // dont know what to do the the "namespace" "f"
@@ -197,8 +170,6 @@ public class RCV1RecordFactory implements RecordFactory {
       String[] feature = parts[x].split(":");
       int index = (Integer.parseInt(feature[0]) + 1) % FEATURES;
       double val = Double.parseDouble(feature[1]);
-      
-//      System.out.println(index + " -> " + feature[1] + " = " + val );
       
       if (index < FEATURES) {
         v.set(index, val);
@@ -211,8 +182,6 @@ public class RCV1RecordFactory implements RecordFactory {
       
     }
     
-    // System.out.println("\nEOL\n");
-    
     return actual;
   }
   
@@ -221,13 +190,8 @@ public class RCV1RecordFactory implements RecordFactory {
     
     List<String> out = new ArrayList<String>();
     
-    // for ( int x = 0; x < this.newsGroups.size(); x++ ) {
-    
-    // System.out.println( x + "" + this.newsGroups.values().get(x) );
     out.add("0");
     out.add("1");
-    
-    // }
     
     return out;
     
@@ -235,7 +199,6 @@ public class RCV1RecordFactory implements RecordFactory {
 
 @Override
 public int processLine(String line, Vector featureVector) throws Exception {
-	// TODO Auto-generated method stub
 	return 0;
 }
   

@@ -18,19 +18,8 @@ import org.apache.mahout.math.MatrixWritable;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
 
-//import com.cloudera.knittingboar.sgd.GradientBuffer;
-//import com.cloudera.knittingboar.sgd.ParallelOnlineLogisticRegression;
-//import com.cloudera.knittingboar.utils.Utils;
 
 /**
- * 
- * TODO
- * - add new functions for "classify" that instead produce a value of the regression
- * 	-	use classifyNoLink() instead
- * 
- * - 
- * 
- * 
  * 
  * 
  * @author josh
@@ -53,15 +42,6 @@ public class ParallelOnlineLinearRegression extends
 
 	// controls how per term annealing works
 	private int perTermAnnealingOffset = 20;
-
-	// had to add this because its private in the base class
-	//private Gradient default_gradient = new DefaultGradient();
-
-	// ####### This is NEW ######################
-	// that is (numCategories-1) x numFeatures
-	//protected GradientBuffer gamma; // this is the saved updated gradient we
-									// merge
-									// at the super step
 
 	
 	
@@ -91,8 +71,6 @@ public class ParallelOnlineLinearRegression extends
 		// actually we could change beta over to a Vector but I'm lazy now.
 		beta = new DenseMatrix(1, numFeatures);
 
-		// brand new factor for parallelization
-	//	this.gamma = new GradientBuffer(numCategories, numFeatures);
 	}
 
 	/**
@@ -262,14 +240,6 @@ public class ParallelOnlineLinearRegression extends
 			while (nonZeros.hasNext()) {
 				Vector.Element updateLocation = nonZeros.next();
 				int j = updateLocation.index();
-
-/*
-				double newValue = beta.getQuick(0, j) - (gradientBase
-						* learningRate * perTermLearningRate(j)
-						* training_instance.get(j));
-				
-				beta.setQuick(0, j, newValue);
-*/
 				
 				// calc: actual - instance_value * term_value
 				double addition = gradientBase * training_instance.get(j);
@@ -304,7 +274,7 @@ public class ParallelOnlineLinearRegression extends
 	 */
 	public void miniBatchUpdateParameterVector(int batchSize, Vector batch_buffer) {
 		
-		System.out.println( " miniBatchUpdateParameterVector ------------- " );
+//		System.out.println( " miniBatchUpdateParameterVector ------------- " );
 		
 		regularize(batch_buffer);
 		
@@ -317,12 +287,6 @@ public class ParallelOnlineLinearRegression extends
 			double avg_gradient_update = (batch_buffer.get(j) / batchSize );
 			
 			double newValue = beta.getQuick(0, j) - ( avg_gradient_update * learningRate * perTermLearningRate(j) );
-			
-/*
-			double newValue = beta.getQuick(0, j) - (gradientBase
-					* learningRate * perTermLearningRate(j)
-					* training_instance.get(j));
-*/			
 			beta.setQuick(0, j, newValue);
 
 			Vector.Element element = nonZeros.next();
@@ -358,19 +322,8 @@ public class ParallelOnlineLinearRegression extends
 	 * 
 	 * 
 	 * 
-	 * #### TODO #######################
-	 * 
-	 * 
-	 * - instead of "actual" class, we need to pass in a float as the actual value
-	 * 
-	 * - there is only one parameter vector as opposed to an array of vectors in multinomial logRegression
-	 * 
-	 * 
-	 * 
-	 * 
 	 * 
 	 */
-	// long trackingKey, String groupKey, 
 	public void train(double actual_value,
 			Vector instance) {
 		unseal();
@@ -379,26 +332,11 @@ public class ParallelOnlineLinearRegression extends
 		// push coefficients back to zero based on the prior
 		regularize(instance);
 
-		// basically this only gets the results for each classification
-		// update each row of coefficients according to result
-		
-		// gives us an array of dot products, one for each classification
-		
-//		Vector gradient = this.default_gradient.apply(groupKey, actual,
-//				instance, this);
-	
-		
 		double dot_product = this.beta.viewRow(0).dot(instance);
 		
-		//System.out.println( "> gradient_base: " + dot_product );
-		
-		
-//		for (int i = 0; i < numCategories - 1; i++) {
-
 		
 			double gradientBase = dot_product - actual_value; //gradient.get(i);
 
-			//System.out.println("gradient (aka 'y'): " + gradientBase + " =  " + dot_product + " - " + actual_value);
 
 			// we're only going to look at the non-zero elements of the vector
 			// then we apply the gradientBase to the resulting element.
@@ -410,11 +348,6 @@ public class ParallelOnlineLinearRegression extends
 				Vector.Element updateLocation = nonZeros.next();
 				int j = updateLocation.index();
 
-
-/*				double newValue = beta.getQuick(0, j) - gradientBase
-						* learningRate * perTermLearningRate(j)
-						* instance.get(j);
-*/
 				double newValue = beta.getQuick(0, j) - (gradientBase
 						* learningRate * perTermLearningRate(j)
 						* instance.get(j));
@@ -422,7 +355,6 @@ public class ParallelOnlineLinearRegression extends
 				beta.setQuick(0, j, newValue);
 
 			}
-		//}
 
 		// remember that these elements got updated
 		Iterator<Vector.Element> i = instance.iterateNonZero();
@@ -472,19 +404,5 @@ public class ParallelOnlineLinearRegression extends
 		
 	}
 
-	/**
-	 * Reset all values in Gamma (gradient buffer) back to zero
-	 * 
-	 */
-/*	public void FlushGamma() {
-
-		this.gamma.Reset();
-
-	}
-
-	public GradientBuffer getGamma() {
-		return this.gamma;
-	}
-*/
 	
 }

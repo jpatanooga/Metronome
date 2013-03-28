@@ -5,21 +5,15 @@ import org.apache.hadoop.conf.Configuration;
 public class NodeBase {
 	  
 	  protected Configuration conf = null;
-	  //protected int num_categories = 2;
 	  protected int FeatureVectorSize = -1;
-	  //protected int BatchSize = 200;
 	  protected double Lambda = 1.0e-4;
 	  protected double LearningRate = 10;
 	  
-	  //String LocalInputSplitPath = "";
 	  String PredictorLabelNames = "";
 	  String PredictorVariableTypes = "";
 	  protected String TargetVariableName = "";
 	  protected String ColumnHeaderNames = "";
 	  protected int NumberIterations = 1;
-	  
-	  //protected int LocalBatchCountForIteration = 0;
-	  //protected int GlobalBatchCountForIteration = 0;
 	  
 	  protected String RecordFactoryClassname = "";
 	  

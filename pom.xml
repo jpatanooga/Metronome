@@ -12,7 +12,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hadoop.version>2.0.0-cdh4.1.2</hadoop.version>
+    <hadoop.version>2.0.0-cdh4.2.0</hadoop.version>
     <mahout.version>0.6-cdh4.0.1</mahout.version>
   </properties>
 

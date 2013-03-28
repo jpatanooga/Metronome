@@ -39,6 +39,12 @@ import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Experimental Mini-Batch worker node
+ * 
+ * @author josh
+ *
+ */
 public class MiniBatchWorkerNode extends NodeBase implements
 		ComputableWorker<ParameterVectorUpdateable> {
 
@@ -77,7 +83,6 @@ public class MiniBatchWorkerNode extends NodeBase implements
 
 		ParameterVector vector = new ParameterVector();
 		vector.parameter_vector = this.polr.getBeta().clone(); // this.polr.getGamma().getMatrix().clone();
-//		gradient.SrcWorkerPassCount = this.LocalBatchCountForIteration;
 
 		if (this.lineParser.hasMoreRecords()) {
 			vector.IterationComplete = 0;
@@ -87,8 +92,6 @@ public class MiniBatchWorkerNode extends NodeBase implements
 
 		vector.CurrentIteration = this.CurrentIteration;
 
-//		vector.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood))
-//				.floatValue();
 		vector.AvgError = (new Double(metrics.AvgError * 100))
 				.floatValue();
 		vector.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
@@ -102,25 +105,10 @@ public class MiniBatchWorkerNode extends NodeBase implements
 	 * The IR::Compute method - this is where we do the next batch of records
 	 * for SGD
 	 * 
-	 * TODO: massive review work here
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
 	 */
 	@Override
 	public ParameterVectorUpdateable compute() {
 
-		//System.out.println( "MiniBatchWorker 00000" );
 		
 		Text value = new Text();
 		long batch_vec_factory_time = 0;
@@ -139,7 +127,6 @@ public class MiniBatchWorkerNode extends NodeBase implements
 			try {
 				result = this.lineParser.next(value);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -150,14 +137,10 @@ public class MiniBatchWorkerNode extends NodeBase implements
 				Vector v = new RandomAccessSparseVector(this.FeatureVectorSize);
 				double actual = 0.0;
 				try {
-					
-				    
-//				    double actual = factory.processLineNew(line, vec);
 
 					actual = this.VectorFactory
 							.processLineAlt(value.toString(), v);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -165,49 +148,40 @@ public class MiniBatchWorkerNode extends NodeBase implements
 
 				batch_vec_factory_time += (endTime - startTime);
 
-				
-				
-				
 				// calc stats ---------
 
 				double mu = Math.min(k + 1, 200);
 				
-				//double ll = this.polr.logLikelihood(actual, v);
 				
 				// the dot product of the parameter vector and the current instance
 				// is the hypothesis value for the currnet instance
 				double hypothesis_value = v.dot(this.polr.getBeta().viewRow(0));
 				
-				//double instance_loss_value = SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 				double error = Math.abs( hypothesis_value - actual );
 
 
-if (Double.POSITIVE_INFINITY == error) { 
-	
-} else {
-				err_buf += error;
-}
+				if (Double.POSITIVE_INFINITY == error) { 
+					
+				} else {
+								err_buf += error;
+				}
 				
 				// ####### where we train ############
 				// update the parameter vector with the actual value and the instance data
-//				this.polr.train(actual, v);
+
 				this.polr.trainMiniBatch(actual, v, miniBatchBuffer);
 				
 				batch_count++;
 				
 				if ( batch_count >= batch_limit ) {
 					
-				//	System.out.println( "process batch ******" );
-					
 					// 1. update all of the coefficients with the average update
 					
 					this.polr.miniBatchUpdateParameterVector(batch_limit, miniBatchBuffer);
 					
-				//	Utils.PrintVector(miniBatchBuffer);
 					
 					// reset batch buffer --- best way to do this?
 					miniBatchBuffer = miniBatchBuffer.like();
-				//	Utils.PrintVector(miniBatchBuffer);
 					
 					batch_count = 0;
 				}
@@ -228,14 +202,6 @@ if (Double.POSITIVE_INFINITY == error) {
 		
 		err_buf = err_buf / run_count;
 		metrics.AvgError = err_buf;
-		
-/*
-		System.out
-				.printf("Worker %s:\t Iteration: %s, Trained Recs: %10d, Avg Error: %10.2f, VF: %d\n",
-						this.internalID, this.CurrentIteration, k,
-						 metrics.AvgError * 100,
-						batch_vec_factory_time);
-*/
 		return new ParameterVectorUpdateable(this.GenerateUpdate());
 	}
 
@@ -251,7 +217,6 @@ if (Double.POSITIVE_INFINITY == error) {
 	 */
 	@Override
 	public void update(ParameterVectorUpdateable t) {
-		// masterTotal = t.get();
 		ParameterVector global_update = t.get();
 		
 		// set the local parameter vector to the global aggregate ("beta")
@@ -266,22 +231,11 @@ if (Double.POSITIVE_INFINITY == error) {
 
 		try {
 
-//			this.num_categories = this.conf.getInt(
-//					"com.cloudera.knittingboar.setup.numCategories", 2);
-
-			// feature vector size
 
 			this.FeatureVectorSize = LoadIntConfVarOrException(
 					"com.cloudera.knittingboar.setup.FeatureVectorSize",
 					"Error loading config: could not load feature vector size");
 
-			// feature vector size
-//			this.BatchSize = this.conf.getInt(
-//					"com.cloudera.knittingboar.setup.BatchSize", 200);
-
-			// this.NumberPasses = this.conf.getInt(
-			// "com.cloudera.knittingboar.setup.NumberPasses", 1);
-			// app.iteration.count
 			this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
 
 			// protected double Lambda = 1.0e-4;
@@ -322,13 +276,10 @@ if (Double.POSITIVE_INFINITY == error) {
 						"com.cloudera.knittingboar.setup.ColumnHeaderNames",
 						"Error loading config: Column Header Names");
 
-				// System.out.println("LoadConfig(): " +
-				// this.ColumnHeaderNames);
 
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -370,8 +321,6 @@ if (Double.POSITIVE_INFINITY == error) {
 		if (RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY
 				.equals(this.RecordFactoryClassname)) {
 
-//			this.VectorFactory = new TwentyNewsgroupsRecordFactory("\t");
-
 		} else if (RecordFactory.RCV1_RECORDFACTORY
 				.equals(this.RecordFactoryClassname)) {
 
@@ -401,7 +350,6 @@ if (Double.POSITIVE_INFINITY == error) {
 
 		polr_modelparams.setPOLR(polr);
 
-		// this.bSetup = true;
 	}
 
 	@Override
@@ -429,11 +377,6 @@ if (Double.POSITIVE_INFINITY == error) {
 		ToolRunner.run(aw, args);
 	}
 
-	/*
-	 * @Override public int getCurrentGlobalIteration() { // TODO Auto-generated
-	 * method stub return 0; }
-	 */
-
 	/**
 	 * returns false if we're done with iterating over the data
 	 * 
@@ -446,8 +389,6 @@ if (Double.POSITIVE_INFINITY == error) {
 		this.IterationComplete = false;
 		this.lineParser.reset();
 
-//		System.out.println("IncIteration > " + this.CurrentIteration + ", "
-//				+ this.NumberIterations);
 
 		if (this.CurrentIteration >= this.NumberIterations) {
 			System.out.println("POLRWorkerNode: [ done with all iterations ]");
@@ -458,12 +399,4 @@ if (Double.POSITIVE_INFINITY == error) {
 
 	}
 
-	/*
-	 * @Override public boolean isStillWorkingOnCurrentIteration() {
-	 * 
-	 * 
-	 * //return this.lineParser.hasMoreRecords();
-	 * 
-	 * //return this. return !this.IterationComplete; }
-	 */
 }

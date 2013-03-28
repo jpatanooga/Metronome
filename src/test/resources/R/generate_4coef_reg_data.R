@@ -10,11 +10,11 @@ maxValueForX = floor(numObservations/10)
 
 # Intercept and coefficent
 
-intercept = 2
+intercept = 0
 
 x1coef = 1
 
-x2coef = 5
+x2coef = 2
 
 x3coef = 3
 
@@ -29,12 +29,12 @@ outputFilename = "lrdata.txt"
 
 # Use command line args if given
 args = commandArgs(TRUE)
-if (length(args) == 5) {
+if (length(args) == 3) {
   numObservations = as.numeric(args[1])
-  intercept = as.numeric(args[2])
-  x1coef = as.numeric(args[3])
-  variance = as.numeric(args[4])
-  outputFilename = args[5]
+#  intercept = as.numeric(args[2])
+#  x1coef = as.numeric(args[3])
+  variance = as.numeric(args[2])
+  outputFilename = args[3]
 }
 
 ############################################################

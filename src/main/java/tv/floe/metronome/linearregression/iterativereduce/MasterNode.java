@@ -18,6 +18,7 @@ import tv.floe.metronome.linearregression.ModelParameters;
 import tv.floe.metronome.linearregression.ParallelOnlineLinearRegression;
 import tv.floe.metronome.linearregression.ParameterVector;
 import tv.floe.metronome.linearregression.RegressionStatistics;
+import tv.floe.metronome.utils.Utils;
 
 import com.cloudera.iterativereduce.ComputableMaster;
 //import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorUpdateable;
@@ -45,17 +46,9 @@ public class MasterNode extends NodeBase implements
 	  
 	  ParameterVector global_parameter_vector = null;
 	  
-//	  private int GlobalMaxPassCount = 0;
-	  
-//	  private int Global_Min_IterationCount = 0;
-
 	  private long total_record_count = 0;
 	  private double y_sum = 0;
 	  private double y_avg = 0;
-	  
-	
-	  
-	  
 	  
 	  // these are only used for saving the model
 	  public ParallelOnlineLinearRegression polr = null;
@@ -68,39 +61,30 @@ public class MasterNode extends NodeBase implements
 	      Collection<ParameterVectorUpdateable> workerUpdates,
 	      Collection<ParameterVectorUpdateable> masterUpdates) {
 	    
-	    //System.out.println("\nMaster Compute: SuperStep - Worker Info ----- ");
 	    int x = 0;
 	    
 	    // gets recomputed each time
 	    RegressionStatistics regStats = new RegressionStatistics();
 
 	    // reset
-	    //this.Global_Min_IterationCount = this.NumberPasses;
 	    boolean iterationComplete = true;
 	    
 	    double SSyy_partial_sum = 0;
 	    double SSE_partial_sum = 0;
 	    
-	    //i.get().parameter_vector.viewRow(0).
 	    this.global_parameter_vector.parameter_vector = new DenseMatrix(1, this.FeatureVectorSize);
 
 	    float avg_err = 0;
-	    
+	    long totalBatchesTimeMS = 0;
 	    
 	    
 	    for (ParameterVectorUpdateable i : workerUpdates) {
 	      
-	      // not sure we still need this ---------------
-/*	      if (i.get().SrcWorkerPassCount > this.GlobalMaxPassCount) {
-	        
-	        this.GlobalMaxPassCount = i.get().SrcWorkerPassCount;
-	        
-	      }
-	*/      
+	    	totalBatchesTimeMS += i.get().batchTimeMS;
+	    	
 	      // if any worker is not done with hte iteration, trip the flag
 	      if (i.get().IterationComplete == 0 ) {
 	        
-	        //this.Global_Min_IterationCount = i.get().IterationCount;
 	        iterationComplete = false;
 	        
 	      }
@@ -111,11 +95,6 @@ public class MasterNode extends NodeBase implements
 	      
 		    if ( 0 == i.get().CurrentIteration ) {
 		    	
-		    	
-//		    	System.out.println( "y-sum: " + i.get().y_partial_sum + ", rec-count: " + i.get().TrainedRecords );
-		    	
-
-		    	//regStats.AddPartialSumForY(i.get().y_partial_sum, i.get().TrainedRecords);
 		    	this.y_sum += i.get().y_partial_sum;
 		    	this.total_record_count += i.get().TrainedRecords;
 		    	
@@ -129,13 +108,15 @@ public class MasterNode extends NodeBase implements
 		    
 		    
 	      x++;
-	      // accumulate gradient of parameter vectors
-	      //this.global_parameter_vector.AccumulateGradient(i.get().parameter_vector);
 	      this.global_parameter_vector.AccumulateVector(i.get().parameter_vector.viewRow(0));
 	      
 	    }
 	    
-	    System.out.println( "[MASTER] ----- Iteration " + this.iteration_count + " -------" );
+	    long avgBatchSpeedMS = totalBatchesTimeMS / workerUpdates.size();
+	    
+	    System.out.println( "\n[Master] ----- Iteration " + this.iteration_count + " -------" );
+	    System.out.println( "> Workers: " + workerUpdates.size()  + " ");
+	    System.out.println( "> Avg Batch Scan Time: " + avgBatchSpeedMS  + " ms");
 	    
 	    if ( iteration_count == 0 ) {
 	    	
@@ -143,12 +124,11 @@ public class MasterNode extends NodeBase implements
 	    	regStats.AddPartialSumForY(this.y_sum, this.total_record_count);
 	    	
 	    	this.global_parameter_vector.y_avg = regStats.ComputeYAvg();
-	    	//System.out.println( "y-bar: " + this.global_parameter_vector.y_avg );
 
 	    	this.y_avg = regStats.ComputeYAvg();
 	    	
-	    	System.out.println("[Master] " 
-			          + " Computed Y Average: "
+	    	System.out.println("" 
+			          + "> Computed Y Average: "
 			          + this.global_parameter_vector.y_avg );
 	    	
 	    } else {
@@ -174,25 +154,9 @@ public class MasterNode extends NodeBase implements
 			    
 	    
 	    // now average the parameter vectors together
-	    //this.global_parameter_vector.AverageAccumulations(workerUpdates.size());
 	    this.global_parameter_vector.AverageVectors(workerUpdates.size());
 	    
-//	    LOG.debug("Master node accumulating and averaging " + workerUpdates.size()
-//	        + " worker updates.");
-	    
-	    
-	    
-	    
 	    ParameterVector vec_msg = new ParameterVector();
-//	    vec_msg.GlobalPassCount = this.GlobalMaxPassCount;
-	    
-	/*    if (iterationComplete) {
-	      gradient_msg.IterationComplete = 1;
-	      System.out.println( "> Master says: Iteration Complete" );
-	    } else {
-	      gradient_msg.IterationComplete = 0;
-	    }
-	    */
 	    vec_msg.parameter_vector = this.global_parameter_vector.parameter_vector
 	        .clone();
 	    
@@ -225,22 +189,12 @@ public class MasterNode extends NodeBase implements
 	    
 	    try {
 	      
-	      // this is hard set with LR to 2 classes
-//	      this.num_categories = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.numCategories", 2);
-	      
 	      // feature vector size
 	      
 	      this.FeatureVectorSize = LoadIntConfVarOrException(
 	          "com.cloudera.knittingboar.setup.FeatureVectorSize",
 	          "Error loading config: could not load feature vector size");
 	      
-	      // feature vector size
-//	      this.BatchSize = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.BatchSize", 200);
-	      
-//	      this.NumberPasses = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.NumberPasses", 1);
 	      this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
 	      
 	      // protected double Lambda = 1.0e-4;
@@ -256,7 +210,6 @@ public class MasterNode extends NodeBase implements
 	      // "com.cloudera.knittingboar.setup.LocalInputSplitPath",
 	      // "Error loading config: could not load local input split path");
 	      
-	      // System.out.println("LoadConfig()");
 	      
 	      // maps to either CSV, 20newsgroups, or RCV1
 	      this.RecordFactoryClassname = LoadStringConfVarOrException(
@@ -293,15 +246,10 @@ public class MasterNode extends NodeBase implements
 	      }
 	      
 	    } catch (Exception e) {
-	      // TODO Auto-generated catch block
 	      e.printStackTrace();
 	      System.err.println(">> Error loading conf!");
 	    }
 	    
-//	    System.out.println( "-----------------------------------------" );
-//	    System.out.println( "# Master Conf #" );
-//	    System.out.println( "Number Iterations: " + this.NumberPasses );
-//	    System.out.println( "-----------------------------------------\n\n" );
 	    
 	    this.SetupPOLR();
 	    
@@ -309,14 +257,6 @@ public class MasterNode extends NodeBase implements
 	  
 	  public void SetupPOLR() {
 	    
-/*	    System.err.println("SetupOLR: " + this.num_categories + ", "
-	        + this.FeatureVectorSize);
-	    LOG.debug("SetupOLR: " + this.num_categories + ", "
-	        + this.FeatureVectorSize);
-	*/    
-//	    this.global_parameter_vector = new GradientBuffer(this.num_categories,
-//	        this.FeatureVectorSize);
-	
 		this.global_parameter_vector = new ParameterVector();  
 		  
 	    String[] predictor_label_names = this.PredictorLabelNames.split(",");
@@ -349,9 +289,7 @@ public class MasterNode extends NodeBase implements
 	    
 	    if (RecordFactory.TWENTYNEWSGROUPS_RECORDFACTORY
 	        .equals(this.RecordFactoryClassname)) {
-	      
-//	      this.VectorFactory = new TwentyNewsgroupsRecordFactory("\t");
-	      
+	      	      
 	    } else if (RecordFactory.RCV1_RECORDFACTORY
 	        .equals(this.RecordFactoryClassname)) {
 	      
@@ -375,22 +313,24 @@ public class MasterNode extends NodeBase implements
 	    
 	    // ----- this normally is generated from the POLRModelParams ------
 	    
-	    System.out.println( "Debug: Learning Rate: " + this.LearningRate );
 	    
 	    this.polr = new ParallelOnlineLinearRegression(
 	        this.FeatureVectorSize, new UniformPrior()).alpha(1).stepOffset(1000)
 	        .decayExponent(0.9).lambda(this.Lambda).learningRate(this.LearningRate);
 	    
 	    polr_modelparams.setPOLR(polr);
-	    // this.bSetup = true;
 	    
 	  }
 	  
 	  @Override
 	  public void complete(DataOutputStream out) throws IOException {
-	    // TODO Auto-generated method stub
-	    System.out.println("master::complete ");
+
+		  System.out.println("master::complete ");
 	    System.out.println("complete-ms:" + System.currentTimeMillis());
+	    
+		System.out.println("\n\nComplete: ");
+		Utils.PrintVector( this.polr.getBeta().viewRow(0) );
+	    
 	    
 	    LOG.debug("Master complete, saving model.");
 	    
