@@ -8,7 +8,6 @@ public class TestSquaredErrorLossFunction {
 
 	@Test
 	public void test() {
-		//fail("Not yet implemented");
 		
 		double hypothesis_value = 1;
 		double actual = 1;

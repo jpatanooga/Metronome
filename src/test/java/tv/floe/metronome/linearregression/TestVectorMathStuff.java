@@ -98,27 +98,6 @@ public class TestVectorMathStuff {
 		
 		Utils.PrintVector(v_assign);
 
-		/*
-		Vector v3 = new DenseVector(3);
-		v3.set(0, 10.40);
-		v3.set(1, 20.20);
-		v3.set(2, 120.20);
-		
-		Vector v3n = v3.normalize(20);
-		
-		System.out.println("normalized:");
-		Utils.PrintVector(v3n);
-		
-		Vector v4 = new DenseVector(3);
-		v4.set(0, 1.40);
-		v4.set(1, 2.20);
-		v4.set(2, 12.20);
-		
-		Vector v4n = v4.normalize(20);
-		
-		System.out.println("normalized:");
-		Utils.PrintVector(v4n);
-		*/
 	}
 
 }

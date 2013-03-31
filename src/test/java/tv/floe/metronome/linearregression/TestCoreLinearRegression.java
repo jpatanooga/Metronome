@@ -35,32 +35,26 @@ import com.google.common.collect.Multiset;
 public class TestCoreLinearRegression {
 	
 
-	// lr: 0.003
-	//private static String file_name = "src/test/resources/linear_regression_sample_data.txt";
 	
-	// lr: 3
-//	private static String file_name = "src/test/resources/data/SAT_Scores/sat_scores_svmlight.txt";
 
 //	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/SAT_Scores/sat_scores_svmlight.txt", 17, 3000, 2 );
 
-//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/R_synth_data_10032013_v1.csv", 0.0002, 1000 );
-	
-//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_data_meh.csv", 0.5, 3000 );
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/R_synth_data_10032013_v1.csv", 0.0002, 1000, 2 ); // breaks R-Square somehow? large X-values? [bug]	
 	
 	// beta:  0.09412438653921235, 4.051704052081415 ----- Final R-Squared: 0.9962182306267638
-	//QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/temp/temp.txt", 0.02, 3000 );
+	//QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/temp/temp.txt", 0.02, 3000, 2 );
 	
-//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_20_10p5_var4.csv", 20, 300, 2 );
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_20_10p5_var4.csv", 20, 300, 2 );
 
-//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_20_10p5_var10.csv", 20, 300 );
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_20_10p5_var10.csv", 20, 300, 2 );
 	
-//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_synth_2_10_var.csv", 20, 300 );
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_2_10_var2.csv", 20, 300, 2 );
 
 	// R_m4_synth_20_10p5_var4.csv
-//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_m4_synth_20_10p5_var4.csv", 20, 300 );
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_m4_synth_20_10p5_var4.csv", 20, 300, 2 );
 	
 	//R_synth_multi_4coef_test.csv
-	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/multi_coef_split_100k.csv", 5, 10, 5 );
+	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_multi_4coef_test.csv", 5, 10, 5 );
 	
 	@Test
 	public void test() throws Exception {
@@ -110,12 +104,7 @@ public class TestCoreLinearRegression {
 					
 				    
 				    double actual = factory.processLineAlt(line, vec);
-/*
-				    Utils.PrintVector(vec);
-				    System.out.println( "y: " + actual );
-				    
-				    Utils.PrintVector(polr.getBeta().viewRow(0));
-	*/				
+
 				    // we're only looking at the first row or the matrix because 
 				    // the original code was for multinomial log regression
 				    // but here we only need a single parameter vector
@@ -123,9 +112,6 @@ public class TestCoreLinearRegression {
 				    
 				    double error = Math.abs( hypothesis_value - actual ); // SquaredErrorLossFunction.Calc(hypothesis_value, actual);
 				    error_sum += error;
-				    
-//System.out.println( "hypothesis_value - actual: " + hypothesis_value + " - " + actual );				    
-
 
 					polr.train(actual, vec);
 
@@ -152,7 +138,6 @@ public class TestCoreLinearRegression {
 
 			} // while
 			
-			//" + error_sum + " / " + rec_count + " = 
 			System.out.println("> " + x + " Avg Err: " + ( error_sum / (rec_count) ) );
 
 			// setup the avg'd y-bar data
@@ -177,7 +162,6 @@ public class TestCoreLinearRegression {
 		    	
 		    }
 			
-			// reader.reset();
 			System.out.println("----------------------- ");			
 		} // for
 		

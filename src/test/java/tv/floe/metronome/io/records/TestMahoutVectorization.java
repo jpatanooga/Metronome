@@ -14,7 +14,6 @@ public class TestMahoutVectorization {
 
 	@Test
 	public void test() {
-		//fail("Not yet implemented");
 		
 		
 		FeatureVectorEncoder encoder = new ContinuousValueEncoder("demo");
@@ -27,6 +26,7 @@ public class TestMahoutVectorization {
 		
 		encoder_other.addToVector("100", 1, v);
 		
+		assertEquals( v.get(0), 132.0, 0.0);
 		
 		Utils.PrintVector(v);
 		

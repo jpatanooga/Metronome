@@ -24,11 +24,14 @@ import com.cloudera.iterativereduce.ComputableWorker;
 //import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
 import com.cloudera.iterativereduce.Updateable;
 import com.cloudera.iterativereduce.io.TextRecordParser;
-//import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradient;
-//import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
-//import com.cloudera.knittingboar.sgd.iterativereduce.POLRMasterNode;
-//import com.cloudera.knittingboar.sgd.iterativereduce.POLRWorkerNode;
 
+/**
+ * Modified version of the IterativeReduce IRDriver
+ * 
+ * @author josh
+ *
+ * @param <T>
+ */
 public class IRUnitDriver<T> {
 
 	private static JobConf defaultConf = new JobConf();

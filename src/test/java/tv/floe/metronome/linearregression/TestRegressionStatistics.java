@@ -17,7 +17,7 @@ import tv.floe.metronome.utils.Utils;
 
 public class TestRegressionStatistics {
 	
-	private static String file_name = "src/test/resources/sat_scores_svmlight.txt";
+	private static String file_name = "src/test/resources/data/SAT_Scores/sat_scores_svmlight.txt";
 	
 	
 	
@@ -50,8 +50,6 @@ public class TestRegressionStatistics {
 			} else {
 
 				System.out.println( "> " + line  );
-				
-//				factory.processLineAlt(line, v)
 	
 				Vector vec = new RandomAccessSparseVector(2);
 				
@@ -156,20 +154,12 @@ public class TestRegressionStatistics {
 				
 			} else {
 
-//				System.out.println( "> " + line  );
-				
-//				factory.processLineAlt(line, v)
-	
 				Vector vec = new RandomAccessSparseVector(2);
 				
 			    
 			    double y_observed = factory.processLineAlt(line, vec);
 			    double y_predicted = polr.getBeta().viewRow(0).dot(vec);
 				
-//			    System.out.println( "Parsed: y:" + y_observed + ", x: " + vec.get(1) + "\n" );
-			    
-			    //y_partial_sum += y_observed;
-			    //rec_count++;
 			    
 			    SSyy_partial_sum += Math.pow( (y_observed - y_bar), 2 );
 			    
