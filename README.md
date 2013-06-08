@@ -26,3 +26,4 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
 * Michael Katzenellenbollen
 * Dr. Jason Baldridge
 * Dr. James Scott
+* Paul Wilkinson
