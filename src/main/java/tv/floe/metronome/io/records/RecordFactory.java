@@ -50,6 +50,8 @@ public interface RecordFactory {
   
   public List<String> getTargetCategories();
   
+  public int getFeatureVectorSize();
+  
   // void firstLine(String line);
   
 }

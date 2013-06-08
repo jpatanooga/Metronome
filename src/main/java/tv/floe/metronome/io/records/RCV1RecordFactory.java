@@ -197,9 +197,14 @@ public class RCV1RecordFactory implements RecordFactory {
     
   }
 
-@Override
-public int processLine(String line, Vector featureVector) throws Exception {
-	return 0;
-}
+	@Override
+	public int processLine(String line, Vector featureVector) throws Exception {
+		return 0;
+	}
+
+	@Override
+	public int getFeatureVectorSize() {
+		return this.FEATURES;
+	}
   
 }

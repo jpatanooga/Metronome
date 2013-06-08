@@ -216,5 +216,11 @@ public class libsvmRecordFactory implements RecordFactory {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	  
+
+	@Override
+	public int getFeatureVectorSize() {
+		return this.FEATURES;
 	}
+	
+	
+}

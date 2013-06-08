@@ -51,10 +51,12 @@ public class TestCoreLinearRegression {
 //	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_2_10_var2.csv", 20, 300, 2 );
 
 	// R_m4_synth_20_10p5_var4.csv
-//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_m4_synth_20_10p5_var4.csv", 20, 300, 2 );
+	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/R/R_m4_synth_20_10p5_var4.csv", 20, 300, 2 );
 	
 	//R_synth_multi_4coef_test.csv
-	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_multi_4coef_test.csv", 5, 10, 5 );
+	
+	
+//	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_multi_4coef_test.csv", 5, 10, 5 );
 	
 	@Test
 	public void test() throws Exception {
