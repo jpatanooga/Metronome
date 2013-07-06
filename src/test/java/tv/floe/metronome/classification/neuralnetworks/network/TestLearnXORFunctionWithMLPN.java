@@ -25,19 +25,6 @@ public class TestLearnXORFunctionWithMLPN {
 	@Test
 	public void test() throws Exception {
 
-/*
-        DataSet trainingSet = new DataSet(2, 1);
-        trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{0}));
-        trainingSet.addRow(new DataSetRow(new double[]{0, 1}, new double[]{1}));
-        trainingSet.addRow(new DataSetRow(new double[]{1, 0}, new double[]{1}));
-        trainingSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{0}));
-
-        // create multi layer perceptron
-        MultiLayerPerceptron myMlPerceptron = new MultiLayerPerceptron(TransferFunctionType.TANH, 2, 3, 1);
-	
- */
-		
-		//ArrayList<Vector> xor_recs = new ArrayList<Vector>();
 		
 		Vector v0 = new DenseVector(2);
 		v0.set(0, 0);
