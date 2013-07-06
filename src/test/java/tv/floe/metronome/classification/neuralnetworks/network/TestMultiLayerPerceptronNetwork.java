@@ -139,7 +139,7 @@ public class TestMultiLayerPerceptronNetwork {
 		for ( int x = 0; x < 200; x++ ) {
 			
 			
-			BufferedReader reader = new BufferedReader( new FileReader("src/test/resources/datasets/iris/iris_data_normalised.txt") );
+			BufferedReader reader = new BufferedReader( new FileReader("src/test/resources/data/iris/iris_data_normalised.txt") );
 			
 			
 			String line = reader.readLine();
@@ -185,7 +185,7 @@ public class TestMultiLayerPerceptronNetwork {
 			} // while
 			
 			
-			reader = new BufferedReader( new FileReader("src/test/resources/datasets/iris/iris_data_normalised.txt") );
+			reader = new BufferedReader( new FileReader("src/test/resources/data/iris/iris_data_normalised.txt") );
 			
 			
 			line = reader.readLine();
