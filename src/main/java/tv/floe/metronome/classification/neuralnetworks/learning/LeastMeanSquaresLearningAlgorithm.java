@@ -63,9 +63,6 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
         }
     }
 
-    /**
-     *      deltaWeight = learningRate * neuronError * input
-     */
     protected void updateNeuronWeights(Neuron neuron) {
 
     	double neuronError = neuron.getError();
@@ -86,20 +83,10 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
         }
     }	
     
-    /**
-     * Returns true if stop condition has been reached, false otherwise.
-     * Override this method in derived classes to implement custom stop criteria.
-     *
-     * @return true if stop condition is reached, false otherwise
-     */
     protected boolean hasReachedStopCondition() {
         return (this.totalNetworkError < this.maxError) || this.errorChangeStalled();
     }
 
-    /**
-     * Returns true if absolute error change is sufficently small (<=minErrorChange) for minErrorChangeStopIterations number of iterations
-     * @return true if absolute error change is stalled (error is sufficently small for some number of iterations)
-     */
     protected boolean errorChangeStalled() {
         double absErrorChange = Math.abs(previousEpochError - totalNetworkError);
 
@@ -116,15 +103,6 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
         return false;
     }
 
-    /**
-     * Calculates the network error for the current input pattern - diference between
-     * desired and actual output
-     * 
-     * @param output
-     *            actual network output
-     * @param desiredOutput
-     *            desired network output
-     */
     protected double[] calculateOutputError(Vector desiredOutputVec, Vector currentOutputVec) {
         
     	double[] outputError = new double[ desiredOutputVec.size() ];

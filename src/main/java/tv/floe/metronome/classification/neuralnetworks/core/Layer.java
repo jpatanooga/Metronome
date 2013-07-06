@@ -136,8 +136,6 @@ public class Layer {
                                     
             neuron.setParentLayer(this);
 
-            // now safely set new neuron at specified index position
-            //this.layer_neurons[index] = neuron;
             this.layer_neurons.set(index, neuron);
         }
 
@@ -210,14 +208,6 @@ public class Layer {
     public void setLabel(String label) {
         this.label = label;
     }
- /*   
-    public void ConnectAllNeurons(Layer nextLayer) {
-    	
-    	
-    	
-    	
-    }
-   */ 
 
 	public void calculate() {
 

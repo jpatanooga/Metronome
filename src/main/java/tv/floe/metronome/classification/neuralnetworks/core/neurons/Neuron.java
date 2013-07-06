@@ -9,7 +9,6 @@ import tv.floe.metronome.classification.neuralnetworks.core.Layer;
 import tv.floe.metronome.classification.neuralnetworks.core.Weight;
 import tv.floe.metronome.classification.neuralnetworks.input.InputFunction;
 import tv.floe.metronome.classification.neuralnetworks.input.WeightedSum;
-import tv.floe.metronome.classification.neuralnetworks.transfer.Linear;
 import tv.floe.metronome.classification.neuralnetworks.transfer.Sigmoid;
 import tv.floe.metronome.classification.neuralnetworks.transfer.Step;
 import tv.floe.metronome.classification.neuralnetworks.transfer.TransferFunction;
@@ -22,24 +21,13 @@ public class Neuron {
 	
 	protected InputFunction inputFunction;
 	protected TransferFunction transferFunction;
-    private String label;
     double netInput = 0;
         	
 	
-    /**
-	 * Total net input for this neuron. Represents total input for this neuron
-	 * received from input function.
-	 */
 	protected transient double totalNetInputFunctionInput = 0;
 
-	/**
-	 * the value this neuron outputs
-	 */
 	protected transient double output = 0;
 
-	/**
-	 * the amount of error for the neuron
-	 */
 	protected transient double error = 0;
 	
 	public Neuron() {
@@ -50,13 +38,6 @@ public class Neuron {
 		
 		this.inConnections = new ArrayList<Connection>();
 		this.outConnections = new ArrayList<Connection>();
-		
-		//this.inputFunction = new WeightedSum();
-		//this.transferFunction = new Step();
-
-		//this.inputConnections = new Connection[0];
-        
-		//this.outConnections = new Connection[0];		
 		
 		
 	}
@@ -74,17 +55,6 @@ public class Neuron {
 	}
 	
 	
-	/**
-	 * TODO
-	 * - InputFunction
-	 * - TransferFunction
-	 * 
-	 * 
-	 * 
-	 * @param c
-	 * @param layerIndex
-	 * @return
-	 */
 	public static Neuron createNeuron(Config c, int layerIndex) {
 		
 		Neuron n = null; 
@@ -92,12 +62,9 @@ public class Neuron {
 		
 		if (0 == layerIndex) {
 			n = new InputNeuron();
-			//tf = new Linear();
 			
 		} else {
 			n = new Neuron(new WeightedSum(), new Sigmoid());
-			// tf = new Linear();
-			//tf = new Sigmoid();
 		}
 		
 		
@@ -156,7 +123,6 @@ public class Neuron {
         		this.netInput = this.inputFunction.getOutput(this.inConnections);
         }
         
-        //System.out.println( "> net input: " + this.netInput + ", conn size: " + this.inConnections.size() );
 
         this.output = this.transferFunction.getOutput(this.netInput);
 		
@@ -206,21 +172,12 @@ public class Neuron {
     }
     
     
-    
-    
-    
-    
-    
-    
-	
 	
 	public void addInConnection(Connection connection) throws Exception {     
-        // check whaeather connection is  null
         if (connection == null) {
             throw new Exception("Attempt to add null connection to neuron!");
         }
               
-        // make sure that connection instance is pointing to this neuron
         if (connection.getToNeuron() != this) {
             throw new Exception("Cannot add input connection - bad toNeuron specified!");
         } 
@@ -230,45 +187,22 @@ public class Neuron {
             return;
         }            
         
-        //this.inConnections =  Arrays.copyOf(inputConnections, inputConnections.length+1);     // grow existing connections  array to make space for new connection
-        //this.inConnections[inputConnections.length - 1] = connection;
-        
         this.inConnections.add(connection);
-        
-        //System.out.println( "> len: " + this.inConnections.size() );
         
         Neuron fromNeuron = connection.getFromNeuron();
         fromNeuron.addOutConnection(connection);                    
 	}
 	
-	/**
-	 * Adds input connection from specified neuron
-	 *
-	 * @param fromNeuron
-	 *            neuron to connect from
-	 * @throws Exception 
-	 */
 	public void addInConnection(Neuron fromNeuron) throws Exception {
 		Connection connection = new Connection(fromNeuron, this);
 		this.addInConnection(connection);
 	}
 	
-	/**
-	 * Adds input connection with the given weight, from given neuron
-	 * 
-	 * @param fromNeuron
-	 *            neuron to connect from
-	 * @param weightVal
-	 *	      connection weight value
-	 * @throws Exception 
-	 * 
-	 */	
 	public void addInConnection(Neuron fromNeuron, double weightVal) throws Exception {
 		Connection connection = new Connection(fromNeuron, this, weightVal);
 		this.addInConnection(connection);
 	}	
 	
-	// TODO: check the connection state
 	private void addOutConnection(Connection c) {
 
 		this.outConnections.add(c);

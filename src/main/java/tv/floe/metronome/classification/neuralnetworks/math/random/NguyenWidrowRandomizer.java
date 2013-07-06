@@ -26,7 +26,6 @@ public class NguyenWidrowRandomizer extends RangeRandomizer {
 
 
         for (Layer layer : neuralNetwork.getLayers()) {
-            // Calculate the Euclidean Norm for the weights: norm += value * value - suma vadrata tezina u layeru
             double norm = 0.0;
             for (Neuron neuron : layer.getNeurons()) {
                 for (Connection connection : neuron.getInConnections()) {
@@ -36,7 +35,6 @@ public class NguyenWidrowRandomizer extends RangeRandomizer {
             }
             norm = Math.sqrt(norm);
 
-            // Rescale the weights using beta and the norm: beta * value / norm            
             for (Neuron neuron : layer.getNeurons()) {
                 for (Connection connection : neuron.getInConnections()) {
                     double weight = connection.getWeight().getValue();

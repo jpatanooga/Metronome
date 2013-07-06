@@ -56,27 +56,10 @@ public class Connection {
     public Neuron getFromNeuron() {
         return from;
     }
-/*
-    public void setFromNeuron(Neuron fromNeuron) throws Exception {
-        if (fromNeuron == null) {
-            throw new Exception("From neuron in connection cant be null!");
-        } else {
-            this.from = fromNeuron;
-        }
-    }
-*/
+
     public Neuron getToNeuron() {
         return to;
     }
-/*
-    public void setToNeuron(Neuron toNeuron) throws Exception {
-        if (toNeuron == null) {
-            throw new Exception("From neuron in connection cant be null!");
-        } else {
-            this.to = toNeuron;
-        }
-    }    
-	*/
     
     public double getInput() {
         return this.from.getOutput();

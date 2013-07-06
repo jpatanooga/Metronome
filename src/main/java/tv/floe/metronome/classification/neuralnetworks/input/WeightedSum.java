@@ -9,12 +9,9 @@ public class WeightedSum extends InputFunction {
     @Override
     public double getOutput(ArrayList<Connection> inConnections) {
         double output = 0d;
-
-        //System.out.println( "> Weighted Sum ---- " );
         
         for (Connection connection : inConnections) {
             output += connection.getWeightedInput();
-            //System.out.println( ">> output partial sum: " + connection.getWeightedInput() );
         }
 
         return output;

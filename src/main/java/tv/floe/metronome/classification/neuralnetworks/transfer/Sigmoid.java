@@ -20,12 +20,6 @@ public class Sigmoid extends TransferFunction {
 		this.slope = slope;
 	}
 
-	/**
-	 * Output
-	 * 
-	 * output == 1/(1+ e^(-slope*input))
-	 * 
-	 */
 	@Override
 	public double getOutput(double net) {
 
@@ -48,10 +42,8 @@ public class Sigmoid extends TransferFunction {
 	}
 
 	@Override
-	public double getDerivative(double net) { // remove net parameter? maybe we dont need it since we use cached output value
-                // +0.1 is fix for flat spot see http://www.heatonresearch.com/wiki/Flat_Spot
+	public double getDerivative(double net) { 
 		double derivative = this.slope * this.output * (1d - this.output) + 0.1;
-		
 		return derivative;
 	}	
 	

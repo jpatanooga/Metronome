@@ -39,13 +39,6 @@ public class Weight {
 	public void randomize(double min, double max) {
             this.value = min + Math.random() * (max - min);
 	}
-        
-//    public void randomize(Random generator) {
-//      this.value = generator.nextDouble();  
-//    } 
-
-
-
     
     
 }
