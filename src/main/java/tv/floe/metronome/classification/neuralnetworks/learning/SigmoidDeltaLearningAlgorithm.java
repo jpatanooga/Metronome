@@ -13,23 +13,27 @@ public class SigmoidDeltaLearningAlgorithm extends LeastMeanSquaresLearningAlgor
 	}
 
 	protected void calculateErrorAndUpdateOutputNeurons(double[] outputError) {
-		int i = 0;
-		for(Neuron neuron : nn.getOutputNeurons()) {
+		
+		int x = 0;
+		
+		for (Neuron neuron : nn.getOutputNeurons()) {
 
-			if (outputError[i] == 0) {
-				neuron.setError(0);
-                i++;
+			if (outputError[ x ] == 0) {
+				neuron.setError( 0 );
+                x++;
 				continue;
 			}
 			
 			TransferFunction transferFunction = neuron.getTransferFunction();
 			double neuronInput = neuron.getNetInput();
-			double delta = outputError[i] * transferFunction.getDerivative(neuronInput); // delta = (d-y)*df(net)
-			neuron.setError(delta);
+			double delta = outputError[ x ] * transferFunction.getDerivative( neuronInput ); // delta = (d-y)*df(net)
+			neuron.setError( delta );
                         
-			this.updateNeuronWeights(neuron);				
-			i++;
-		} // for				
+			this.updateNeuronWeights( neuron );				
+			x++; 
+			
+		} // for
+		
 	}	
 	
 }
