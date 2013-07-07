@@ -12,36 +12,49 @@ public class NguyenWidrowRandomizer extends RangeRandomizer {
     }
 
     @Override
-    public void randomize(NeuralNetwork neuralNetwork) {
-        super.randomize(neuralNetwork);
+    public void randomize(NeuralNetwork nn) {
+    	
+        super.randomize(nn);
 
-        int inputNeuronsCount = neuralNetwork.getInputNeurons().size();
-        int hiddenNeuronsCount = 0;
+        int inNeuronsCnt = nn.getInputNeurons().size();
+        int hiddenNeuronsCnt = 0;
 
-        for (int i = 1; i < neuralNetwork.getLayersCount() - 1; i++) {
-            hiddenNeuronsCount += neuralNetwork.getLayerByIndex(i).getNeuronsCount();
+        for (int i = 1; i < nn.getLayersCount() - 1; i++) {
+        	hiddenNeuronsCnt += nn.getLayerByIndex(i).getNeuronsCount();
         }
 
-        double beta = 0.7 * Math.pow(hiddenNeuronsCount, 1.0 / inputNeuronsCount); // should we use the total number of hidden neurons or different norm for each layer
+        double beta = 0.7 * Math.pow(hiddenNeuronsCnt, 1.0 / inNeuronsCnt); // should we use the total number of hidden neurons or different norm for each layer
 
 
-        for (Layer layer : neuralNetwork.getLayers()) {
+        for (Layer layer : nn.getLayers()) {
+        	
             double norm = 0.0;
+            
             for (Neuron neuron : layer.getNeurons()) {
-                for (Connection connection : neuron.getInConnections()) {
-                    double weight = connection.getWeight().getValue();
+            
+            	for (Connection connection : neuron.getInConnections()) {
+                
+            		double weight = connection.getWeight().getValue();
                     norm += weight * weight;
-                }
+                
+            	}
+            
             }
+            
             norm = Math.sqrt(norm);
 
             for (Neuron neuron : layer.getNeurons()) {
-                for (Connection connection : neuron.getInConnections()) {
-                    double weight = connection.getWeight().getValue();
+            
+            	for (Connection connection : neuron.getInConnections()) {
+                
+            		double weight = connection.getWeight().getValue();
                     weight = beta * weight / norm;
                     connection.getWeight().setValue(weight);
-                }
+                
+            	}
+            
             }
+        
         }
 
     }
