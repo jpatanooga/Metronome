@@ -14,6 +14,13 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
 	}
 
 
+	/**
+	 * This is the main driver method for the learning algorithms 
+	 * train( ... )
+	 * - calculate output of current instance
+	 * - calculate error of output vs desired output
+	 * 
+	 */
 	@Override
 	protected void updateNetworkWeights(double[] outputError) {
 				

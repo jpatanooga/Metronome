@@ -12,6 +12,12 @@ public class SigmoidDeltaLearningAlgorithm extends LeastMeanSquaresLearningAlgor
 		
 	}
 
+	/**
+	 * used by back propogation to update output neurons
+	 * 
+	 * 
+	 * @param outputError
+	 */
 	protected void calculateErrorAndUpdateOutputNeurons(double[] outputError) {
 		
 		int x = 0;
