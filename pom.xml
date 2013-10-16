@@ -296,6 +296,12 @@
       <version>0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+		<groupId>net.myrrix</groupId>
+		<artifactId>myrrix-common</artifactId>
+		<version>1.0.1</version>
+	</dependency>
 
   </dependencies>
 </project>
