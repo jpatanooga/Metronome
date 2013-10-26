@@ -16,12 +16,17 @@ public class Weight {
 		this.value = value;
  	}
         
-	public void inc(double amount) {
+	public void accumulate(double amount) {
 		this.value += amount;
+		System.out.println("> Accum (+ " + amount + " )  : " + this.value);
 	}
 
-	public void dec(double amount) {
+	public void decreaseBy(double amount) {
 		this.value -= amount;
+	}
+	
+	public void average(double denominator) {
+		this.value = this.value / denominator;
 	}
 
 	public void setValue(double value) {

@@ -24,6 +24,7 @@ import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.MatrixWritable;
 import org.apache.mahout.math.Vector;
 
+import tv.floe.metronome.classification.neuralnetworks.conf.Config;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.BiasNeuron;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
 import tv.floe.metronome.classification.neuralnetworks.learning.LearningAlgorithm;
@@ -66,10 +67,22 @@ public class NeuralNetwork {
     
     private String label = "";
     
+    private Config conf = null;
+    
     public NeuralNetwork() {
     	
         this.layers = new ArrayList<Layer>();
 
+    }
+    
+    public void setConfig(Config c) {
+    	this.conf = c;
+    }
+    
+    public Config getConfig() {
+    	
+    	return this.conf;
+    	
     }
     
     public void addLayer(Layer layer) {

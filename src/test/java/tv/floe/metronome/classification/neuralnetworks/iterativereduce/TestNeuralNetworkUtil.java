@@ -68,8 +68,8 @@ public class TestNeuralNetworkUtil {
 		
 		
 		
-		int[] neurons = { 2, 3, 1 };
-		c.setLayerNeuronCounts( neurons );
+//		int[] neurons = { 2, 3, 1 };
+//		c.setLayerNeuronCounts( neurons );
 		
 		mlp_network.buildFromConf(c);		
 		
@@ -99,9 +99,34 @@ public class TestNeuralNetworkUtil {
 	}
 	
 	@Test
-	public void testAverageCollectedNetworks() {
+	public void testAverageCollectedNetworks() throws Exception {
 		
+		NeuralNetworkUtil util = new NeuralNetworkUtil();
+
+		NeuralNetwork nn0 =  buildXORMLP();
+		nn0.getLayerByIndex(1).getNeuronAt(0).getInConnections().get(0).setWeight(new Weight(0));
+		nn0.getLayerByIndex(1).getNeuronAt(0).getInConnections().get(1).setWeight(new Weight(1));
+		util.AccumulateWorkerNetwork( nn0 );
+
+		NeuralNetwork nn1 =  buildXORMLP();
+		nn1.getLayerByIndex(1).getNeuronAt(0).getInConnections().get(0).setWeight(new Weight(1));
+		nn1.getLayerByIndex(1).getNeuronAt(0).getInConnections().get(1).setWeight(new Weight(0));
+		util.AccumulateWorkerNetwork( nn1 );
 		
+		//NeuralNetwork nn_out = util.AverageNetworkWeights();
+		
+		NetworkAccumulator accumNet = NetworkAccumulator.buildAveragingNetworkFromConf(nn0.getConfig());
+		
+		assertEquals(3, accumNet.getLayersCount());
+		
+		accumNet.AccumulateWorkerNetwork(nn0);
+		accumNet.AccumulateWorkerNetwork(nn1);
+		
+		accumNet.AverageNetworkWeights();
+		
+		assertEquals(0.5, accumNet.getLayerByIndex(1).getNeuronAt(0).getInConnections().get(0).getWeight().getValue(), 0.0 );
+		assertEquals(0.5, accumNet.getLayerByIndex(1).getNeuronAt(0).getInConnections().get(1).getWeight().getValue(), 0.0 );
+
 	}
 
 }
