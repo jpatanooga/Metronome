@@ -1,6 +1,8 @@
 package tv.floe.metronome.classification.neuralnetworks.core;
 
-public class Weight {
+import java.io.Serializable;
+
+public class Weight implements Serializable {
 
 
 	public double value;
@@ -18,7 +20,7 @@ public class Weight {
         
 	public void accumulate(double amount) {
 		this.value += amount;
-		System.out.println("> Accum (+ " + amount + " )  : " + this.value);
+		//System.out.println("> Accum (+ " + amount + " )  : " + this.value);
 	}
 
 	public void decreaseBy(double amount) {

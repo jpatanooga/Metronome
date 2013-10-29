@@ -33,7 +33,8 @@ public class TestlibsvmRecordFactory {
 		String record_2 = "-1 4:1 6:1 15:1 21:1 35:1 40:1 57:1 63:1 67:1 73:1 74:1 77:1 80:1 83:1 ";
 		
 		
-		libsvmRecordFactory rec_factory = new libsvmRecordFactory();
+		libsvmRecordFactory rec_factory = new libsvmRecordFactory(libsvmRecordFactory.FEATURES);
+		rec_factory.setUseBiasTerm();
 		
 		Vector v = new RandomAccessSparseVector(RCV1RecordFactory.FEATURES);
 		
@@ -47,6 +48,40 @@ public class TestlibsvmRecordFactory {
 		
 		
 		
+		
+		
+	}
+	
+	@Test
+	public void testXorParse() throws Exception {
+		
+		/*
+0 0:0 1:0
+1 0:0 1:1
+1 0:1 1:0
+0 0:1 1:1
+
+		 */
+		
+		String xor_0 = "0 0:0 1:0";
+		String xor_1 = "-1 0:0 1:1";
+		
+		
+		libsvmRecordFactory rec_factory = new libsvmRecordFactory(2);
+		
+		Vector v0 = new RandomAccessSparseVector(RCV1RecordFactory.FEATURES);
+		Vector v1 = new RandomAccessSparseVector(RCV1RecordFactory.FEATURES);
+		
+		double actual_0 = rec_factory.processLineAlt(xor_0, v0);
+		double actual_1 = rec_factory.processLineAlt(xor_1, v1);
+		
+		assertEquals( 0.0, actual_0, 0.0 );
+		assertEquals( 0.0, v0.get(0), 0.0 );
+		assertEquals( 0.0, v0.get(1), 0.0 );
+		
+		assertEquals( -1.0, actual_1, 0.0 );
+		assertEquals( 0.0, v1.get(0), 0.0 );
+		assertEquals( 1.0, v1.get(1), 0.0 );
 		
 		
 	}

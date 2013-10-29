@@ -1,10 +1,12 @@
 package tv.floe.metronome.classification.neuralnetworks.learning;
 
+import java.io.Serializable;
+
 import org.apache.mahout.math.Vector;
 
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 
-public abstract class LearningAlgorithm {
+public abstract class LearningAlgorithm implements Serializable {
 
     protected NeuralNetwork nn;
     

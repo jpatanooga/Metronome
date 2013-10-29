@@ -33,11 +33,19 @@ public class libsvmRecordFactory implements RecordFactory {
 	  
 	  public static final int FEATURES = 10000;
 	  //ConstantValueEncoder encoder = null;
+	  private boolean useBiasTerm = false;
+	  private int featureVectorSize = FEATURES;
 	  
-	  public libsvmRecordFactory() {
+	  public libsvmRecordFactory(int featureVectorSize) {
 	    
+		  this.featureVectorSize = featureVectorSize;
+		  
 	    //this.encoder = new ConstantValueEncoder("body_values");
 	    
+	  }
+	  
+	  public void setUseBiasTerm() {
+		  this.useBiasTerm = true;
 	  }
 	  
 	  public static void ScanFile(String file, int debug_break_cnt)
@@ -63,6 +71,8 @@ public class libsvmRecordFactory implements RecordFactory {
 	        // shard_writer.write(line + "\n");
 	        // out += line;
 	        
+	    	  
+	    	  
 	        String[] parts = line.split(" ");
 	        
 	        // System.out.println( "Class: " + parts[0] );
@@ -162,28 +172,36 @@ public class libsvmRecordFactory implements RecordFactory {
 	    
 	    double actual = 0;
 	    
+	    //System.out.println("Line: " + line);
+	    
 	    String[] parts = line.split(" ");
 	    
 	    //actual = Integer.parseInt(parts[0]);
 	    actual = Double.parseDouble(parts[0]);
 	    
+	    int startFeatureIndex = 0;
 	    // dont know what to do the the "namespace" "f"
-	    v.set(0, 1.0);
+	    if (this.useBiasTerm) {
+	    	v.set(0, 1.0);
+	    	startFeatureIndex = 1;
+	    }
 	    
 	    for (int x = 1; x < parts.length; x++) {
 	      
+	    	//System.out.println("> DEbug > part: " + parts[x]);
+	    	
 	      String[] feature = parts[x].split(":");
-	      int index = (Integer.parseInt(feature[0]) + 1) % FEATURES;
+	      int index = (Integer.parseInt(feature[0]) + startFeatureIndex) % this.featureVectorSize;
 	      double val = Double.parseDouble(feature[1]);
 	      
 //	      System.out.println(index + " -> " + feature[1] + " = " + val );
 	      
-	      if (index < FEATURES) {
+	      if (index < this.featureVectorSize) {
 	        v.set(index, val);
 	      } else {
 	        
 	        System.out
-	            .println("Could Hash: " + index + " to " + (index % FEATURES));
+	            .println("Could Hash: " + index + " to " + (index % this.featureVectorSize));
 	        
 	      }
 	      
@@ -219,7 +237,7 @@ public class libsvmRecordFactory implements RecordFactory {
 
 	@Override
 	public int getFeatureVectorSize() {
-		return this.FEATURES;
+		return this.featureVectorSize;
 	}
 	
 	

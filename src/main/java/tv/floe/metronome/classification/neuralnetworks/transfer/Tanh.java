@@ -1,5 +1,19 @@
 package tv.floe.metronome.classification.neuralnetworks.transfer;
 
+/**
+ * The hyperbolic tangent activation function
+ * - produces output numbers between -1 and 1
+ * - most useful for training data that is also between 0 and 1. 
+ * - can be used with gradient descent based training methods.  
+ * - common activation function used for neural networks
+ * 
+ * - provides similar scaling to the sigmoid activation function, 
+ * --- the difference being: has a range from -1 to 1 
+ * - often used in place of the sigmoid activation function.
+ * 
+ * 
+ *
+ */
 public class Tanh  extends TransferFunction {
 
 	private double slope = 2d;

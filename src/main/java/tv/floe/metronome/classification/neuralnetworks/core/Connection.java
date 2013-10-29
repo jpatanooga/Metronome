@@ -1,8 +1,10 @@
 package tv.floe.metronome.classification.neuralnetworks.core;
 
+import java.io.Serializable;
+
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
 
-public class Connection {
+public class Connection implements Serializable {
 
 	// from Neuron
     protected Neuron from;

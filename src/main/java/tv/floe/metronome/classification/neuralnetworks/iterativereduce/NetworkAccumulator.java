@@ -1,5 +1,12 @@
 package tv.floe.metronome.classification.neuralnetworks.iterativereduce;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import tv.floe.metronome.classification.neuralnetworks.conf.Config;
@@ -158,7 +165,8 @@ public class NetworkAccumulator extends NeuralNetwork {
 		
 	}	
 	
-	private void buildFromConf(Config conf) throws Exception {
+	@Override
+	public void buildFromConf(Config conf) throws Exception {
 
 		this.setNetworkType(NetworkType.MULTI_LAYER_PERCEPTRON);
 
@@ -229,6 +237,8 @@ public class NetworkAccumulator extends NeuralNetwork {
      this.clearNetworkConnectionWeights();
      
 	}	
+
+    	
 	
 	
 	

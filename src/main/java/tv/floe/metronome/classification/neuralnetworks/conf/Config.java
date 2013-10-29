@@ -28,10 +28,22 @@ public class Config extends Hashtable {
 */	
 	ArrayList<Integer> layerNeuronCounts;
 
+	public Config() {
+		
+		this.setupDefaults();
+		
+	}
 	
+	/**
+	 * Call this to prep any values out of the setup config
+	 * - also can read values out of a hadoop config
+	 * 
+	 * @param c
+	 */
 	public void parse(Configuration c) {
 
-		this.setupDefaults();
+		
+		
 		
 		// parse c here
 		
@@ -61,6 +73,8 @@ public class Config extends Hashtable {
 			int val = Integer.parseInt(parts[x]);
 			
 			this.layerNeuronCounts.add( val );
+			
+		//	System.out.println(">> ParseNeuronCounts: (index: " + x + "): " + val );
 			
 		}
 		

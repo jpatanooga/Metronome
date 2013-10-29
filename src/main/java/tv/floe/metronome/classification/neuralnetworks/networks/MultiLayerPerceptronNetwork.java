@@ -1,5 +1,14 @@
 package tv.floe.metronome.classification.neuralnetworks.networks;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import tv.floe.metronome.classification.neuralnetworks.conf.Config;
 import tv.floe.metronome.classification.neuralnetworks.core.Layer;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
@@ -15,8 +24,14 @@ public class MultiLayerPerceptronNetwork extends NeuralNetwork {
 	}
 
 
+	@Override
 	public void buildFromConf(Config conf) throws Exception {
 
+		// parse hashtable values
+		
+		
+		
+		
 		this.setNetworkType(NetworkType.MULTI_LAYER_PERCEPTRON);
 
 
@@ -84,5 +99,7 @@ public class MultiLayerPerceptronNetwork extends NeuralNetwork {
      this.setConfig(conf);
      
 	}
+	
+
 
 }

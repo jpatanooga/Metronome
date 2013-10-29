@@ -76,7 +76,11 @@ public class IRUnitDriver<T> {
 		
 
 		for ( int x = 0; x < props_to_copy.length; x++ ) {
-			c.set(props_to_copy[x], this.props.getProperty(props_to_copy[x]));
+			if (null != this.props.getProperty(props_to_copy[x])) {
+				c.set(props_to_copy[x], this.props.getProperty(props_to_copy[x]));
+			} else {
+			//	System.out.println("> Conf: Did not find in properties file - " + props_to_copy[x]);
+			}
 		}
 
 		

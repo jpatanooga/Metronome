@@ -242,5 +242,12 @@ public class TestMultiLayerPerceptronNetwork {
 		
 	}
 	
+	@Test
+	public void testSerde() {
+		
+		
+		
+	}
+	
 
 }

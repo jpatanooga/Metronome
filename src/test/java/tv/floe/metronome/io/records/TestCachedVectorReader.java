@@ -117,7 +117,7 @@ public class TestCachedVectorReader {
 		
 		
 
-		libsvmRecordFactory rec_factory = new libsvmRecordFactory();
+		libsvmRecordFactory rec_factory = new libsvmRecordFactory(libsvmRecordFactory.FEATURES);
 
 	    JobConf job = new JobConf(defaultConf);
 	    
@@ -151,6 +151,10 @@ public class TestCachedVectorReader {
 		
 		while (cachedVecReader.next(cv)) {
 			
+			if (0 == record_count || 1 == record_count) {
+				System.out.println("rec 0>  " + cv.label + " == " + cv.vec.toString() );
+				assertEquals(-1.0, cv.label, 0.0);
+			}
 			
 			record_count++;
 			

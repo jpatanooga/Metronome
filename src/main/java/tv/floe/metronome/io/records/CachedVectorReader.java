@@ -38,6 +38,13 @@ public class CachedVectorReader {
 		
 	}
 	
+	/**
+	 * I spent too long of periods trying to finish this, it can probably be a lot better
+	 * 
+	 * @param cachedVec
+	 * @return
+	 * @throws IOException
+	 */
 	  public boolean next( CachedVector cachedVec ) throws IOException {
 		    
 		    Text value = new Text();
@@ -57,6 +64,7 @@ public class CachedVectorReader {
 		    	
 		    		//System.out.println( "> hittin that cache: " + this.currentVectorIndex );
 		    		cachedVec.vec.assign(this.arCachedVectors.get(this.currentVectorIndex).vec);
+		    		cachedVec.label = this.arCachedVectors.get(this.currentVectorIndex).label;
 			    	this.currentVectorIndex++;
 			    	return true;
 			    	
@@ -86,6 +94,7 @@ public class CachedVectorReader {
 				        
 				        try {
 							cVec.label = this.vector_factory.processLineAlt(value.toString(), cVec.vec);
+							//System.out.println("vec val: " + cVec.label);
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -93,6 +102,8 @@ public class CachedVectorReader {
 				        
 				        this.arCachedVectors.add(cVec);
 				        cachedVec.vec.assign(cVec.vec);
+				        cachedVec.label = cVec.label;
+				        
 				        
 			        } else {
 			        	

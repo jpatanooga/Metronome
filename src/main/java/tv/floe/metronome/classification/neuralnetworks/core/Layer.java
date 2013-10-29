@@ -1,12 +1,13 @@
 package tv.floe.metronome.classification.neuralnetworks.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
 import tv.floe.metronome.classification.neuralnetworks.conf.Config;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
 
-public class Layer {
+public class Layer implements Serializable {
 
 	private NeuralNetwork parentNetwork;
 
@@ -32,6 +33,8 @@ public class Layer {
 		
 		
 		int neuronCount = c.getLayerNeuronCount(layerIndex);
+		
+		//System.out.println("Layer " + layerIndex + ": neurons: " + neuronCount );
 		
 		for (int x = 0; x < neuronCount; x++ ) {
 			
@@ -227,6 +230,19 @@ public class Layer {
 			
 		}		
 	}
+	
+	public int getIncomingConnectionCount() {
+		
+		int connections = 0;
+		
+		// for each neuron
+		for (Neuron neuron : this.layer_neurons) {
+			connections += neuron.inConnections.size();
+		}
+		
+		return connections;
+	}
+	
 
 	
 }

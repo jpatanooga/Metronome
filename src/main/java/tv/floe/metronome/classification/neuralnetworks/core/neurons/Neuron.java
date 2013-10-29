@@ -1,5 +1,6 @@
 package tv.floe.metronome.classification.neuralnetworks.core.neurons;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -13,7 +14,7 @@ import tv.floe.metronome.classification.neuralnetworks.transfer.Sigmoid;
 import tv.floe.metronome.classification.neuralnetworks.transfer.Step;
 import tv.floe.metronome.classification.neuralnetworks.transfer.TransferFunction;
 
-public class Neuron {
+public class Neuron implements Serializable {
 	
 	public Layer parentLayer = null;
 	public ArrayList<Connection> inConnections = null;

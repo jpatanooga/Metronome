@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -31,7 +32,7 @@ import tv.floe.metronome.classification.neuralnetworks.learning.LearningAlgorith
 import tv.floe.metronome.classification.neuralnetworks.math.random.RangeRandomizer;
 import tv.floe.metronome.classification.neuralnetworks.math.random.WeightsRandomizer;
 
-public class NeuralNetwork {
+public class NeuralNetwork implements Serializable {
 
 	public enum NetworkType { 
 		
@@ -393,51 +394,55 @@ public class NeuralNetwork {
 		
 	}
     
-	public byte[] Serialize() throws IOException {
+	
 
 	
-	    // DataOutput d
-	    
+	
+	public byte[] Serialize() throws IOException {
+
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-	    DataOutput d = new DataOutputStream(out);
+	    ObjectOutputStream oos = new ObjectOutputStream(out);
 	    
-/*	    // d.writeUTF(src_host);
-	    d.writeInt(this.SrcWorkerPassCount);
-	    d.writeInt(this.GlobalPassCount);
+	    oos.writeObject( this );
 	    
-	    d.writeInt(this.IterationComplete);
-	    d.writeInt(this.CurrentIteration);
+	    oos.flush();
+	    oos.close();
 	    
-	    d.writeInt(this.TrainedRecords);
-	    d.writeFloat(this.AvgLogLikelihood);
-	    d.writeFloat(this.PercentCorrect);
-	    // buf.write
-	    // MatrixWritable.writeMatrix(d, this.worker_gradient.getMatrix());
-	    MatrixWritable.writeMatrix(d, this.parameter_vector);
-	    // MatrixWritable.
-*/
+	    
 	    
     return out.toByteArray();
+
   }
   
-  public void Deserialize(byte[] bytes) throws IOException {
-    // DataInput in) throws IOException {
-	    
-	    ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-	    DataInput in = new DataInputStream(b);
-	    // this.src_host = in.readUTF();
-/*	    this.SrcWorkerPassCount = in.readInt();
-	    this.GlobalPassCount = in.readInt();
-	    
-	    this.IterationComplete = in.readInt();
-	    this.CurrentIteration = in.readInt();
-	    
-	    this.TrainedRecords = in.readInt(); // d.writeInt(this.TrainedRecords);
-	    this.AvgLogLikelihood = in.readFloat(); // d.writeFloat(this.AvgLogLikelihood);
-	    this.PercentCorrect = in.readFloat(); // d.writeFloat(this.PercentCorrect);
-	    
-	    this.parameter_vector = MatrixWritable.readMatrix(in);
-    */
+  public static NeuralNetwork Deserialize(byte[] bytes) throws IOException {
+
+      ObjectInputStream oistream = null;
+
+      try {
+
+          oistream = new ObjectInputStream(new ByteArrayInputStream( bytes ));
+          NeuralNetwork nnet = (NeuralNetwork) oistream.readObject();
+          return nnet;
+
+      } catch (IOException ioe) {
+          ioe.printStackTrace();
+      } catch (ClassNotFoundException cnfe) {
+          cnfe.printStackTrace();
+      } finally {
+          if (oistream != null) {
+              try {
+                  oistream.close();
+              } catch (IOException ioe) {
+              }
+          }
+      }
+
+      return null;  
+  
+  }
+  
+  public void buildFromConf(Config conf) throws Exception {
+	  
   }
     
 	
