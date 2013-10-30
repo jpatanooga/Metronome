@@ -351,5 +351,11 @@ public class IRUnitDriver<T> {
 		return this.master;
 		
 	}
+	
+	public ArrayList<ComputableWorker> getWorker() {
+		
+		return this.workers;
+		
+	}
 
 }

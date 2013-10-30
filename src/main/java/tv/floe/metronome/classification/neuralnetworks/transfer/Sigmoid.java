@@ -1,5 +1,14 @@
 package tv.floe.metronome.classification.neuralnetworks.transfer;
-
+/**
+ * Classical neural network activation function
+ * - scalar to scalar function
+ * - needed for hidden units to introduce non-linearity into the networks
+ * --- composition of linear functions is a linear function!
+ * - backpropagation works well with sigmoid function
+ * 
+ * @author josh
+ *
+ */
 public class Sigmoid extends TransferFunction {
 
 	private double slope = 1d;

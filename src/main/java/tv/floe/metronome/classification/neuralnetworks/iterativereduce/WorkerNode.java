@@ -243,10 +243,11 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	    this.GlobalBatchCountForIteration = global_update.GlobalPassCount;
 	*/
 		
-//		NeuralNetworkWeightsDelta global_update = nwu.get();
+		NeuralNetworkWeightsDelta global_update = nwu.get();
 		
 		// TODO: now update the local network
 		
+		this.nn = global_update.network;
 		
 		
 		

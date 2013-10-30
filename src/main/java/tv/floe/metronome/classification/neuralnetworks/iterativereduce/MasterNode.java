@@ -19,6 +19,7 @@ import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
 public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWeightsUpdateable> {
 
 	public NeuralNetwork master_nn = null;
+	public NeuralNetwork first_worker_copy = null;
 	
 	@Override
 	public void complete(DataOutputStream ds) throws IOException {
@@ -53,6 +54,10 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 		
 		if (null == first) {
 			System.out.println("Can't seem to get the first network weights updateable");
+		}
+		
+		if (null == this.first_worker_copy) {
+			this.first_worker_copy = first.networkUpdate.network;
 		}
 		
 		try {
