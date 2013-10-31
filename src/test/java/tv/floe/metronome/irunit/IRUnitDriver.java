@@ -292,7 +292,7 @@ public class IRUnitDriver<T> {
 		int iterations = Integer.parseInt(props
 				.getProperty("app.iteration.count"));
 
-		System.out.println("Starting Iterations...");
+		System.out.println("Starting Iterations (" + iterations + ")...");
 		
 		for (int x = 0; x < iterations; x++) {
 
@@ -331,6 +331,7 @@ public class IRUnitDriver<T> {
 
 		} // for
 		
+		System.out.println("Complete " + iterations + " Iterations Per Worker.");
 		
 
 		/*

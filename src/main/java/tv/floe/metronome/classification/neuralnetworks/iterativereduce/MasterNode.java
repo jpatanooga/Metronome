@@ -24,8 +24,10 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	@Override
 	public void complete(DataOutputStream ds) throws IOException {
 
-	    System.out.println("master::complete ");
+	    System.out.println("master::complete (Iterations: " + this.NumberIterations + ")");
 	    System.out.println("complete-ms:" + System.currentTimeMillis());
+	    
+	    
 	    
 	    //LOG.debug("Master complete, saving model.");
 	    
