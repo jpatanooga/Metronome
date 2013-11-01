@@ -13,6 +13,7 @@ import tv.floe.metronome.classification.neuralnetworks.conf.Config;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
 import tv.floe.metronome.classification.neuralnetworks.input.WeightedSum;
+import tv.floe.metronome.classification.neuralnetworks.learning.BackPropogationLearningAlgorithm;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.classification.neuralnetworks.transfer.Tanh;
 import tv.floe.metronome.io.records.CachedVector;
@@ -33,7 +34,8 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	  
 	  // basic stats tracking
 	  POLRMetrics metrics = new POLRMetrics();
-	
+	  public double lastRMSE = 0.0;
+	boolean hitErrThreshold = false;
 	
 	// do we want to hardcode the record factory type in?
 	// TODO: fix this
@@ -74,7 +76,9 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	
 	@Override
 	public boolean IncrementIteration() {
-		// TODO Auto-generated method stub
+
+		this.CurrentIteration++;
+
 		return false;
 	}
 
@@ -95,23 +99,49 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		Vector vec_function_output = new DenseVector(1);
 		//vec_function_output.set(0, 1);
 		
-		//System.out.println("Input Neurons: " + this.nn.getLayerByIndex(0).getNeuronsCount());
+		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
+		bp.clearTotalSquaredError();
 		
-		try {
-			while (cachedVecReader.next(cv)) {
-				
-				//System.out.println( "Worker > CachedVector > Label: " + cv.label + ", Features: " + cv.vec.toString() ) ;
-				vec_function_output.set(0, cv.label);
-				//mlp_network.train(v0_out, v0);
-				this.nn.train(vec_function_output, cv.vec);
-				
-//			record_count++;
+		//System.out.println("Input Neurons: " + this.nn.getLayerByIndex(0).getNeuronsCount());
+			// once its already printed this, dont print again.
+//			if (!hitErrThreshold) {
+				//System.out.println("Hit Min Err Threshold > Iteration: " + this.CurrentIteration);
+
+//				hitErrThreshold = true;
+	//		}
+		//} else {
+			
+			
+			try {
+				while (cachedVecReader.next(cv)) {
+	
+					
+					//System.out.println( "Worker > CachedVector > Label: " + cv.label + ", Features: " + cv.vec.toString() ) ;
+					vec_function_output.set(0, cv.label);
+					//mlp_network.train(v0_out, v0);
+					this.nn.train(vec_function_output, cv.vec);
+					
+					
+	//			record_count++;
+					
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		//} // if
+		
+			if (bp.hasHitMinErrorThreshold()) {
+				if (!hitErrThreshold) {
+					System.out.println("Hit Min Err Threshold > Iteration: " + this.CurrentIteration);
+
+					hitErrThreshold = true;
+				}
 				
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			
+		
 		
 		long totalTime = System.currentTimeMillis() - startMS;
 		
@@ -119,6 +149,8 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 
 		NeuralNetworkWeightsDelta nnwd = new NeuralNetworkWeightsDelta();
 		nnwd.network = this.nn;
+		nnwd.RMSE = bp.calcRMSError();
+		this.lastRMSE = nnwd.RMSE;
 		
 		NetworkWeightsUpdateable nwu = new NetworkWeightsUpdateable();
 		nwu.networkUpdate = nnwd;

@@ -30,6 +30,7 @@ public class NeuralNetworkWeightsDelta {
 	  public int TrainedRecords = 0;
 //	  public float AvgLogLikelihood = 0;
 	  public float PercentCorrect = 0;
+	  public double RMSE = 0.0;
 	
 	  public byte[] Serialize() throws IOException {
 		    
@@ -48,6 +49,7 @@ public class NeuralNetworkWeightsDelta {
 		    d.writeInt(this.TrainedRecords);
 		    //d.writeFloat(this.AvgLogLikelihood);
 		    d.writeFloat(this.PercentCorrect);
+		    d.writeDouble(this.RMSE);
 		    
 		    //d.write
 		    
@@ -81,6 +83,7 @@ public class NeuralNetworkWeightsDelta {
 		    this.TrainedRecords = in.readInt(); // d.writeInt(this.TrainedRecords);
 		    //this.AvgLogLikelihood = in.readFloat(); // d.writeFloat(this.AvgLogLikelihood);
 		    this.PercentCorrect = in.readFloat(); // d.writeFloat(this.PercentCorrect);
+		    this.RMSE = in.readDouble();
 
 		     ObjectInputStream oistream = null;
 

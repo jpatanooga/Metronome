@@ -19,6 +19,8 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     private int minErrorChangeIterationsLimit = Integer.MAX_VALUE;
     private transient int minErrorChangeIterationsCount;
     private boolean batchMode = false;
+    private long recordsSeenDuringEpock = 0;
+    private double trainingErrorThreshold = 0.02d;
         
     public double getTotalSquaredError() {
     	return this.totalSquaredErrorSum;
@@ -27,6 +29,7 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     public void clearTotalSquaredError() {
     	
     	this.totalSquaredErrorSum = 0;
+    	this.recordsSeenDuringEpock = 0;
     	
     }
 	
@@ -38,6 +41,8 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
+        this.recordsSeenDuringEpock++;
                 
         this.nn.calculate();
         
@@ -87,6 +92,20 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
         return (this.totalNetworkError < this.maxError) || this.errorChangeStalled();
     }
 
+    public boolean hasHitMinErrorThreshold() {
+    	
+    	if (this.recordsSeenDuringEpock < 1) {
+    		return false;
+    	}
+    	//System.out.println("> Debug-RMSE: " + this.calcRMSError() + " < " + this.trainingErrorThreshold);
+    	double rmse = this.calcRMSError();
+    	if (Double.isNaN(rmse) ) {
+    		return false;
+    	}
+        return (rmse < this.trainingErrorThreshold);
+    }
+    
+    
     protected boolean errorChangeStalled() {
         double absErrorChange = Math.abs(previousEpochError - totalNetworkError);
 
@@ -116,19 +135,38 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
         return outputError;
     }
 
+    /**
+     * Adjusted this to reflect a general RMS formula
+     * 
+     * @param outputError
+     */
     protected void addToSquaredErrorSum(double[] outputError) {
         
     	double outputErrorSqrSum = 0.0d;
     	
         for (double error : outputError) {
         
-        	outputErrorSqrSum += (error * error) * 0.5d; // a;so multiply with 1/trainingSetSize  1/2n * (...)
-        
+        	//outputErrorSqrSum += (error * error) * 0.5d; // a;so multiply with 1/trainingSetSize  1/2n * (...)
+        	outputErrorSqrSum += (error * error);
         	//System.out.println("> err^2 " + ((error * error)) );
         	
         }
 
         this.totalSquaredErrorSum += outputErrorSqrSum;
+    }
+    
+    /**
+     * Calculates Root Mean Square Error
+     * - should be reset per each pass of a dataset!
+     * 
+     * @return
+     */
+    public double calcRMSError() {
+    	//System.out.println("RMSECalc - Debug: " + this.totalSquaredErrorSum + " / " + ((double)this.recordsSeenDuringEpock) );
+    	//System.out.println("Sqrt: " + Math.sqrt(this.totalSquaredErrorSum / ((double)this.recordsSeenDuringEpock)));
+    
+    	return Math.sqrt(this.totalSquaredErrorSum / ((double)this.recordsSeenDuringEpock));
+    	
     }
     
     public boolean isInBatchMode() {
@@ -138,6 +176,12 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     public void setBatchMode(boolean batchMode) {
         this.batchMode = batchMode;
     }    
+    
+    public void setRecordsSeen_Debug(long rec_seen) {
+    	
+    	this.recordsSeenDuringEpock = rec_seen;
+    	
+    }
     
     
     

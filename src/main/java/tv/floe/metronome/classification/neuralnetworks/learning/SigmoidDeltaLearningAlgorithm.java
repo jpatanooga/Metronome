@@ -13,7 +13,7 @@ public class SigmoidDeltaLearningAlgorithm extends LeastMeanSquaresLearningAlgor
 	}
 
 	/**
-	 * used by back propogation to update output neurons
+	 * used by back propagation to update output neurons
 	 * 
 	 * 
 	 * @param outputError

@@ -135,6 +135,9 @@ public class TestTwoWorkersXOR_IR_NN {
 
 		this.scoreNeuralNetworkXor( master.master_nn );
 		
+		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
+		System.out.println("w2 > RMSE: " + secondWorker.lastRMSE );
+		
 //		this.scoreNeuralNetworkXor( singleWorker.nn );
 //		PrintNeuralNetwork( singleWorker.nn );
 		

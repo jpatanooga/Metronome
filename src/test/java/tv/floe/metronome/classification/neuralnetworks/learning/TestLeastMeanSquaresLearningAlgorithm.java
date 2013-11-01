@@ -40,7 +40,7 @@ public class TestLeastMeanSquaresLearningAlgorithm {
 		int num_inputs = 4;
 		int num_outputs = 3;
 		
-		BufferedReader reader = new BufferedReader( new FileReader("src/test/resources/datasets/iris/iris_data_normalised.txt") );
+		BufferedReader reader = new BufferedReader( new FileReader("src/test/resources/data/iris/iris_data_normalised.txt") );
 		
 		
 		String line = reader.readLine();
@@ -174,15 +174,27 @@ public class TestLeastMeanSquaresLearningAlgorithm {
 		
 		lms_algo.addToSquaredErrorSum(outputError_0);
 		
-		assertEquals( 0.015d, lms_algo.getTotalSquaredError(), 0.000001d );
+		assertEquals( 0.03d, lms_algo.getTotalSquaredError(), 0.000001d );
 
 		lms_algo.clearTotalSquaredError();
 		
 		lms_algo.addToSquaredErrorSum(outputError_1);
 		
-		assertEquals( 0.07d, lms_algo.getTotalSquaredError(), 0.000001d );
+		assertEquals( 0.14d, lms_algo.getTotalSquaredError(), 0.000001d );
 		
 		
+		// now make sure RMSE works correctly
+		lms_algo.clearTotalSquaredError();
+		lms_algo.addToSquaredErrorSum(outputError_0);
+		lms_algo.addToSquaredErrorSum(outputError_1);
+		
+		lms_algo.setRecordsSeen_Debug(2);
+		
+		double rmse = lms_algo.calcRMSError();
+		
+		double rmse_answer = Math.sqrt((0.03d +  0.14d) / 2.0);
+		
+		assertEquals(rmse_answer, rmse, 0.0);
 		
 	}
 	

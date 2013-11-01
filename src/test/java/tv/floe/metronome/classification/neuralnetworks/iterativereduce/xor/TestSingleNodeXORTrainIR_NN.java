@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.MasterNode;
+import tv.floe.metronome.classification.neuralnetworks.iterativereduce.WorkerNode;
 import tv.floe.metronome.irunit.IRUnitDriver;
 
 public class TestSingleNodeXORTrainIR_NN {
@@ -101,11 +102,13 @@ public class TestSingleNodeXORTrainIR_NN {
 
 		polr_ir.SimulateRun();
 
+		WorkerNode singleWorker = (WorkerNode)polr_ir.getWorker().get(0);
 		
 		MasterNode master = (MasterNode) polr_ir.getMaster();
 		
 		System.out.println("\n\nComplete: ");
 		//Utils.PrintVector( master.polr.getBeta().viewRow(0) );
+		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
 
 		this.scoreNeuralNetworkXor( master.master_nn );
 		
