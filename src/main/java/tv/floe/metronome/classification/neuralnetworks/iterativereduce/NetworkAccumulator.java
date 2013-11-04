@@ -38,7 +38,7 @@ public class NetworkAccumulator extends NeuralNetwork {
 		this.worker_networks = new ArrayList<NeuralNetwork>();
 		
 	}
-	
+	/*
 	public void clearNetworkConnectionWeights() {
 		
 		for ( int x = 1; x < this.getLayersCount(); x++ ) {
@@ -58,7 +58,7 @@ public class NetworkAccumulator extends NeuralNetwork {
 		
 		
 	}
-
+*/
 	public void AverageNetworkWeights() throws Exception {
 
 		int denominator = this.worker_networks.size(); 

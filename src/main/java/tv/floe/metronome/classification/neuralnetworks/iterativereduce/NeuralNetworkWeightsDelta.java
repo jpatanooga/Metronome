@@ -59,6 +59,8 @@ public class NeuralNetworkWeightsDelta {
 		    // MatrixWritable.
 		    ObjectOutputStream oos = new ObjectOutputStream(out);
 		    
+		    System.out.println("Worker:Serialize() > " + this.network.getClass());
+		    
 		    oos.writeObject( this.network );
 		    
 		    oos.flush();

@@ -58,7 +58,7 @@ public class NeuralNetwork implements Serializable {
   
     private ArrayList<Layer> layers;
     
-    protected Vector output_vector;
+    protected transient Vector output_vector;
     
     private ArrayList<Neuron> inputNeurons;
     
@@ -444,6 +444,67 @@ public class NeuralNetwork implements Serializable {
   public void buildFromConf(Config conf) throws Exception {
 	  
   }
+  
+  /**
+   * 
+   * 
+   * @param other
+   */
+  public void copyWeightsAndConf(NeuralNetwork other_nn) {
+	  
+	  // scan layers, copy weights
+	  this.clearNetworkConnectionWeights();
+
+		// for each layer starting after the input layer
+		for ( int x = 1; x < other_nn.getLayersCount(); x++ ) {
+			
+			this.copyLayer(other_nn.getLayerByIndex(x), this.getLayerByIndex(x));
+			
+		}
+		
+	}
+	
+	private void copyLayer(Layer src_layer, Layer dst_layer) {
+		
+      //for (Neuron neuron : worker_layer.getNeurons()) {
+		for ( int x = 0; x < src_layer.getNeuronsCount(); x++ ) {
+      	
+			this.copyNeuronConnections(src_layer.getNeuronAt(x), dst_layer.getNeuronAt(x));
+          
+      }
+		
+	}
+	
+	private void copyNeuronConnections(Neuron srcNeuron, Neuron dstNeuron) {
+
+		for ( int x = 0; x < srcNeuron.inConnections.size(); x++ ) {
+      	
+			dstNeuron.getInConnections().get(x).getWeight().accumulate( srcNeuron.getInConnections().get(x).getWeight().getValue() );
+          
+      }
+		
+	} 
+	
+	public void clearNetworkConnectionWeights() {
+		
+		for ( int x = 1; x < this.getLayersCount(); x++ ) {
+				        	
+            for (Neuron neuron : this.getLayerByIndex(x).getNeurons()) {
+            	
+                for (Connection connection : neuron.getInConnections()) {
+                	
+                    connection.getWeight().setValue( 0 );
+                    
+                }
+                
+            }
+	            
+			
+		}
+		
+		
+	}
+
     
 	
 }

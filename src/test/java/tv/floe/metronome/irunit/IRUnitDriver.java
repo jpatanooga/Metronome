@@ -1,8 +1,13 @@
 package tv.floe.metronome.irunit;
 
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -68,15 +73,15 @@ public class IRUnitDriver<T> {
 
 		Configuration c = new Configuration();
 
-		String[] props_to_copy = {
+/*		String[] props_to_copy = {
 				"app.iteration.count",
 				"com.cloudera.knittingboar.setup.FeatureVectorSize",
 				"com.cloudera.knittingboar.setup.RecordFactoryClassname",
 				"com.cloudera.knittingboar.setup.LearningRate"
 		};
-		
+	*/	
 		 for(Entry<Object, Object> e : props.entrySet()) {
-	            //System.out.println(e.getKey());
+	           // System.out.println(e.getKey());
 			 c.set(e.getKey().toString(), e.getValue().toString());
 	        }		
 /*
@@ -337,18 +342,49 @@ public class IRUnitDriver<T> {
 		} // for
 		
 		System.out.println("Complete " + iterations + " Iterations Per Worker.");
-		
 
-		/*
-		 * Path out = new Path("/tmp/IR_Model_0.model"); FileSystem fs =
-		 * out.getFileSystem(defaultConf); FSDataOutputStream fos =
-		 * fs.create(out);
-		 * 
-		 * //LOG.info("Writing master results to " + out.toString());
-		 * IR_Master.complete(fos);
-		 * 
-		 * fos.flush(); fos.close();
-		 */
+		//String output_path = this.props.getProperty("app.output.path");
+		
+		//System.out.println("Writing the output to: " + output_path);
+		
+		
+		// make sure we have somewhere to write the model
+		if (null != this.props.getProperty("app.output.path")) {
+			
+			String output_path = this.props.getProperty("app.output.path");
+			
+			System.out.println("Writing the output to: " + output_path);
+			
+
+			try {
+
+				Path out = new Path(output_path); 
+				FileSystem fs =
+						  out.getFileSystem(defaultConf); 
+				
+				FSDataOutputStream fos;
+
+				fos = fs.create(out);
+				  //LOG.info("Writing master results to " + out.toString());
+				  master.complete(fos);
+				  
+				  fos.flush(); 
+				  fos.close();
+
+
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			  
+
+		} else {
+			
+			System.out.println("Not Firing Master::Complete() function due to no output path in conf");
+			
+		}
+
 
 	}
 	

@@ -43,7 +43,7 @@ public class Test_IrisDataset_IR_NN {
 		
 		//System.out.println("Gobal Results");
 		//TestTwoWorkersXOR_IR_NN.scoreNeuralNetworkXor( master.master_nn );
-		//Utils.PrintNeuralNetwork(  master.master_nn );
+		Utils.PrintNeuralNetwork(  master.master_nn );
 		
 	}
 		

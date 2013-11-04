@@ -188,7 +188,18 @@ public class TestMetronomeVectorizatonFormat {
 		System.out.println("assign-out: " + v_alt.get(3));
 		
 		
+		Vector a = new RandomAccessSparseVector(3);
+		Vector b = new RandomAccessSparseVector(3);
 		
+		a.set(0,  1.0);
+		a.set(1,  2.0);
+		a.set(2,  3.0);
+		
+		b.set(0,  1.0);
+		b.set(1,  2.0);
+		b.set(2,  3.0);
+		
+		System.out.println("same: " + (a.equals(b)) );
 		
 	}
 	

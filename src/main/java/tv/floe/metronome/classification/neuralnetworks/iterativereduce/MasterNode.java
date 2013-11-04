@@ -1,7 +1,10 @@
 package tv.floe.metronome.classification.neuralnetworks.iterativereduce;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.apache.hadoop.conf.Configuration;
@@ -10,6 +13,7 @@ import org.apache.hadoop.util.ToolRunner;
 import tv.floe.metronome.classification.logisticregression.iterativereduce.POLRMasterNode;
 import tv.floe.metronome.classification.logisticregression.iterativereduce.ParameterVectorUpdatable;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
+import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.linearregression.iterativereduce.NodeBase;
 
@@ -19,7 +23,7 @@ import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
 public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWeightsUpdateable> {
 
 	public NeuralNetwork master_nn = null;
-	public NeuralNetwork first_worker_copy = null;
+	//public NeuralNetwork first_worker_copy = null;
 	
 	@Override
 	public void complete(DataOutputStream ds) throws IOException {
@@ -27,8 +31,50 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	    System.out.println("master::complete (Iterations: " + this.NumberIterations + ")");
 	    System.out.println("complete-ms:" + System.currentTimeMillis());
 	    
+	    //System.out.println("type: " + this.master_nn.getClass());
 	    
+	    ds.write(this.master_nn.Serialize());
 	    
+	   // System.out.println("Master NN Size: " + this.master_nn.Serialize().length );
+/*	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    
+	    ObjectOutputStream oos = new ObjectOutputStream(out);
+	    
+	    oos.writeObject( this.master_nn );
+	    
+	    oos.flush();
+	*/
+	    
+//	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+//	    DataOutput d = new DataOutputStream(out);
+	    
+	    // d.writeUTF(src_host);
+	    //d.writeInt(this.SrcWorkerPassCount);
+/*	    d.writeInt(this.GlobalPassCount);
+	    
+	    d.writeInt(this.IterationComplete);
+	    d.writeInt(this.CurrentIteration);
+	    
+	    d.writeInt(this.TrainedRecords);
+	    //d.writeFloat(this.AvgLogLikelihood);
+	    d.writeFloat(this.PercentCorrect);
+	    d.writeDouble(this.RMSE);
+	*/    
+	    //d.write
+	    
+	    // buf.write
+	    // MatrixWritable.writeMatrix(d, this.worker_gradient.getMatrix());
+	    //MatrixWritable.writeMatrix(d, this.parameter_vector);
+	    // MatrixWritable.
+/*	    ObjectOutputStream oos = new ObjectOutputStream(out);
+	    
+	    //oos.writeObject( ((NeuralNetwork)this.master_nn) );
+	    
+	    System.out.println("type: " + this.master_nn.getClass());
+	    
+	    oos.flush();
+	    oos.close();	    
+	    */
 	    //LOG.debug("Master complete, saving model.");
 	    
 /*	    try {
@@ -56,12 +102,27 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 		
 		if (null == first) {
 			System.out.println("Can't seem to get the first network weights updateable");
+		} else {
+			
+			if (null == this.master_nn) {
+				
+				System.out.println("Building base master MLP network");
+				this.master_nn = new MultiLayerPerceptronNetwork();
+		        try {
+					this.master_nn.buildFromConf(first.networkUpdate.network.getConfig());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        
+			}
+			
 		}
-		
+/*		
 		if (null == this.first_worker_copy) {
 			this.first_worker_copy = first.networkUpdate.network;
 		}
-		
+	*/	
 		try {
 			accumNet = NetworkAccumulator.buildAveragingNetworkFromConf(first.networkUpdate.network.getConfig());
 		} catch (Exception e) {
@@ -88,13 +149,15 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 		}
 	    
 	    //accumNet.
+	    
+	    this.master_nn.copyWeightsAndConf(accumNet);
 		
 	    NeuralNetworkWeightsDelta nnwd = new NeuralNetworkWeightsDelta();
-	    nnwd.network = accumNet;
+	    nnwd.network = this.master_nn;
 	    
 	    return_msg.set(nnwd);
 	    
-	    this.master_nn = nnwd.network;
+	    //this.master_nn = nnwd.network;
 		
 	    // THIS NEEDS TO BE DONE, probably automated!
 	    workerUpdates.clear();
