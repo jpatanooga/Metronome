@@ -5,12 +5,14 @@ import org.apache.mahout.math.Vector;
 
 public class CachedVector {
 	
-	public Vector vec = null;
-	public double label = 0.0;
+	public Vector vec_input = null;
+	public Vector vec_output = null;
+	//public double label = 0.0;
 	
-	public CachedVector( int feature_vec_size ) {
+	public CachedVector( int input_feature_vec_size, int output_vec_size ) {
 		
-		this.vec = new RandomAccessSparseVector( feature_vec_size );
+		this.vec_input = new RandomAccessSparseVector( input_feature_vec_size );
+		this.vec_output = new RandomAccessSparseVector( output_vec_size );
 		
 	}
 

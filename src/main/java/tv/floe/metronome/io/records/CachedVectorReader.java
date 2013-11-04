@@ -2,10 +2,12 @@ package tv.floe.metronome.io.records;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.hadoop.io.Text;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
+import org.apache.mahout.math.Vector.Element;
 
 import com.cloudera.iterativereduce.io.TextRecordParser;
 
@@ -38,6 +40,17 @@ public class CachedVectorReader {
 		
 	}
 	
+	  public void clearVector(Vector v) {
+		  
+		  Iterator<Element> it = v.iterateNonZero();
+		  while (it.hasNext()) {
+		    Element e = it.next();
+		    e.set(0);
+		  }
+		  
+	  }
+	
+	
 	/**
 	 * I spent too long of periods trying to finish this, it can probably be a lot better
 	 * 
@@ -57,14 +70,16 @@ public class CachedVectorReader {
 		    	
 		    	if ( this.currentVectorIndex >= this.arCachedVectors.size() ) {
 		    		
-		    		cachedVec.vec.assign(0.0);
+		    		cachedVec.vec_input.assign(0.0);
+		    		cachedVec.vec_output.assign(0.0);
+		    		//this.clearVector(cachedVec.vec);
 		    		return false;
 		    		
 		    	} else {
 		    	
 		    		//System.out.println( "> hittin that cache: " + this.currentVectorIndex );
-		    		cachedVec.vec.assign(this.arCachedVectors.get(this.currentVectorIndex).vec);
-		    		cachedVec.label = this.arCachedVectors.get(this.currentVectorIndex).label;
+		    		cachedVec.vec_input.assign(this.arCachedVectors.get(this.currentVectorIndex).vec_input);
+		    		cachedVec.vec_output.assign( this.arCachedVectors.get(this.currentVectorIndex).vec_output );
 			    	this.currentVectorIndex++;
 			    	return true;
 			    	
@@ -87,13 +102,13 @@ public class CachedVectorReader {
 			        if (result) {
 			        	
 				      
-				        //System.out.println( " value: " + value.toString() );
+				    //    System.out.println( " value: " + value.toString() );
 				        
-				        CachedVector cVec = new CachedVector( this.vector_factory.getFeatureVectorSize() );
+				        CachedVector cVec = new CachedVector( this.vector_factory.getFeatureVectorSize(), this.vector_factory.getOutputVectorSize() );
 				        //cVec.vec = new RandomAccessSparseVector( this.vector_factory.getFeatureVectorSize() );
 				        
 				        try {
-							cVec.label = this.vector_factory.processLineAlt(value.toString(), cVec.vec);
+							this.vector_factory.vectorizeLine(value.toString(), cVec.vec_input, cVec.vec_output);
 							//System.out.println("vec val: " + cVec.label);
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -101,8 +116,9 @@ public class CachedVectorReader {
 						}
 				        
 				        this.arCachedVectors.add(cVec);
-				        cachedVec.vec.assign(cVec.vec);
-				        cachedVec.label = cVec.label;
+				        cachedVec.vec_input.assign(cVec.vec_input);
+				        cachedVec.vec_output.assign(cVec.vec_output);
+				        //cachedVec.label = cVec.label;
 				        
 				        
 			        } else {

@@ -18,6 +18,7 @@ import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPercep
 import tv.floe.metronome.classification.neuralnetworks.transfer.Tanh;
 import tv.floe.metronome.io.records.CachedVector;
 import tv.floe.metronome.io.records.CachedVectorReader;
+import tv.floe.metronome.io.records.MetronomeRecordFactory;
 import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.io.records.libsvmRecordFactory;
 import tv.floe.metronome.linearregression.iterativereduce.NodeBase;
@@ -27,6 +28,19 @@ import com.cloudera.iterativereduce.io.RecordParser;
 import com.cloudera.iterativereduce.io.TextRecordParser;
 import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
 
+/**
+ * TODO
+ * - figure out / fix the configuration of the Vectorizer setup
+ * - vectorizer needs to accept {K,V} pairs
+ * EX: want to be able to read a sequence file of images and train a neural network
+ * - would give the great transfer rate of MR, with similar mechanics
+ * - more efficient throughput for learning at scale
+ * 
+ * 
+ * 
+ * @author josh
+ *
+ */
 public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeightsUpdateable> {
 
 	  private boolean IterationComplete = false;
@@ -39,7 +53,10 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	
 	// do we want to hardcode the record factory type in?
 	// TODO: fix this
-	libsvmRecordFactory rec_factory = new libsvmRecordFactory(2);
+	//libsvmRecordFactory rec_factory = new libsvmRecordFactory(2);
+	RecordFactory rec_factory = null; // gotta be dynamically set!
+	
+	
 	// TODO: fix so its not hardcoded
 	TextRecordParser lineParser = new TextRecordParser();
 	
@@ -47,29 +64,23 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	
 	NeuralNetwork nn = null;
 	
+	private String layerNeuronCounts = "2,3,1"; // default XOR network
+	private double learningRate = 0.1d;
+	private double trainingErrorThreshold = 0.2d;
+	private boolean useVectorCaching = true;
+	private String vectorSchema = ""; // tv.floe.metronome.neuralnetwork.conf.InputRecordSchema
+	
+	private int inputVectorSize = 0; // in the event you'd use libsvm... FIX?
+	
 	/**
 	 * Constructor for WorkerNode
 	 * - TODO: needs to use conf stuff from YARN/Hadoop
 	 * 
+	 * - thoughts: gets complicated to config things when there are this many moving parts
+	 * 
 	 */
 	public WorkerNode() {
 		
-		Config c = new Config();
-		c.parse(null); // default layer: 2-3-2
-        c.setConfValue("inputFunction", WeightedSum.class);
-		c.setConfValue("transferFunction", Tanh.class);
-		c.setConfValue("neuronType", Neuron.class);
-		c.setConfValue("networkType", NeuralNetwork.NetworkType.MULTI_LAYER_PERCEPTRON);
-		c.setConfValue("layerNeuronCounts", "2,3,1" );
-		c.parse(null);
-		
-		this.nn = new MultiLayerPerceptronNetwork();
-		try {
-			this.nn.buildFromConf(c);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 	}
 	
@@ -90,36 +101,33 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	public NetworkWeightsUpdateable compute() {
 
 		// the vector to pull from the local read through cache
-		CachedVector cv = new CachedVector( 2 ) ;// rec_factory.getFeatureVectorSize() );
+		CachedVector cv = new CachedVector( this.nn.getInputsCount(), this.rec_factory.getOutputVectorSize() ) ;// rec_factory.getFeatureVectorSize() );
 
+//		System.out.println("NN Inputs Count: " + this.nn.getInputsCount() );
+//		System.out.println("RecFactory Inputs Count: " + this.rec_factory.getInputVectorSize() );
+//		System.out.println("RecFactory Outputs Count: " + this.rec_factory.getOutputVectorSize() );
+		
 		long startMS = System.currentTimeMillis();
 		
 		cachedVecReader.Reset();
 		
-		Vector vec_function_output = new DenseVector(1);
-		//vec_function_output.set(0, 1);
+		Vector vec_function_output = new DenseVector( this.nn.getOutputsCount() );
 		
 		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
 		bp.clearTotalSquaredError();
 		
-		//System.out.println("Input Neurons: " + this.nn.getLayerByIndex(0).getNeuronsCount());
-			// once its already printed this, dont print again.
-//			if (!hitErrThreshold) {
-				//System.out.println("Hit Min Err Threshold > Iteration: " + this.CurrentIteration);
-
-//				hitErrThreshold = true;
-	//		}
-		//} else {
-			
+		
 			
 			try {
 				while (cachedVecReader.next(cv)) {
 	
 					
 					//System.out.println( "Worker > CachedVector > Label: " + cv.label + ", Features: " + cv.vec.toString() ) ;
-					vec_function_output.set(0, cv.label);
+					//vec_function_output.set(0, cv.label);
+					
+					//vec_function_output.assign(cv.vec_output);
 					//mlp_network.train(v0_out, v0);
-					this.nn.train(vec_function_output, cv.vec);
+					this.nn.train(cv.vec_output, cv.vec_input);
 					
 					
 	//			record_count++;
@@ -181,6 +189,8 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	/**
 	 * Setup the record factory and record reader
 	 * 
+	 * - we can build out the neural network architecture and vectorizer based on these settings
+	 * 
 	 */
 	@Override
 	public void setup(Configuration c) {
@@ -212,16 +222,30 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 //	      this.Lambda = Double.parseDouble(this.conf.get(
 //	          "com.cloudera.knittingboar.setup.Lambda", "1.0e-4"));
 	      
-	      // protected double LearningRate = 50;
-//	      this.LearningRate = Double.parseDouble(this.conf.get(
-//	          "com.cloudera.knittingboar.setup.LearningRate", "10"));
+	      this.learningRate = Double.parseDouble(this.conf.get(
+		          "tv.floe.metronome.neuralnetwork.conf.LearningRate", "0.1"));
+
+	      this.trainingErrorThreshold = Double.parseDouble(this.conf.get(
+	          "tv.floe.metronome.neuralnetwork.conf.TrainingErrorThreshold", "0.2"));
 	      
+	      //System.out.println("layers: " + this.conf.get("tv.floe.metronome.neuralnetwork.conf.LayerNeuronCounts") );
+	      
+	    this.layerNeuronCounts = LoadStringConfVarOrException(
+		          "tv.floe.metronome.neuralnetwork.conf.LayerNeuronCounts",
+		          "Error loading config: could not load Layer Neuron Counts!");
+		      
+
 	      // maps to either CSV, 20newsgroups, or RCV1
 	      this.RecordFactoryClassname = LoadStringConfVarOrException(
-	          "com.cloudera.knittingboar.setup.RecordFactoryClassname",
+	          "tv.floe.metronome.neuralnetwork.conf.RecordFactoryClassname",
 	          "Error loading config: could not load RecordFactory classname");
 	      
-	      if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
+	      
+	    		  
+
+	      
+	      
+//	      if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
 	        
 	        // so load the CSV specific stuff ----------
 	        
@@ -247,14 +271,76 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	*/        
 	        // System.out.println("LoadConfig(): " + this.ColumnHeaderNames);
 	        
-	      }
+//	      }
 	      
 	    } catch (Exception e) {
 	      // TODO Auto-generated catch block
 	      e.printStackTrace();
 	    }
 	    		
+
+	    // finish it up!
+	    try {
+			finishNNSetup();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		
+	}
+	
+	public void finishNNSetup() throws Exception {
+
+//	    System.out.println("\n> Conf ------- ");
+//	    System.out.println("Layers: " + this.layerNeuronCounts);
+//	    System.out.println("> Conf ------- \n");
+
+		
+		Config c = new Config();
+		c.parse(null); // default layer: 2-3-2
+        c.setConfValue("inputFunction", WeightedSum.class);
+		c.setConfValue("transferFunction", Tanh.class);
+		c.setConfValue("neuronType", Neuron.class);
+		c.setConfValue("networkType", NeuralNetwork.NetworkType.MULTI_LAYER_PERCEPTRON);
+		c.setConfValue("layerNeuronCounts", this.layerNeuronCounts );
+		c.parse(null);
+		
+		this.nn = new MultiLayerPerceptronNetwork();
+		try {
+			this.nn.buildFromConf(c);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// setup the learning rate
+		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
+		bp.setLearningRate(this.LearningRate);
+		
+		
+	      if (this.RecordFactoryClassname.equals( "tv.floe.metronome.io.records.MetronomeRecordFactory" )) {
+
+//	    	  System.out.println("Using Metronome Format!");
+
+		      this.vectorSchema = LoadStringConfVarOrException(
+		    		  "tv.floe.metronome.neuralnetwork.conf.InputRecordSchema",
+		    		  "Error Loading Config: Need a vector schema!" );
+	    	  
+	    	  
+	    	  this.rec_factory = new MetronomeRecordFactory( this.vectorSchema );
+	    	  
+	    	  
+	      } else {
+	    	  // default to libsvm format
+	    	  
+//		      this.inputVectorSize = Integer.parseInt(this.conf.get(
+//			          "tv.floe.metronome.neuralnetwork.conf.InputVectorSize", "2"));
+	    	  
+	    	  
+//	    	  System.out.println("Defaulting to Using LibSVM Format!");
+	    	  this.rec_factory = new libsvmRecordFactory( this.nn.getInputsCount() );
+	      }		
 		
 		
 	}

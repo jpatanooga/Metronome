@@ -240,5 +240,32 @@ public class libsvmRecordFactory implements RecordFactory {
 		return this.featureVectorSize;
 	}
 	
+	@Override
+	public void parseSchema() {
+		// implied schema, does nothing here
+	}
+	    
+	// need to decide which of these two we'll keep!
+	@Override
+	public int getInputVectorSize() {
+		return this.featureVectorSize;
+	}
+	  
+	@Override
+	public int getOutputVectorSize() {
+		return 1;
+	}
+	
+	// using the older method above
+	@Override
+	public void vectorizeLine(String line, Vector v_in, Vector v_out) throws Exception {
+		//return null;
+		
+		double out = this.processLineAlt( line, v_in );
+		v_out.set(0, out);
+		
+	}
+	
+	
 	
 }

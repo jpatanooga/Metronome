@@ -147,7 +147,7 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
         for (double error : outputError) {
         
         	//outputErrorSqrSum += (error * error) * 0.5d; // a;so multiply with 1/trainingSetSize  1/2n * (...)
-        	outputErrorSqrSum += (error * error);
+        	outputErrorSqrSum += (error * error) * 0.5;
         	//System.out.println("> err^2 " + ((error * error)) );
         	
         }
@@ -180,6 +180,12 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     public void setRecordsSeen_Debug(long rec_seen) {
     	
     	this.recordsSeenDuringEpock = rec_seen;
+    	
+    }
+    
+    public void setLearningRate(double lr) {
+    	
+    	this.learningRate = lr;
     	
     }
     

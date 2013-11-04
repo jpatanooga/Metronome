@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -74,7 +75,11 @@ public class IRUnitDriver<T> {
 				"com.cloudera.knittingboar.setup.LearningRate"
 		};
 		
-
+		 for(Entry<Object, Object> e : props.entrySet()) {
+	            //System.out.println(e.getKey());
+			 c.set(e.getKey().toString(), e.getValue().toString());
+	        }		
+/*
 		for ( int x = 0; x < props_to_copy.length; x++ ) {
 			if (null != this.props.getProperty(props_to_copy[x])) {
 				c.set(props_to_copy[x], this.props.getProperty(props_to_copy[x]));
@@ -82,7 +87,7 @@ public class IRUnitDriver<T> {
 			//	System.out.println("> Conf: Did not find in properties file - " + props_to_copy[x]);
 			}
 		}
-
+*/
 		
 		return c;
 

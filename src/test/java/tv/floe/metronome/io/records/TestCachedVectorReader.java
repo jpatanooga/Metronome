@@ -143,7 +143,7 @@ public class TestCachedVectorReader {
 		
 		CachedVectorReader cachedVecReader = new CachedVectorReader(txt_reader, rec_factory); 
 		
-		CachedVector cv = new CachedVector( rec_factory.getFeatureVectorSize() );
+		CachedVector cv = new CachedVector( rec_factory.getFeatureVectorSize(), 1 );
 		
 		int record_count = 0;
 		
@@ -152,8 +152,8 @@ public class TestCachedVectorReader {
 		while (cachedVecReader.next(cv)) {
 			
 			if (0 == record_count || 1 == record_count) {
-				System.out.println("rec 0>  " + cv.label + " == " + cv.vec.toString() );
-				assertEquals(-1.0, cv.label, 0.0);
+				System.out.println("rec 0>  " + cv.vec_output.get(0) + " == " + cv.vec_input.toString() );
+				assertEquals(-1.0, cv.vec_output.get(0), 0.0);
 			}
 			
 			record_count++;

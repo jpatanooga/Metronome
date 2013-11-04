@@ -206,5 +206,27 @@ public class RCV1RecordFactory implements RecordFactory {
 	public int getFeatureVectorSize() {
 		return this.FEATURES;
 	}
+	
+	@Override
+	public void parseSchema() {
+		// implied schema, does nothing here
+	}
+	    
+	@Override
+	public int getInputVectorSize() {
+		return this.FEATURES;
+	}
+	  
+	@Override
+	public int getOutputVectorSize() {
+		return 1;
+	}
+	
+	// using the older method above, but wired this for the cached vector reader
+	@Override
+	public void vectorizeLine(String line, Vector v_in, Vector v_out) throws Exception {
+		double out = this.processLineAlt( line, v_in );
+		v_out.set(0, out);
+	}
   
 }

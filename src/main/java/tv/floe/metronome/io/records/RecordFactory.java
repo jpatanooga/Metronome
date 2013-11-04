@@ -39,8 +39,10 @@ public interface RecordFactory {
   public static String RCV1_RECORDFACTORY = "com.cloudera.knittingboar.records.RCV1RecordFactory";
   public static String CSV_RECORDFACTORY = "com.cloudera.knittingboar.records.CSVRecordFactory";
   
+  // we're evolving this interface, we'll settle on something soon
   public int processLine(String line, Vector featureVector) throws Exception;
   public double processLineAlt(String line, Vector v) throws Exception;
+  public void vectorizeLine(String line, Vector v_in, Vector v_out) throws Exception;
   
   public String GetClassnameByID(int id);
   
@@ -53,5 +55,13 @@ public interface RecordFactory {
   public int getFeatureVectorSize();
   
   // void firstLine(String line);
+  
+  public void parseSchema();
+	    
+  public int getInputVectorSize();
+  
+  // in the case of neural networks, else: size == 1
+  public int getOutputVectorSize();
+  
   
 }
