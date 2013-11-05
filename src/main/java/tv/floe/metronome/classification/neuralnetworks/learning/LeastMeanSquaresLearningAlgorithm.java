@@ -85,6 +85,10 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
             } else { 
                 weight.weightChange += weightChange;
             }
+            
+            if (this.isMetricCollectionOn()) {
+            	this.metrics.incWeightOpCount();
+            }
         }
     }	
     

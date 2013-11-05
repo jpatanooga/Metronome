@@ -167,7 +167,7 @@ public class IrisDatasetUtils {
         
         v_answer_selected.set(getLargestIndex(networkOutput), 1.0);
         
-        System.out.println( "> out: " + v_answer_selected.toString() );
+        //System.out.println( "> out: " + v_answer_selected.toString() );
         
         if ( answer_vec.equals(v_answer_selected)) {
         	return true;

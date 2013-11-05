@@ -163,6 +163,12 @@ public class CachedVectorReader {
 		  return this.bCacheIsHot;
 		  
 	  }
+	  
+	  public long recordsInCache() {
+		  
+		  return this.arCachedVectors.size();
+		  
+	  }
 	
 
 }

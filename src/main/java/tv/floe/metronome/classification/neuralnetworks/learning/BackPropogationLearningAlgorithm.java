@@ -33,8 +33,10 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
                 
 		ArrayList<Layer> layers = nn.getLayers();
 		
+	
+		
 		for (int l = layers.size() - 2; l > 0; l--) {
-						
+									
 			for ( Neuron neuron : layers.get( l ).getNeurons() ) {	
                                 
 				double neuronError = this.calculateHiddenNeuronError( neuron ); 
@@ -53,13 +55,21 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
 		
 		double deltaSum = 0d;
 		
+		
+		
 		for (Connection connection : neuron.getOutConnections()) {	
 			
 			double delta = connection.getToNeuron().getError() * connection.getWeight().value;
 			deltaSum += delta; // weighted delta sum from the next layer
 		
+			if (this.isMetricCollectionOn()) {
+				this.metrics.incErrCalcOpCount();
+			}
+			
 		} // for
 
+		
+		
 		TransferFunction transferFunction = neuron.getTransferFunction();
 		
 		

@@ -298,6 +298,20 @@ public class NeuralNetwork implements Serializable {
         return this.outputNeurons.size();
         
     }
+    
+    public int getTotalConnectionCount() {
+        
+    	int total = 0;
+    	
+        for ( int x = 1; x < this.getLayersCount(); x++ ) {
+        	
+        	total += this.getLayerByIndex(x).getIncomingConnectionCount();
+            
+        }
+        
+        return total;
+        
+    }    
 
     public void setOutputNeurons(ArrayList<Neuron> outputNeurons) {
 
@@ -502,6 +516,22 @@ public class NeuralNetwork implements Serializable {
 			
 		}
 		
+		
+	}
+	
+	public void PrintStats() {
+		
+		String layers = this.getLayerByIndex(0).getNeuronsCount() + "";
+		
+		for ( int x = 1; x < this.getLayersCount(); x++ ) {
+			layers += "," + this.getLayerByIndex(x).getNeuronsCount();
+		}
+
+		
+		System.out.println("---------- Network Stats --------- ");
+		System.out.println("> Layers: " + layers);
+		System.out.println("> Total Connections: " + this.getTotalConnectionCount());
+		System.out.println("---------- Network Stats --------- ");
 		
 	}
 

@@ -22,6 +22,7 @@ import tv.floe.metronome.io.records.MetronomeRecordFactory;
 import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.io.records.libsvmRecordFactory;
 import tv.floe.metronome.linearregression.iterativereduce.NodeBase;
+import tv.floe.metronome.metrics.Metrics;
 
 import com.cloudera.iterativereduce.ComputableWorker;
 import com.cloudera.iterativereduce.io.RecordParser;
@@ -47,7 +48,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	  private int CurrentIteration = 0;
 	  
 	  // basic stats tracking
-	  POLRMetrics metrics = new POLRMetrics();
+	  Metrics metrics = new Metrics();
 	  public double lastRMSE = 0.0;
 	boolean hitErrThreshold = false;
 	
@@ -64,6 +65,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	
 	NeuralNetwork nn = null;
 	
+	private boolean metricsOn = false;
 	private String layerNeuronCounts = "2,3,1"; // default XOR network
 	private double learningRate = 0.1d;
 	private double trainingErrorThreshold = 0.2d;
@@ -120,21 +122,11 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 			
 			try {
 				while (cachedVecReader.next(cv)) {
-	
 					
-					//System.out.println( "Worker > CachedVector > Label: " + cv.label + ", Features: " + cv.vec.toString() ) ;
-					//vec_function_output.set(0, cv.label);
-					
-					//vec_function_output.assign(cv.vec_output);
-					//mlp_network.train(v0_out, v0);
 					this.nn.train(cv.vec_output, cv.vec_input);
-					
-					
-	//			record_count++;
 					
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -142,13 +134,18 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		
 			if (bp.hasHitMinErrorThreshold()) {
 				if (!hitErrThreshold) {
-					System.out.println("Hit Min Err Threshold > Iteration: " + this.CurrentIteration);
+					System.out.println("Hit Min Err Threshold > Iteration: " + this.CurrentIteration );
 
 					hitErrThreshold = true;
 				}
 				
 			}
 			
+			
+			this.metrics.printProgressiveStepDebugMsg(this.CurrentIteration, "Iteration: " + this.CurrentIteration + " > RMSE: " + bp.calcRMSError()  + ", Records Trainined: " + this.cachedVecReader.recordsInCache() );
+			if (this.metricsOn) {
+				bp.getMetrics().PrintMetrics();
+			}
 		
 		
 		long totalTime = System.currentTimeMillis() - startMS;
@@ -234,6 +231,10 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		          "tv.floe.metronome.neuralnetwork.conf.LayerNeuronCounts",
 		          "Error loading config: could not load Layer Neuron Counts!");
 		      
+	    String metricsOn = this.conf.get("tv.floe.metronome.neuralnetwork.conf.MetricsOn");
+	    if (metricsOn != null && metricsOn.equals("true")) {
+	    	this.metricsOn = true;
+	    }
 
 	      // maps to either CSV, 20newsgroups, or RCV1
 	      this.RecordFactoryClassname = LoadStringConfVarOrException(
@@ -318,6 +319,10 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
 		bp.setLearningRate(this.LearningRate);
 		
+		if (this.metricsOn) {
+			bp.turnMetricsOn();
+		}
+		
 		
 	      if (this.RecordFactoryClassname.equals( "tv.floe.metronome.io.records.MetronomeRecordFactory" )) {
 
@@ -341,6 +346,8 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 //	    	  System.out.println("Defaulting to Using LibSVM Format!");
 	    	  this.rec_factory = new libsvmRecordFactory( this.nn.getInputsCount() );
 	      }		
+	      
+	      this.nn.PrintStats();
 		
 		
 	}
@@ -392,10 +399,10 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	    
 //	    delta.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood))
 //	        .floatValue();
-	    delta.PercentCorrect = (new Double(metrics.AvgCorrect * 100))
-	        .floatValue();
-	    delta.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
-	        .intValue();
+//	    delta.PercentCorrect = (new Double(metrics.AvgCorrect * 100))
+//	        .floatValue();
+//	    delta.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
+//	        .intValue();
 	    
 	    return delta;
 	    
