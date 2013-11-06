@@ -531,6 +531,7 @@ public class NeuralNetwork implements Serializable {
 		System.out.println("---------- Network Stats --------- ");
 		System.out.println("> Layers: " + layers);
 		System.out.println("> Total Connections: " + this.getTotalConnectionCount());
+		//System.out.
 		System.out.println("---------- Network Stats --------- ");
 		
 	}

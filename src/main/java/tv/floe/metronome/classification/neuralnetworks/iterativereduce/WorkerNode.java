@@ -123,7 +123,11 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 			try {
 				while (cachedVecReader.next(cv)) {
 					
+					bp.getMetrics().startTrainingRecordTimer();
+					
 					this.nn.train(cv.vec_output, cv.vec_input);
+					
+					bp.getMetrics().stopTrainingRecordTimer();
 					
 				}
 			} catch (IOException e) {
