@@ -102,7 +102,7 @@ public class CachedVectorReader {
 			        if (result) {
 			        	
 				      
-				    //    System.out.println( " value: " + value.toString() );
+				        //System.out.println( " value: " + value.toString() );
 				        
 				        CachedVector cVec = new CachedVector( this.vector_factory.getFeatureVectorSize(), this.vector_factory.getOutputVectorSize() );
 				        //cVec.vec = new RandomAccessSparseVector( this.vector_factory.getFeatureVectorSize() );

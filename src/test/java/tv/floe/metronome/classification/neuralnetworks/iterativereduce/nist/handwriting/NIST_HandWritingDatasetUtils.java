@@ -40,7 +40,9 @@ public class NIST_HandWritingDatasetUtils {
 			}
 			*/
 			double normalized_val = (double)tmp / (double)normalize_base;
-			inputs += x + ":" + normalized_val + " ";
+			if (normalized_val > 0.0) {
+				inputs += x + ":" + normalized_val + " ";
+			}
 		}
 		
 		//System.out.println("max: " + max);
@@ -80,8 +82,8 @@ public class NIST_HandWritingDatasetUtils {
 			
 			String formatted_line = formatNISTHandwritingColumnToMetronomeRecord(line, 16);
 			
-		//	System.out.println("old > " + line);
-		//	System.out.println("new > " + formatted_line);
+			System.out.println("old > " + line);
+			System.out.println("new > " + formatted_line);
 			bw.write(formatted_line);
 			
 		}
