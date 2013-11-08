@@ -297,7 +297,7 @@ public class IRUnitDriver<T> {
 
 		long ts_start = System.currentTimeMillis();
 
-		System.out.println("start-ms:" + ts_start);
+		//System.out.println("start-ms:" + ts_start);
 
 		int iterations = Integer.parseInt(props
 				.getProperty("app.iteration.count"));

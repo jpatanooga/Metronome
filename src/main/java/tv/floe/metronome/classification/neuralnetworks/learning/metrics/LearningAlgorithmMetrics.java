@@ -11,6 +11,8 @@ public class LearningAlgorithmMetrics implements Serializable {
 	
 	long currentRunTimerStartMS = 0;
 	
+	double lastRMSE = 0;
+	
 	public void incWeightOpCount() {
 		this.weightUpdateOpCount++;
 	}
@@ -66,5 +68,12 @@ public class LearningAlgorithmMetrics implements Serializable {
 		
 	}
 	
+	public void setLastRMSE(double rmse) {
+		this.lastRMSE = rmse;
+	}
+	
+	public double getLastRMSE() {
+		return this.lastRMSE;
+	}
 
 }

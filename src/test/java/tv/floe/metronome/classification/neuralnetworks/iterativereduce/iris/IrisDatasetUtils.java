@@ -19,6 +19,7 @@ import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
+import tv.floe.metronome.classification.neuralnetworks.learning.BackPropogationLearningAlgorithm;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.classification.neuralnetworks.utils.Utils;
 import tv.floe.metronome.io.records.MetronomeRecordFactory;
@@ -101,7 +102,7 @@ public class IrisDatasetUtils {
 		MetronomeRecordFactory rec_factory = new MetronomeRecordFactory("i:4 | o:3");
 	
 			
-			String recs = "src/test/resources/data/iris/iris_data_normalised.mne";
+			String recs = "src/test/resources/data/uci/iris/iris_data_normalised.mne";
 			Vector v_in_0 = new RandomAccessSparseVector(rec_factory.getInputVectorSize());
 			Vector v_out_0 = new RandomAccessSparseVector(rec_factory.getOutputVectorSize());
 			
@@ -129,6 +130,9 @@ public class IrisDatasetUtils {
 			}
 			br.close();		
 			
+			BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)mlp.getLearningRule());
+			
+			System.out.println("Avg RMSE: " + bp.getMetrics().getLastRMSE());
 			System.out.println("Total: " + total_recs);
 			System.out.println("Correct: " + correct);
 		

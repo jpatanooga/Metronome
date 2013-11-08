@@ -13,6 +13,7 @@ import org.apache.hadoop.util.ToolRunner;
 import tv.floe.metronome.classification.logisticregression.iterativereduce.POLRMasterNode;
 import tv.floe.metronome.classification.logisticregression.iterativereduce.ParameterVectorUpdatable;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
+import tv.floe.metronome.classification.neuralnetworks.learning.BackPropogationLearningAlgorithm;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.linearregression.iterativereduce.NodeBase;
@@ -23,66 +24,16 @@ import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
 public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWeightsUpdateable> {
 
 	public NeuralNetwork master_nn = null;
-	//public NeuralNetwork first_worker_copy = null;
+	double trainingErrorThreshold = 0;
+	boolean hasHitThreshold = false;
 	
 	@Override
 	public void complete(DataOutputStream ds) throws IOException {
 
 	    System.out.println("master::complete (Iterations: " + this.NumberIterations + ")");
-	    System.out.println("complete-ms:" + System.currentTimeMillis());
-	    
-	    //System.out.println("type: " + this.master_nn.getClass());
 	    
 	    ds.write(this.master_nn.Serialize());
 	    
-	   // System.out.println("Master NN Size: " + this.master_nn.Serialize().length );
-/*	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-	    
-	    ObjectOutputStream oos = new ObjectOutputStream(out);
-	    
-	    oos.writeObject( this.master_nn );
-	    
-	    oos.flush();
-	*/
-	    
-//	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-//	    DataOutput d = new DataOutputStream(out);
-	    
-	    // d.writeUTF(src_host);
-	    //d.writeInt(this.SrcWorkerPassCount);
-/*	    d.writeInt(this.GlobalPassCount);
-	    
-	    d.writeInt(this.IterationComplete);
-	    d.writeInt(this.CurrentIteration);
-	    
-	    d.writeInt(this.TrainedRecords);
-	    //d.writeFloat(this.AvgLogLikelihood);
-	    d.writeFloat(this.PercentCorrect);
-	    d.writeDouble(this.RMSE);
-	*/    
-	    //d.write
-	    
-	    // buf.write
-	    // MatrixWritable.writeMatrix(d, this.worker_gradient.getMatrix());
-	    //MatrixWritable.writeMatrix(d, this.parameter_vector);
-	    // MatrixWritable.
-/*	    ObjectOutputStream oos = new ObjectOutputStream(out);
-	    
-	    //oos.writeObject( ((NeuralNetwork)this.master_nn) );
-	    
-	    System.out.println("type: " + this.master_nn.getClass());
-	    
-	    oos.flush();
-	    oos.close();	    
-	    */
-	    //LOG.debug("Master complete, saving model.");
-	    
-/*	    try {
-	      this.polr_modelparams.saveTo(out);
-	    } catch (Exception ex) {
-	      throw new IOException("Unable to save model", ex);
-	    }
-*/		
 		
 	}
 
@@ -91,10 +42,8 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 			Collection<NetworkWeightsUpdateable> masterUpdates) {
 
 		NetworkWeightsUpdateable return_msg = new NetworkWeightsUpdateable();
-		
-		//NeuralNetwork nn_0 = workerUpdates
-		
-		//System.out.println("Count: " + workerUpdates.size());
+				
+		double avg_rmse = 0;
 		
 		
 		NetworkWeightsUpdateable first = workerUpdates.iterator().next();
@@ -138,8 +87,23 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	    for (NetworkWeightsUpdateable nn_worker : workerUpdates) {
 
 	    	accumNet.AccumulateWorkerNetwork(nn_worker.networkUpdate.network);
+	    	avg_rmse += nn_worker.networkUpdate.RMSE;
+	    }
+	    
+	    avg_rmse = avg_rmse / workerUpdates.size();
+	    BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.master_nn.getLearningRule());
+	    bp.getMetrics().setLastRMSE(avg_rmse);
+	    
+	    if (avg_rmse <= this.trainingErrorThreshold && !hasHitThreshold && first.networkUpdate.CurrentIteration > 10) {
+	    	System.out.println("\nMaster hit avg rmse threshold at iteration: " + first.networkUpdate.CurrentIteration + "\n");
+	    	this.hasHitThreshold = true;
+	    } else {
+	    	
+	    	//System.out.println("rmse debug > " + avg_rmse + " <= " + this.trainingErrorThreshold + ", iterations: " + first.networkUpdate.CurrentIteration);
 	    	
 	    }
+	    	
+	    
 	    
 	    try {
 			accumNet.AverageNetworkWeights();
@@ -180,74 +144,12 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	    this.conf = c;
 	    
 	    try {
+
+	    	// this is the target to get the avg rmse under for testing purposes
+	    	this.trainingErrorThreshold = Double.parseDouble(this.conf.get(
+			          "tv.floe.metronome.neuralnetwork.conf.TrainingErrorThreshold", "0.2"));
 	      
-	      // this is hard set with LR to 2 classes
-//	      this.num_categories = this.conf.getInt(
-	//          "com.cloudera.knittingboar.setup.numCategories", 2);
-	      
-	      // feature vector size
-	      
-/*	      this.FeatureVectorSize = LoadIntConfVarOrException(
-	          "com.cloudera.knittingboar.setup.FeatureVectorSize",
-	          "Error loading config: could not load feature vector size");
-	*/      
-	      // feature vector size
-//	      this.BatchSize = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.BatchSize", 200);
-	      
-//	      this.NumberPasses = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.NumberPasses", 1);
-//	      this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
-	      
-	      // protected double Lambda = 1.0e-4;
-//	      this.Lambda = Double.parseDouble(this.conf.get(
-//	          "com.cloudera.knittingboar.setup.Lambda", "1.0e-4"));
-	      
-	      // protected double LearningRate = 50;
-//	      this.LearningRate = Double.parseDouble(this.conf.get(
-//	          "com.cloudera.knittingboar.setup.LearningRate", "10"));
-	      
-	      // local input split path
-	      // this.LocalInputSplitPath = LoadStringConfVarOrException(
-	      // "com.cloudera.knittingboar.setup.LocalInputSplitPath",
-	      // "Error loading config: could not load local input split path");
-	      
-	      // System.out.println("LoadConfig()");
-	      
-	      // maps to either CSV, 20newsgroups, or RCV1
-/*	      this.RecordFactoryClassname = LoadStringConfVarOrException(
-	          "com.cloudera.knittingboar.setup.RecordFactoryClassname",
-	          "Error loading config: could not load RecordFactory classname");
-	      
-	      if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
-	        
-	        // so load the CSV specific stuff ----------
-	        System.out
-	            .println("----- Loading CSV RecordFactory Specific Stuff -------");
-	        // predictor label names
-	        this.PredictorLabelNames = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.PredictorLabelNames",
-	            "Error loading config: could not load predictor label names");
-	        
-	        // predictor var types
-	        this.PredictorVariableTypes = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.PredictorVariableTypes",
-	            "Error loading config: could not load predictor variable types");
-	        
-	        // target variables
-	        this.TargetVariableName = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.TargetVariableName",
-	            "Error loading config: Target Variable Name");
-	        
-	        // column header names
-	        this.ColumnHeaderNames = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.ColumnHeaderNames",
-	            "Error loading config: Column Header Names");
-	        
-	        // System.out.println("LoadConfig(): " + this.ColumnHeaderNames);
-	        
-	      }
-*/	      
+
 	    } catch (Exception e) {
 	      // TODO Auto-generated catch block
 	      e.printStackTrace();

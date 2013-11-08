@@ -163,6 +163,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		
 		NetworkWeightsUpdateable nwu = new NetworkWeightsUpdateable();
 		nwu.networkUpdate = nnwd;
+		nwu.networkUpdate.CurrentIteration = this.CurrentIteration;
 		
 		return nwu;
 	}
