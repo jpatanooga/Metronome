@@ -11,17 +11,24 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
 
 	protected double learningRate = 0.1d;
 	
-    protected transient double totalNetworkError;
+	// per epoch
+    protected transient double totalNetworkMeanSquaredError;
+    
     protected transient double totalSquaredErrorSum;
-    protected transient double previousEpochError;
-    protected double maxError = 0.01d;
-    private double minErrorChange = Double.POSITIVE_INFINITY;
-    private int minErrorChangeIterationsLimit = Integer.MAX_VALUE;
-    private transient int minErrorChangeIterationsCount;
+    protected transient double prevEpochTotalError = 0;
+    // ---
+    //protected double maxError = 0.01d;
+    private double stallMinErrorDelta = 0.000001;
+    
+    private int maxConsecutivelyStalledEpochs = 200; //Integer.MAX_VALUE;
+    private transient int consecutivelyStalledEpochCounter = 0;
+    
     private boolean batchMode = false;
     private long recordsSeenDuringEpock = 0;
     private double trainingErrorThreshold = 0.02d;
         
+    
+    
     public double getTotalSquaredError() {
     	return this.totalSquaredErrorSum;
     }
@@ -93,7 +100,8 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     }	
     
     protected boolean hasReachedStopCondition() {
-        return (this.totalNetworkError < this.maxError) || this.errorChangeStalled();
+        //return (this.totalNetworkMeanSquaredError < this.maxError) || this.checkForLearningStallOut();
+    	return (this.totalNetworkMeanSquaredError < this.trainingErrorThreshold) || this.checkForLearningStallOut();
     }
 
     public boolean hasHitMinErrorThreshold() {
@@ -109,21 +117,38 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
         return (rmse < this.trainingErrorThreshold);
     }
     
-    
-    protected boolean errorChangeStalled() {
-        double absErrorChange = Math.abs(previousEpochError - totalNetworkError);
+    /**
+     * Check to see if learning has stalled out
+     * - called 1x per epoch (at end)
+     * 
+     * 
+     * @return
+     */
+    public boolean checkForLearningStallOut() {
+    	
+        double errorDelta = Math.abs(this.prevEpochTotalError - this.totalNetworkMeanSquaredError);
 
-        if (absErrorChange <= this.minErrorChange) {
-            this.minErrorChangeIterationsCount++;
+        if (errorDelta <= this.stallMinErrorDelta) {
+        	
+            this.consecutivelyStalledEpochCounter++;
 
-            if (this.minErrorChangeIterationsCount >= this.minErrorChangeIterationsLimit) {
+            if (this.consecutivelyStalledEpochCounter >= this.maxConsecutivelyStalledEpochs) {
                 return true;
             }
+            
         } else {
-            this.minErrorChangeIterationsCount = 0;
+        	
+            this.consecutivelyStalledEpochCounter = 0;
+            
         }
 
         return false;
+    }
+    
+    public void resetStallTracking() {
+    	
+    	this.consecutivelyStalledEpochCounter = 0;
+    	
     }
 
     protected double[] calculateOutputError(Vector desiredOutputVec, Vector currentOutputVec) {
@@ -192,6 +217,22 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     	this.learningRate = lr;
     	
     }
+    
+	public boolean isStalled() {
+		return false;
+	}
+	
+	public void completeTrainingEpoch() {
+		
+		this.prevEpochTotalError = this.totalNetworkMeanSquaredError;
+				
+        this.totalNetworkMeanSquaredError = this.totalSquaredErrorSum / this.recordsSeenDuringEpock;
+
+        
+        // check for stall?
+		
+	}
+    
     
     
     

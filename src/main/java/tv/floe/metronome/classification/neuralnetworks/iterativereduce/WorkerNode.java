@@ -51,6 +51,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	  Metrics metrics = new Metrics();
 	  public double lastRMSE = 0.0;
 	boolean hitErrThreshold = false;
+	int trainingCompleteEpoch = -1;
 	
 	// do we want to hardcode the record factory type in?
 	// TODO: fix this
@@ -113,7 +114,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		
 		cachedVecReader.Reset();
 		
-		Vector vec_function_output = new DenseVector( this.nn.getOutputsCount() );
+		//Vector vec_function_output = new DenseVector( this.nn.getOutputsCount() );
 		
 		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
 		bp.clearTotalSquaredError();
@@ -134,19 +135,35 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 				e.printStackTrace();
 			}
 			
+			// TODO: clean up post-epoch -- this may should be handled via the nn interface?
+			bp.completeTrainingEpoch();
+			
 		//} // if
 		
 			if (bp.hasHitMinErrorThreshold()) {
 				if (!hitErrThreshold) {
-					System.out.println("Hit Min Err Threshold > Iteration: " + this.CurrentIteration );
-
+					//System.out.println("Hit Min Err Threshold > Epoch: " + this.CurrentIteration );
+					trainingCompleteEpoch = this.CurrentIteration;
 					hitErrThreshold = true;
 				}
 				
 			}
 			
 			
-			this.metrics.printProgressiveStepDebugMsg(this.CurrentIteration, "Iteration: " + this.CurrentIteration + " > RMSE: " + bp.calcRMSError()  + ", Records Trainined: " + this.cachedVecReader.recordsInCache() );
+			String marker = "";
+			if (hitErrThreshold) {
+				marker += ", Hit Err Threshold at: " + this.trainingCompleteEpoch;
+			}
+
+			if (bp.checkForLearningStallOut()) {
+				marker += " [ --- STALL ---]";
+				this.nn.randomizeWeights();
+				bp.resetStallTracking();
+				System.out.println("[ - STALL - ]");
+			}
+			
+			
+			this.metrics.printProgressiveStepDebugMsg(this.CurrentIteration, "Epoch: " + this.CurrentIteration + " > RMSE: " + bp.calcRMSError()  + ", Records Trainined: " + this.cachedVecReader.recordsInCache() + marker );
 			if (this.metricsOn) {
 				bp.getMetrics().PrintMetrics();
 			}
