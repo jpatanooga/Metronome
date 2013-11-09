@@ -155,7 +155,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 				marker += ", Hit Err Threshold at: " + this.trainingCompleteEpoch;
 			}
 
-			if (bp.checkForLearningStallOut()) {
+			if (bp.checkForLearningStallOut() && false == bp.hasHitMinErrorThreshold()) {
 				marker += " [ --- STALL ---]";
 				this.nn.randomizeWeights();
 				bp.resetStallTracking();
