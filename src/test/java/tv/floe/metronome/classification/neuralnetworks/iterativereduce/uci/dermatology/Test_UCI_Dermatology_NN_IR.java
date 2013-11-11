@@ -20,18 +20,10 @@ public class Test_UCI_Dermatology_NN_IR {
 
 		
 		WorkerNode singleWorker = (WorkerNode)polr_ir.getWorker().get(0);
-	//	WorkerNode secondWorker = (WorkerNode)polr_ir.getWorker().get(1);
 		
 		MasterNode master = (MasterNode) polr_ir.getMaster();
 		
 		System.out.println("\n\nComplete: ");
-		//Utils.PrintVector( master.polr.getBeta().viewRow(0) );
-
-//		this.scoreNeuralNetworkXor( master.first_worker_copy );
-		
-		System.out.println("Worker 1 ");
-		//TestTwoWorkersXOR_IR_NN.scoreNeuralNetworkXor( singleWorker.nn );
-		//Utils.PrintNeuralNetwork( singleWorker.nn );
 		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
 		
 	}

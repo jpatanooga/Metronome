@@ -95,7 +95,14 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	    bp.getMetrics().setLastRMSE(avg_rmse);
 	    
 	    if (avg_rmse <= this.trainingErrorThreshold && !hasHitThreshold && first.networkUpdate.CurrentIteration > 10) {
-	    	System.out.println("\nMaster hit avg rmse threshold at iteration: " + first.networkUpdate.CurrentIteration + "\n");
+	    	System.out.println("\nMaster hit avg rmse threshold at epoch: " + first.networkUpdate.CurrentIteration + "\n");
+	    	
+		    for (NetworkWeightsUpdateable nn_worker : workerUpdates) {
+
+		    	System.out.println("worker.rmse: " + nn_worker.networkUpdate.RMSE );
+		    }
+	    	
+	    	
 	    	this.hasHitThreshold = true;
 	    } else {
 	    	
