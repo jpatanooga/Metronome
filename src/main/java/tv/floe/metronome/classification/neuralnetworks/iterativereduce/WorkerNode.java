@@ -42,22 +42,24 @@ import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
  * @author josh
  *
  */
-public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeightsUpdateable> {
+public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 
 	  private boolean IterationComplete = false;
 	  private int CurrentIteration = 0;
+	  protected Configuration conf = null;	  
+	  protected int NumberIterations = 1;
+	  protected String RecordFactoryClassname = "";	  
 	  
 	  // basic stats tracking
 	  Metrics metrics = new Metrics();
 	  public double lastRMSE = 0.0;
 	boolean hitErrThreshold = false;
 	int trainingCompleteEpoch = -1;
+	double learningRate = 0;
+	int stallMaxEpochs = -1; // default
+	double stallMinErrorDelta = -1; // take defaults
 	
-	// do we want to hardcode the record factory type in?
-	// TODO: fix this
-	//libsvmRecordFactory rec_factory = new libsvmRecordFactory(2);
 	RecordFactory rec_factory = null; // gotta be dynamically set!
-	
 	
 	// TODO: fix so its not hardcoded
 	TextRecordParser lineParser = new TextRecordParser();
@@ -68,18 +70,14 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	
 	private boolean metricsOn = false;
 	private String layerNeuronCounts = "2,3,1"; // default XOR network
-	private double learningRate = 0.1d;
+//	private double learningRate = 0.1d;
 	private double trainingErrorThreshold = 0.2d;
 	private boolean useVectorCaching = true;
 	private String vectorSchema = ""; // tv.floe.metronome.neuralnetwork.conf.InputRecordSchema
 	
-	private int inputVectorSize = 0; // in the event you'd use libsvm... FIX?
+//	private int inputVectorSize = 0; // in the event you'd use libsvm... FIX?
 	
 	/**
-	 * Constructor for WorkerNode
-	 * - TODO: needs to use conf stuff from YARN/Hadoop
-	 * 
-	 * - thoughts: gets complicated to config things when there are this many moving parts
 	 * 
 	 */
 	public WorkerNode() {
@@ -140,7 +138,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 			
 		//} // if
 		
-			if (bp.hasHitMinErrorThreshold()) {
+/*			if (bp.hasHitMinErrorThreshold()) {
 				if (!hitErrThreshold) {
 					//System.out.println("Hit Min Err Threshold > Epoch: " + this.CurrentIteration );
 					trainingCompleteEpoch = this.CurrentIteration;
@@ -148,7 +146,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 				}
 				
 			}
-			
+	*/		
 			
 			String marker = "";
 			if (hitErrThreshold) {
@@ -159,7 +157,7 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 				marker += " [ --- STALL ---]";
 				this.nn.randomizeWeights();
 				bp.resetStallTracking();
-				System.out.println("[ - STALL - ]");
+				System.out.println("[ --- STALL WORKER RESET --- ]: " + bp.getSetMaxStalledEpochs());
 			}
 			
 			
@@ -219,28 +217,13 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	    
 	    try {
 	      
-//	      this.num_categories = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.numCategories", 2);
 	      
-	      // feature vector size
-	      
-//	      this.FeatureVectorSize = LoadIntConfVarOrException(
-//	          "com.cloudera.knittingboar.setup.FeatureVectorSize",
-//	          "Error loading config: could not load feature vector size");
-	      
-	      // feature vector size
-//	      this.BatchSize = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.BatchSize", 200);
-	      
-//	      this.NumberPasses = this.conf.getInt(
-//	          "com.cloudera.knittingboar.setup.NumberPasses", 1);
-	      // app.iteration.count
 	    this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
 	      
-	      // protected double Lambda = 1.0e-4;
-//	      this.Lambda = Double.parseDouble(this.conf.get(
-//	          "com.cloudera.knittingboar.setup.Lambda", "1.0e-4"));
-	      
+	    this.stallMaxEpochs = this.conf.getInt("tv.floe.metronome.neuralnetwork.conf.stall.maxEpochs", 200);
+
+	    this.stallMinErrorDelta = Double.parseDouble(this.conf.get("tv.floe.metronome.neuralnetwork.conf.stall.minErrorDelta", "0.000001"));
+	    
 	      this.learningRate = Double.parseDouble(this.conf.get(
 		          "tv.floe.metronome.neuralnetwork.conf.LearningRate", "0.1"));
 
@@ -267,34 +250,6 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	    		  
 
 	      
-	      
-//	      if (this.RecordFactoryClassname.equals(RecordFactory.CSV_RECORDFACTORY)) {
-	        
-	        // so load the CSV specific stuff ----------
-	        
-	        // predictor label names
-/*	        this.PredictorLabelNames = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.PredictorLabelNames",
-	            "Error loading config: could not load predictor label names");
-	        
-	        // predictor var types
-	        this.PredictorVariableTypes = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.PredictorVariableTypes",
-	            "Error loading config: could not load predictor variable types");
-	*/        
-	        // target variables
-/*	        this.TargetVariableName = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.TargetVariableName",
-	            "Error loading config: Target Variable Name");
-	        
-	        // column header names
-	        this.ColumnHeaderNames = LoadStringConfVarOrException(
-	            "com.cloudera.knittingboar.setup.ColumnHeaderNames",
-	            "Error loading config: Column Header Names");
-	*/        
-	        // System.out.println("LoadConfig(): " + this.ColumnHeaderNames);
-	        
-//	      }
 	      
 	    } catch (Exception e) {
 	      // TODO Auto-generated catch block
@@ -339,7 +294,12 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		
 		// setup the learning rate
 		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
-		bp.setLearningRate(this.LearningRate);
+		bp.setLearningRate(this.learningRate);
+		bp.setStallDetectionParams(this.stallMinErrorDelta, this.stallMaxEpochs);
+		
+		System.out.println("Debug-Stall > stallMinErrordelta: " + this.stallMinErrorDelta);
+		System.out.println("Debug-Stall > stallMaxEpochs: " + this.stallMaxEpochs);
+		System.out.println("Debug-Stall > bp: " + bp.getSetMaxStalledEpochs());
 		
 		if (this.metricsOn) {
 			bp.turnMetricsOn();
@@ -395,7 +355,13 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 		// TODO: now update the local network
 		
 		this.nn = global_update.network;
+		//this.nn.copyWeightsAndConf(global_update.network );
 		
+		// this is a hack for now TODO: fix this
+		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
+		bp.setStallDetectionParams(this.stallMinErrorDelta, this.stallMaxEpochs);
+		
+		//System.out.println("max: " + bp.getSetMaxStalledEpochs());
 		
 		
 	}
@@ -429,6 +395,28 @@ public class WorkerNode extends NodeBase implements ComputableWorker<NetworkWeig
 	    return delta;
 	    
 	  }	
+	
+	  protected String LoadStringConfVarOrException(String ConfVarName,
+		      String ExcepMsg) throws Exception {
+		    
+		    if (null == this.conf.get(ConfVarName)) {
+		      throw new Exception(ExcepMsg);
+		    } else {
+		      return this.conf.get(ConfVarName);
+		    }
+		    
+		  }
+		  
+		  protected int LoadIntConfVarOrException(String ConfVarName, String ExcepMsg)
+		      throws Exception {
+		    
+		    if (null == this.conf.get(ConfVarName)) {
+		      throw new Exception(ExcepMsg);
+		    } else {
+		      return this.conf.getInt(ConfVarName, 0);
+		    }
+		    
+		  }	
 	
 	  public static void main(String[] args) throws Exception {
 		    TextRecordParser parser = new TextRecordParser();

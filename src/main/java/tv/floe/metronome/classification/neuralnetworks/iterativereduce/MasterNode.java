@@ -30,7 +30,7 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	@Override
 	public void complete(DataOutputStream ds) throws IOException {
 
-	    System.out.println("master::complete (Iterations: " + this.NumberIterations + ")");
+	    //System.out.println("master::complete (Iterations: " + this.NumberIterations + ")");
 	    
 	    ds.write(this.master_nn.Serialize());
 	    
@@ -88,6 +88,7 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 
 	    	accumNet.AccumulateWorkerNetwork(nn_worker.networkUpdate.network);
 	    	avg_rmse += nn_worker.networkUpdate.RMSE;
+	    	
 	    }
 	    
 	    avg_rmse = avg_rmse / workerUpdates.size();
@@ -95,6 +96,7 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	    bp.getMetrics().setLastRMSE(avg_rmse);
 	    
 	    if (avg_rmse <= this.trainingErrorThreshold && !hasHitThreshold && first.networkUpdate.CurrentIteration > 10) {
+	    	
 	    	System.out.println("\nMaster hit avg rmse threshold at epoch: " + first.networkUpdate.CurrentIteration + "\n");
 	    	
 		    for (NetworkWeightsUpdateable nn_worker : workerUpdates) {

@@ -23,8 +23,8 @@ public class Test_UCI_Dermatology_NN_IR {
 		
 		MasterNode master = (MasterNode) polr_ir.getMaster();
 		
-		System.out.println("\n\nComplete: ");
-		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
+		//System.out.println("\n\nComplete: ");
+		//System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
 		
 	}
 }

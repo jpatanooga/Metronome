@@ -21,12 +21,21 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     private double stallMinErrorDelta = 0.000001;
     
     private int maxConsecutivelyStalledEpochs = 200; //Integer.MAX_VALUE;
-    private transient int consecutivelyStalledEpochCounter = 0;
+    private int consecutivelyStalledEpochCounter = 0;
     
     private boolean batchMode = false;
     private long recordsSeenDuringEpock = 0;
     private double trainingErrorThreshold = 0.02d;
         
+    
+    public void setStallDetectionParams(double minErrorChange, int maxStalledEpochs) {
+    	this.stallMinErrorDelta = minErrorChange;
+    	this.maxConsecutivelyStalledEpochs = maxStalledEpochs;
+    }
+    
+    public int getSetMaxStalledEpochs() {
+    	return this.maxConsecutivelyStalledEpochs;
+    }
     
     
     public double getTotalSquaredError() {

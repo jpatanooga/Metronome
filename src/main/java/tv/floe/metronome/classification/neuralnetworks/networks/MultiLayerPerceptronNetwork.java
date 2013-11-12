@@ -94,7 +94,8 @@ public class MultiLayerPerceptronNetwork extends NeuralNetwork {
 
      this.completeIOWiring();
      this.setLearningRule(new BackPropogationLearningAlgorithm());
-     this.randomizeWeights( new NguyenWidrowRandomizer( -0.7, 0.7 ) );
+     //this.randomizeWeights( new NguyenWidrowRandomizer( -0.7, 0.7 ) );
+     this.randomizeWeights();
 				
      this.setConfig(conf);
      

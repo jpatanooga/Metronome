@@ -24,24 +24,6 @@ public class Test_NIST_HandWritingDataset_IR_NN {
 		
 		MasterNode master = (MasterNode) polr_ir.getMaster();
 		
-		System.out.println("\n\nComplete: ");
-		//Utils.PrintVector( master.polr.getBeta().viewRow(0) );
-
-//		this.scoreNeuralNetworkXor( master.first_worker_copy );
-		
-		System.out.println("Worker 1 ");
-		//TestTwoWorkersXOR_IR_NN.scoreNeuralNetworkXor( singleWorker.nn );
-		//Utils.PrintNeuralNetwork( singleWorker.nn );
-		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
-		/*
-		System.out.println("Worker 2 ");
-		TestTwoWorkersXOR_IR_NN.scoreNeuralNetworkXor( secondWorker.nn );
-		Utils.PrintNeuralNetwork( secondWorker.nn );
-		*/
-		
-		//System.out.println("Gobal Results");
-		//TestTwoWorkersXOR_IR_NN.scoreNeuralNetworkXor( master.master_nn );
-		//Utils.PrintNeuralNetwork(  master.master_nn );
 		
 	}
 }
