@@ -152,7 +152,7 @@ public class TestCachedVectorReader {
 		while (cachedVecReader.next(cv)) {
 			
 			if (0 == record_count || 1 == record_count) {
-				System.out.println("rec 0>  " + cv.vec_output.get(0) + " == " + cv.vec_input.toString() );
+				//System.out.println("rec 0>  " + cv.vec_output.get(0) + " == " + cv.vec_input.toString() );
 				assertEquals(-1.0, cv.vec_output.get(0), 0.0);
 			}
 			

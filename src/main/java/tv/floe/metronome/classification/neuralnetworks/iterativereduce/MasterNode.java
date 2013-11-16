@@ -32,7 +32,9 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 
 	    //System.out.println("master::complete (Iterations: " + this.NumberIterations + ")");
 	    
-	    ds.write(this.master_nn.Serialize());
+	   // ds.write(this.master_nn.Serialize());
+		
+		System.out.println("Master: Model Writing is disabled for testing");
 	    
 		
 	}
@@ -134,7 +136,9 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 		
 	    // THIS NEEDS TO BE DONE, probably automated!
 	    workerUpdates.clear();
+	    masterUpdates.clear();
 
+	    //System.out.println("DEBUG > Master Completes Iteration");
 		
 		return return_msg;
 	}
@@ -167,7 +171,7 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 	    
 	    System.out.println( "-----------------------------------------" );
 	    System.out.println( "# Master Conf #" );
-	    System.out.println( "Number Iterations: " + this.NumberIterations );
+	    //System.out.println( "Number Iterations: " + this.NumberIterations );
 	    System.out.println( "-----------------------------------------\n\n" );
 	    		
 		

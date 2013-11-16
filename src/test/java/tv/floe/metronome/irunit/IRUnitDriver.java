@@ -25,6 +25,8 @@ import org.apache.hadoop.mapred.TextInputFormat;
 
 import tv.floe.metronome.utils.Utils;
 
+import antlr.ByteBuffer;
+
 import com.cloudera.iterativereduce.ComputableMaster;
 import com.cloudera.iterativereduce.ComputableWorker;
 //import com.cloudera.knittingboar.messages.iterativereduce.ParameterVectorGradientUpdatable;
@@ -302,13 +304,16 @@ public class IRUnitDriver<T> {
 		int iterations = Integer.parseInt(props
 				.getProperty("app.iteration.count"));
 
-		System.out.println("Starting Iterations (" + iterations + ")...");
+		System.out.println("Starting Epochs (" + iterations + ")...");
 		
 		for (int x = 0; x < iterations; x++) {
 
 			for (int worker_id = 0; worker_id < workers.size(); worker_id++) {
 
 				Updateable result = workers.get(worker_id).compute();
+				java.nio.ByteBuffer bb = result.toBytes();
+				result.fromBytes(bb);
+				
 				worker_results.add(result);
 				// ParameterVectorGradient msg0 =
 				// workers.get(worker_id).GenerateUpdate();

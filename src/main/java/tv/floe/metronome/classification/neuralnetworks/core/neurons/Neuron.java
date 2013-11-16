@@ -118,15 +118,17 @@ public class Neuron implements Serializable {
 		
 	}
 	
+	/**
+	 * Calculate the output, cache the value to be quickly loaded by backprop
+	 * 
+	 */
 	public void calcOutput() {
 		
         if ((this.inConnections.size() > 0)) {
         		this.netInput = this.inputFunction.getOutput(this.inConnections);
         }
-        
 
         this.output = this.transferFunction.getOutput(this.netInput);
-		
 		
 	}
 	

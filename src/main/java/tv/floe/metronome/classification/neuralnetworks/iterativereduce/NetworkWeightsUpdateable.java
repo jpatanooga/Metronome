@@ -26,6 +26,7 @@ public class NetworkWeightsUpdateable implements Updateable<NeuralNetworkWeights
 	    
 	    
 	    try {
+	    	this.networkUpdate = new NeuralNetworkWeightsDelta();
 	      this.networkUpdate.Deserialize(b.array());
 	    } catch (IOException e) {
 	      // TODO Auto-generated catch block

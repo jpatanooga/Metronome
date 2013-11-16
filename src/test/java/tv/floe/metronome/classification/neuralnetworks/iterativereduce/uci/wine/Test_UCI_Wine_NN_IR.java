@@ -18,13 +18,13 @@ public class Test_UCI_Wine_NN_IR {
 
 		polr_ir.SimulateRun();
 
-		
+		/*
 		WorkerNode singleWorker = (WorkerNode)polr_ir.getWorker().get(0);
 		
 		MasterNode master = (MasterNode) polr_ir.getMaster();
 		
 		System.out.println("\n\nComplete: ");
 		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
-		
+		*/
 	}
 }

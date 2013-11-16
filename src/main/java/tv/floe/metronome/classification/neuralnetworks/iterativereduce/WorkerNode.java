@@ -136,17 +136,6 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 			// TODO: clean up post-epoch -- this may should be handled via the nn interface?
 			bp.completeTrainingEpoch();
 			
-		//} // if
-		
-/*			if (bp.hasHitMinErrorThreshold()) {
-				if (!hitErrThreshold) {
-					//System.out.println("Hit Min Err Threshold > Epoch: " + this.CurrentIteration );
-					trainingCompleteEpoch = this.CurrentIteration;
-					hitErrThreshold = true;
-				}
-				
-			}
-	*/		
 			
 			String marker = "";
 			if (hitErrThreshold) {
@@ -354,8 +343,8 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 		
 		// TODO: now update the local network
 		
-		this.nn = global_update.network;
-		//this.nn.copyWeightsAndConf(global_update.network );
+		//this.nn = global_update.network;
+		this.nn.copyWeightsAndConf( global_update.network );
 		
 		// this is a hack for now TODO: fix this
 		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
