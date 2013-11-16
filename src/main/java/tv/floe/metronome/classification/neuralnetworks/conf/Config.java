@@ -8,7 +8,7 @@ import org.apache.hadoop.conf.Configuration;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
 import tv.floe.metronome.classification.neuralnetworks.input.WeightedSum;
-import tv.floe.metronome.classification.neuralnetworks.transfer.Linear;
+import tv.floe.metronome.classification.neuralnetworks.activation.Linear;
 
 /**
  * At some point I gotta make this thing configurable
@@ -18,14 +18,6 @@ import tv.floe.metronome.classification.neuralnetworks.transfer.Linear;
  */
 public class Config extends Hashtable {
 	
-/*	
-    public String weightsFunction;
-    public String summingFunction;
-    public String inputFunction;
-    public String transferFunction;
-    public String neuronType;
-    public String useBias;
-*/	
 	ArrayList<Integer> layerNeuronCounts;
 
 	public Config() {

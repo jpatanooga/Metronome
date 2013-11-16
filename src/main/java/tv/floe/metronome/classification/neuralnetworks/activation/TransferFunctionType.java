@@ -1,4 +1,4 @@
-package tv.floe.metronome.classification.neuralnetworks.transfer;
+package tv.floe.metronome.classification.neuralnetworks.activation;
 
 public enum TransferFunctionType {
 
@@ -7,10 +7,6 @@ public enum TransferFunctionType {
 	STEP("Step"),
 	SIGMOID("Sigmoid"),
 	TANH("Tanh"),
-//	GAUSSIAN("Gaussian"),
-//	TRAPEZOID("Trapezoid"),
-//	SGN("Sgn"), 
-//        SIN("Sin"), 
         LOG("Log");
 
 		private String typeLabel;

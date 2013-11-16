@@ -1,4 +1,4 @@
-package tv.floe.metronome.classification.neuralnetworks.transfer;
+package tv.floe.metronome.classification.neuralnetworks.activation;
 
 import static org.junit.Assert.*;
 

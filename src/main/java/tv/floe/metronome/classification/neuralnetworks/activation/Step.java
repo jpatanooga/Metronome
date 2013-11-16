@@ -1,6 +1,6 @@
-package tv.floe.metronome.classification.neuralnetworks.transfer;
+package tv.floe.metronome.classification.neuralnetworks.activation;
 
-public class Step  extends TransferFunction {
+public class Step  extends ActivationFunction {
 
 	private double dHigh = 1d;	
 	private double dLow = 0d;

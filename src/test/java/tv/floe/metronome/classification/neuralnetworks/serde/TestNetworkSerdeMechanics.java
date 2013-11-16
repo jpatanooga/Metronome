@@ -10,6 +10,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
 import org.junit.Test;
 
+import tv.floe.metronome.classification.neuralnetworks.activation.Tanh;
 import tv.floe.metronome.classification.neuralnetworks.conf.Config;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
@@ -18,7 +19,6 @@ import tv.floe.metronome.classification.neuralnetworks.iterativereduce.MasterNod
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.NetworkWeightsUpdateable;
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.NeuralNetworkWeightsDelta;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
-import tv.floe.metronome.classification.neuralnetworks.transfer.Tanh;
 
 public class TestNetworkSerdeMechanics {
 

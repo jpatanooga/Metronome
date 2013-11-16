@@ -1,4 +1,4 @@
-package tv.floe.metronome.classification.neuralnetworks.transfer;
+package tv.floe.metronome.classification.neuralnetworks.activation;
 /**
  * Classical neural network activation function
  * - scalar to scalar function
@@ -9,7 +9,7 @@ package tv.floe.metronome.classification.neuralnetworks.transfer;
  * @author josh
  *
  */
-public class Sigmoid extends TransferFunction {
+public class Sigmoid extends ActivationFunction {
 
 	private double slope = 1d;
 		

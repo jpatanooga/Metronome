@@ -1,7 +1,7 @@
 package tv.floe.metronome.classification.neuralnetworks.core.neurons;
 
 import tv.floe.metronome.classification.neuralnetworks.input.WeightedSum;
-import tv.floe.metronome.classification.neuralnetworks.transfer.Linear;
+import tv.floe.metronome.classification.neuralnetworks.activation.Linear;
 
 public class InputNeuron extends Neuron {
 

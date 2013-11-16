@@ -4,15 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
 import tv.floe.metronome.classification.neuralnetworks.conf.Config;
 import tv.floe.metronome.classification.neuralnetworks.core.Connection;
 import tv.floe.metronome.classification.neuralnetworks.core.Layer;
 import tv.floe.metronome.classification.neuralnetworks.core.Weight;
 import tv.floe.metronome.classification.neuralnetworks.input.InputFunction;
 import tv.floe.metronome.classification.neuralnetworks.input.WeightedSum;
-import tv.floe.metronome.classification.neuralnetworks.transfer.Sigmoid;
-import tv.floe.metronome.classification.neuralnetworks.transfer.Step;
-import tv.floe.metronome.classification.neuralnetworks.transfer.TransferFunction;
+import tv.floe.metronome.classification.neuralnetworks.activation.Sigmoid;
+import tv.floe.metronome.classification.neuralnetworks.activation.Step;
+import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
 
 public class Neuron implements Serializable {
 	
@@ -21,7 +22,7 @@ public class Neuron implements Serializable {
 	public ArrayList<Connection> outConnections = null;
 	
 	protected InputFunction inputFunction;
-	protected TransferFunction transferFunction;
+	protected ActivationFunction activationFunction;
     double netInput = 0;
         	
 	
@@ -34,7 +35,7 @@ public class Neuron implements Serializable {
 	public Neuron() {
 		
 		this.inputFunction = new WeightedSum();
-		this.transferFunction = new Step();
+		this.activationFunction = new Step();
 		
 		
 		this.inConnections = new ArrayList<Connection>();
@@ -44,13 +45,13 @@ public class Neuron implements Serializable {
 	}
 
 	
-	public Neuron( InputFunction inputFunc, TransferFunction transFunc) {
+	public Neuron( InputFunction inputFunc, ActivationFunction actFunc) {
 		
 		this.inConnections = new ArrayList<Connection>();
 		this.outConnections = new ArrayList<Connection>();
 		
 		this.inputFunction = inputFunc;
-		this.transferFunction = transFunc;
+		this.activationFunction = actFunc;
 		
 		
 	}
@@ -59,7 +60,7 @@ public class Neuron implements Serializable {
 	public static Neuron createNeuron(Config c, int layerIndex) {
 		
 		Neuron n = null; 
-		TransferFunction tf = null;
+		ActivationFunction tf = null;
 		
 		if (0 == layerIndex) {
 			n = new InputNeuron();
@@ -128,7 +129,7 @@ public class Neuron implements Serializable {
         		this.netInput = this.inputFunction.getOutput(this.inConnections);
         }
 
-        this.output = this.transferFunction.getOutput(this.netInput);
+        this.output = this.activationFunction.getOutput(this.netInput);
 		
 	}
 	
@@ -254,8 +255,8 @@ public class Neuron implements Serializable {
 		return this.parentLayer;
 	}
 	
-	public TransferFunction getTransferFunction() {
-		return this.transferFunction;
+	public ActivationFunction getActivationFunction() {
+		return this.activationFunction;
 	}
 
 	

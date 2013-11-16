@@ -1,4 +1,4 @@
-package tv.floe.metronome.classification.neuralnetworks.transfer;
+package tv.floe.metronome.classification.neuralnetworks.activation;
 
 /**
  * The hyperbolic tangent activation function
@@ -14,7 +14,7 @@ package tv.floe.metronome.classification.neuralnetworks.transfer;
  * 
  *
  */
-public class Tanh  extends TransferFunction {
+public class Tanh  extends ActivationFunction {
 
 	private double slope = 2d;
 

@@ -1,14 +1,14 @@
-package tv.floe.metronome.classification.neuralnetworks.transfer;
+package tv.floe.metronome.classification.neuralnetworks.activation;
 
 import java.io.Serializable;
 
 /**
- * AKA "activation function"
+ * 
  * 
  * @author josh
  *
  */
-public abstract class TransferFunction implements Serializable {
+public abstract class ActivationFunction implements Serializable {
 
     protected double output; 
 

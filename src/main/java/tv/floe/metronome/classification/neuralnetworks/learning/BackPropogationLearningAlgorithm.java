@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import tv.floe.metronome.classification.neuralnetworks.core.Connection;
 import tv.floe.metronome.classification.neuralnetworks.core.Layer;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
-import tv.floe.metronome.classification.neuralnetworks.transfer.TransferFunction;
+import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
 
 public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgorithm {
 
@@ -70,7 +70,7 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
 
 		
 		
-		TransferFunction transferFunction = neuron.getTransferFunction();
+		ActivationFunction transferFunction = neuron.getActivationFunction();
 		
 		
 		double netInput = neuron.getNetInput(); // should we use input of this or other neuron?

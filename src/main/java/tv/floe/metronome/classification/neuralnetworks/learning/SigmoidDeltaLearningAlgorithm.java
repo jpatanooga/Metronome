@@ -1,7 +1,8 @@
 package tv.floe.metronome.classification.neuralnetworks.learning;
 
+import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
-import tv.floe.metronome.classification.neuralnetworks.transfer.TransferFunction;
+import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
 
 public class SigmoidDeltaLearningAlgorithm extends LeastMeanSquaresLearningAlgorithm {
 
@@ -30,7 +31,7 @@ public class SigmoidDeltaLearningAlgorithm extends LeastMeanSquaresLearningAlgor
 				continue;
 			}
 			
-			TransferFunction transferFunction = neuron.getTransferFunction();
+			ActivationFunction transferFunction = neuron.getActivationFunction();
 			double neuronInput = neuron.getNetInput();
 			double delta = outputError[ x ] * transferFunction.getDerivative( neuronInput ); // delta = (d-y)*df(net)
 			neuron.setError( delta );

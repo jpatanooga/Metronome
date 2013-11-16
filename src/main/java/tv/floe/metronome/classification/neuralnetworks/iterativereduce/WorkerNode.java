@@ -15,13 +15,13 @@ import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
 import tv.floe.metronome.classification.neuralnetworks.input.WeightedSum;
 import tv.floe.metronome.classification.neuralnetworks.learning.BackPropogationLearningAlgorithm;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
-import tv.floe.metronome.classification.neuralnetworks.transfer.Tanh;
+import tv.floe.metronome.classification.neuralnetworks.activation.Tanh;
 import tv.floe.metronome.io.records.CachedVector;
 import tv.floe.metronome.io.records.CachedVectorReader;
 import tv.floe.metronome.io.records.MetronomeRecordFactory;
 import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.io.records.libsvmRecordFactory;
-import tv.floe.metronome.linearregression.iterativereduce.NodeBase;
+
 import tv.floe.metronome.metrics.Metrics;
 
 import com.cloudera.iterativereduce.ComputableWorker;

@@ -1,6 +1,6 @@
-package tv.floe.metronome.classification.neuralnetworks.transfer;
+package tv.floe.metronome.classification.neuralnetworks.activation;
 
-public class Linear  extends TransferFunction {
+public class Linear  extends ActivationFunction {
 	
 	private double slope = 1d;
 
