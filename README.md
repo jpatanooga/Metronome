@@ -1,11 +1,13 @@
 Metronome is a suite of parallel iterative algorithms that run natively on Hadoop's Next Generation YARN platform. 
 
 * Based directly on work we did with [Knitting Boar](https://github.com/jpatanooga/KnittingBoar) and [IterativeReduce] (https://github.com/emsixteeen/IterativeReduce)
+	* Parallel Neural Networks
+	* Parallel linear regression
     * Parallel logistic regression
+    * Parallel K-means
     * Scales linearly with input size
     * Built on top of BSP-style computation framework "Iterative Reduce" (Hadoop / YARN)
-    * Uses Mahout's implementation of Stochastic Gradient Descent (SGD) as basis for worker process
-* Linear Regression package can produce a linear regression model off large amounts of data
+
 * Packaged in a new suite of parallel iterative algorithms called Metronome
     * 100% Java, ASF 2.0 Licensed, on github
 
@@ -27,3 +29,4 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
 * Dr. Jason Baldridge
 * Dr. James Scott
 * Paul Wilkinson
+* David Kale
