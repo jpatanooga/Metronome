@@ -58,6 +58,7 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	double learningRate = 0;
 	int stallMaxEpochs = -1; // default
 	double stallMinErrorDelta = -1; // take defaults
+	boolean stallBustingOn = true; // defaults to on
 	
 	RecordFactory rec_factory = null; // gotta be dynamically set!
 	
@@ -145,8 +146,10 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 			if (bp.checkForLearningStallOut() && false == bp.hasHitMinErrorThreshold()) {
 				marker += " [ --- STALL ---]";
 				this.nn.randomizeWeights();
-				bp.resetStallTracking();
-				System.out.println("[ --- STALL WORKER RESET --- ]: " + bp.getSetMaxStalledEpochs());
+				if (this.stallBustingOn) {
+					bp.resetStallTracking();
+					System.out.println("[ --- STALL WORKER RESET --- ]: " + bp.getSetMaxStalledEpochs());
+				}
 			}
 			
 			
@@ -156,7 +159,7 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 			}
 		
 		
-		long totalTime = System.currentTimeMillis() - startMS;
+		//long totalTime = System.currentTimeMillis() - startMS;
 		
 		//System.out.println("Worker Iteration Time: " + totalTime + " ms");
 
@@ -212,6 +215,13 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	    this.stallMaxEpochs = this.conf.getInt("tv.floe.metronome.neuralnetwork.conf.stall.maxEpochs", 200);
 
 	    this.stallMinErrorDelta = Double.parseDouble(this.conf.get("tv.floe.metronome.neuralnetwork.conf.stall.minErrorDelta", "0.000001"));
+	    
+	    String stallBusterOn = this.conf.get("tv.floe.metronome.neuralnetwork.conf.StallBusterOn");
+	    if (stallBusterOn != null && stallBusterOn.equals("true")) {
+	    	this.stallBustingOn = true;
+	    }
+	    
+	    
 	    
 	      this.learningRate = Double.parseDouble(this.conf.get(
 		          "tv.floe.metronome.neuralnetwork.conf.LearningRate", "0.1"));
