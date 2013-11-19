@@ -5,17 +5,14 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.MasterNode;
-import tv.floe.metronome.classification.neuralnetworks.iterativereduce.WorkerNode;
-import tv.floe.metronome.classification.neuralnetworks.utils.Utils;
 import tv.floe.metronome.irunit.IRUnitDriver;
 
-public class TestFiveWorkersXOR_IR_NN {
+public class Test_XOR_IR_NN {
 
-	
 	@Test
 	public void testLearnXORFunctionViaIRNN_MLP() throws Exception {
 		
-		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/unit_tests/nn/xor/app.unit_test.nn.xor.fiveworkers.properties");
+		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/unit_tests/nn/xor/app.unit_test.nn.xor.singlenode.properties");
 		polr_ir.Setup();
 
 		polr_ir.SimulateRun();
@@ -23,9 +20,9 @@ public class TestFiveWorkersXOR_IR_NN {
 		MasterNode master = (MasterNode) polr_ir.getMaster();
 		
 		System.out.println("\n\nComplete: ");
-		
-		System.out.println("Gobal Results");
+
 		XOR_DatasetTestUtils.scoreNeuralNetworkXor( master.master_nn );
 		
 	}
+
 }

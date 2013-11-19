@@ -191,7 +191,6 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	@Override
 	public void setRecordParser(RecordParser rp) {
 		this.lineParser = (TextRecordParser) rp;
-		//System.out.println("setting record parser: " + rp.getClass().toString());
 		this.cachedVecReader = new CachedVectorReader(lineParser, rec_factory);
 	}
 
@@ -219,6 +218,8 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	    String stallBusterOn = this.conf.get("tv.floe.metronome.neuralnetwork.conf.StallBusterOn");
 	    if (stallBusterOn != null && stallBusterOn.equals("true")) {
 	    	this.stallBustingOn = true;
+	    } else {
+	    	this.stallBustingOn = false;
 	    }
 	    
 	    

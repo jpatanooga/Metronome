@@ -32,9 +32,9 @@ public class MasterNode  extends NodeBase implements ComputableMaster<NetworkWei
 
 	    //System.out.println("master::complete (Iterations: " + this.NumberIterations + ")");
 	    
-	   // ds.write(this.master_nn.Serialize());
+	   ds.write(this.master_nn.Serialize());
 		
-		System.out.println("Master: Model Writing is disabled for testing");
+		//System.out.println("Master: Model Writing is disabled for testing");
 	    
 		
 	}

@@ -1,4 +1,4 @@
-package tv.floe.metronome.classification.neuralnetworks.iterativereduce.uci.wine;
+package tv.floe.metronome.classification.neuralnetworks.eval;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -17,7 +17,7 @@ import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.io.records.MetronomeRecordFactory;
 
-public class WineModelTestingTool {
+public class ModelEvaluator {
 
 
 	private static String model_path = "/tmp/nn.wine.model";
@@ -218,21 +218,11 @@ public class WineModelTestingTool {
 		
 	}
 	
-	/**
-	 * TODO: figure out how to handle test dataset param
-	 * - first thought: put it in the properties file as a new property entry
-	 * 
-	 * @param args
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws Exception {
+	public static void eval(String propertiesFile) throws Exception {
 		
 		//app_properties_file = "";
-		parsePropertiesFile("src/test/resources/run_profiles/unit_tests/nn/wine/app.unit_test.nn.wine.properties") ;
+		parsePropertiesFile(propertiesFile);
 		
-		System.out.println("model path: " + model_path);
-		
-		//scoreIrisNeuralNetworkModel("/tmp/nn.nist.0.model", "i:64 | o:10", "src/test/resources/data/nist/HandWritingDigits/optdigits.tra.mne" );
 		scoreNeuralNetworkModel( model_path, schema, src_input_data_path );
 		
 	}
