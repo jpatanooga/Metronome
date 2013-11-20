@@ -73,7 +73,7 @@ public class ModelEvaluator {
 		    byte[] b = new byte[1024 * 200];
 		    int bytes_read = fis.read(b);
 		    
-		    System.out.println("bytes read: " + bytes_read);
+		    //System.out.println("bytes read: " + bytes_read);
 		    
 		    nnet = (MultiLayerPerceptronNetwork) NeuralNetwork.Deserialize(b);
 		    
@@ -209,18 +209,17 @@ public class ModelEvaluator {
 		if (null == src_input_data_path) {
 			throw new Exception("Can't find the eval/test recordset in the properites file!");
 		}
-		
+/*		
 		System.out.println("Conf ------------");
 		System.out.println("Model: " + model_path);
 		System.out.println("Schema: " + schema);
 		System.out.println("Test Dataset: " + src_input_data_path);
-		
+	*/	
 		
 	}
 	
 	public static void eval(String propertiesFile) throws Exception {
 		
-		//app_properties_file = "";
 		parsePropertiesFile(propertiesFile);
 		
 		scoreNeuralNetworkModel( model_path, schema, src_input_data_path );
