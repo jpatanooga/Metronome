@@ -4,7 +4,6 @@ public class AdagradLearningRate {
 
 	private double gamma = 10; // default for gamma (this is the numerator)
 	private double squaredGradientSum = 0;
-	//private long totalGradientsAdded = 0;
 	
 	public AdagradLearningRate(double gamma) {
 		this.gamma = gamma;

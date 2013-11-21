@@ -59,6 +59,7 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	int stallMaxEpochs = -1; // default
 	double stallMinErrorDelta = -1; // take defaults
 	boolean stallBustingOn = true; // defaults to on
+	boolean adagradLearningRateOn = false;
 	
 	RecordFactory rec_factory = null; // gotta be dynamically set!
 	
@@ -227,6 +228,12 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	      this.learningRate = Double.parseDouble(this.conf.get(
 		          "tv.floe.metronome.neuralnetwork.conf.LearningRate", "0.1"));
 
+	      // tv.floe.metronome.neuralnetwork.conf.AdagradLearningRateOn
+		    String adagradOn = this.conf.get("tv.floe.metronome.neuralnetwork.conf.AdagradLearningRateOn");
+		    if (adagradOn != null && adagradOn.equals("true")) {
+		    	this.adagradLearningRateOn = true;
+		    }
+	      
 	      this.trainingErrorThreshold = Double.parseDouble(this.conf.get(
 	          "tv.floe.metronome.neuralnetwork.conf.TrainingErrorThreshold", "0.2"));
 	      
@@ -292,6 +299,11 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
 		bp.setLearningRate(this.learningRate);
 		bp.setStallDetectionParams(this.stallMinErrorDelta, this.stallMaxEpochs);
+		
+		if (this.adagradLearningRateOn) {
+			bp.turnOnAdagradLearning();
+			bp.setup(); // we may need to find a better place for this
+		}
 		
 		System.out.println("Debug-Stall > stallMinErrordelta: " + this.stallMinErrorDelta);
 		System.out.println("Debug-Stall > stallMaxEpochs: " + this.stallMaxEpochs);

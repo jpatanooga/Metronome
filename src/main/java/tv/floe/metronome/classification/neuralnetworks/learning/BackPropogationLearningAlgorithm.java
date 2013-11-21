@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import tv.floe.metronome.classification.neuralnetworks.core.Connection;
 import tv.floe.metronome.classification.neuralnetworks.core.Layer;
+import tv.floe.metronome.classification.neuralnetworks.core.Weight;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
+import tv.floe.metronome.classification.neuralnetworks.learning.adagrad.AdagradLearningRate;
 import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
 
 /**
@@ -63,7 +65,7 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
                 	
                     for (Connection connection : neuron.getInConnections()) {
                     	
-                        connection.getWeight().trainingMetaData.put("adagrad", arg1)
+                        connection.getWeight().trainingMetaData.put("adagrad", new AdagradLearningRate(10.0));
                         
                     }
                     
@@ -151,5 +153,47 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
 		double neuronError = fnDerv * deltaSum;
 		return neuronError;
 	}	
+	
+	
+	/**
+	 * Updated for adagrad
+	 * 
+	 */
+	@Override
+    protected void updateNeuronWeights(Neuron neuron) {
+
+    	double neuronError = neuron.getError();
+        double lrTemp = 0;
+        AdagradLearningRate alr = null;
+        
+        for (Connection connection : neuron.getInConnections()) {
+
+        	if (this.adagradLearningOn) {
+        		alr = (AdagradLearningRate)connection.getWeight().trainingMetaData.get("adagrad");
+        		lrTemp = alr.compute();
+        	} else {
+        		lrTemp = this.learningRate;
+        	}
+        	
+        	double input = connection.getInput();
+            //double weightChange = this.learningRate * neuronError * input;
+        	double weightChange = lrTemp * neuronError * input;
+
+            Weight weight = connection.getWeight();
+
+            if (this.isInBatchMode() == false) {             
+                weight.weightChange = weightChange;                
+                weight.value += weightChange;
+            } else { 
+                weight.weightChange += weightChange;
+            }
+            
+            if (this.isMetricCollectionOn()) {
+            	this.metrics.incWeightOpCount();
+            }
+        }
+    }	
+	
+	
 	
 }
