@@ -48,7 +48,14 @@ public class LeastMeanSquaresLearningAlgorithm extends LearningAlgorithm {
     	this.recordsSeenDuringEpock = 0;
     	
     }
+    
+    // needed for certain training types
+    @Override
+    public void setup() {
+    	
+    }
 	
+    @Override
 	public void train(Vector actual_output_vector, Vector training_instance) {
 		
         try {

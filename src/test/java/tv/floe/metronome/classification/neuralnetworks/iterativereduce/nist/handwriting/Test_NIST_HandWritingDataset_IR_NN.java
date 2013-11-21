@@ -18,12 +18,6 @@ public class Test_NIST_HandWritingDataset_IR_NN {
 
 		polr_ir.SimulateRun();
 
-		/*
-		WorkerNode singleWorker = (WorkerNode)polr_ir.getWorker().get(0);
-	//	WorkerNode secondWorker = (WorkerNode)polr_ir.getWorker().get(1);
-		
-		MasterNode master = (MasterNode) polr_ir.getMaster();
-		*/
 		
 	}
 }

@@ -43,6 +43,7 @@ public abstract class LearningAlgorithm implements Serializable {
     }
 
 
+	abstract public void setup();
 	
     abstract public void train(Vector actual_output_values, Vector instance);
 

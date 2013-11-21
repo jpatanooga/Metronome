@@ -270,10 +270,6 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	
 	public void finishNNSetup() throws Exception {
 
-//	    System.out.println("\n> Conf ------- ");
-//	    System.out.println("Layers: " + this.layerNeuronCounts);
-//	    System.out.println("> Conf ------- \n");
-
 		
 		Config c = new Config();
 		c.parse(null); // default layer: 2-3-2
@@ -321,11 +317,6 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	      } else {
 	    	  // default to libsvm format
 	    	  
-//		      this.inputVectorSize = Integer.parseInt(this.conf.get(
-//			          "tv.floe.metronome.neuralnetwork.conf.InputVectorSize", "2"));
-	    	  
-	    	  
-//	    	  System.out.println("Defaulting to Using LibSVM Format!");
 	    	  this.rec_factory = new libsvmRecordFactory( this.nn.getInputsCount() );
 	      }		
 	      
@@ -341,15 +332,6 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	@Override
 	public void update(NetworkWeightsUpdateable nwu) {
 	    
-/*		ParameterVector global_update = t.get();
-	    
-	    // set the local parameter vector to the global aggregate ("beta")
-	    this.polr.SetBeta(global_update.parameter_vector);
-	    
-	    // update global count
-	    this.GlobalBatchCountForIteration = global_update.GlobalPassCount;
-	*/
-		
 		NeuralNetworkWeightsDelta global_update = nwu.get();
 		
 		// TODO: now update the local network

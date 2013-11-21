@@ -38,7 +38,6 @@ public class Connection implements Serializable {
     }
     
     public double getWeightedInput() {
-//    	System.out.println( ">>> conn > getWeightedOutput : " + this.from.getOutput() + "  * " + weight.value );
         return this.from.getOutput() * weight.value;
     }
     

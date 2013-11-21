@@ -1,17 +1,26 @@
 package tv.floe.metronome.classification.neuralnetworks.core;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
+/**
+ * Added the trainingMetaData member to support things like adagrad and momentum learning,
+ * - but be flexible for other future learning type needs
+ * 
+ * @author josh
+ *
+ */
 public class Weight implements Serializable {
 
 
 	public double value;
-    public transient double weightChange;	
+    public transient double weightChange;
+    public HashMap<String, Object> trainingMetaData = new HashMap<String, Object>();
 	
     
 	public Weight() {
 		this.value = Math.random() - 0.5d;
-                this.weightChange = 0;
+        this.weightChange = 0;
   	}
 
 	public Weight(double value) {

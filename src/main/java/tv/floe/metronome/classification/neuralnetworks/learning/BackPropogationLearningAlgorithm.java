@@ -7,11 +7,84 @@ import tv.floe.metronome.classification.neuralnetworks.core.Layer;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
 import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
 
+/**
+ * Basic backprop implementation
+ * - adagrad and momentum learning are added in a very basic way, no elaborate class system
+ * 
+ * @author josh
+ *
+ */
 public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgorithm {
 
+	boolean adagradLearningOn = false;
+	boolean momentumLearningOn = false;
+	
 	public BackPropogationLearningAlgorithm() {
 		super();
 	}
+	
+	public void turnOnAdagradLearning() {
+		this.adagradLearningOn = true;
+	}
+	
+	public void turnOnMomentumLearning() {
+		this.momentumLearningOn = true;
+	}
+	
+    @Override
+    public void setup() {
+    	
+    	if (this.adagradLearningOn) {
+    		
+    		// add stuff to the weights
+    		
+    		ArrayList<Layer> layers = nn.getLayers();
+    		
+    		
+    		/*
+    		for (int l = layers.size() - 2; l > 0; l--) {
+    									
+    			for ( Neuron neuron : layers.get( l ).getNeurons() ) {	
+                                    
+    				//double neuronError = this.calculateHiddenNeuronError( neuron ); 
+    				
+    				//neuron.setError( neuronError );
+    				
+    				//this.updateNeuronWeights( neuron );
+    								
+    			} // for
+    			
+    		} // for  
+    		*/
+    		
+    		for ( int x = 1; x < this.nn.getLayersCount(); x++ ) {
+	        	
+                for (Neuron neuron : this.nn.getLayerByIndex(x).getNeurons()) {
+                	
+                    for (Connection connection : neuron.getInConnections()) {
+                    	
+                        connection.getWeight().trainingMetaData.put("adagrad", arg1)
+                        
+                    }
+                    
+                }
+    	            
+    			
+    		}    		
+    		
+    		
+    		
+    	}
+    	
+    	if (this.momentumLearningOn) {
+    		
+    		// add stuff to the weights
+    		
+    	}
+    	
+    	
+    }
+	
 
 
 	/**

@@ -15,6 +15,16 @@ import java.io.ObjectOutputStream;
 
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 
+/**
+ * TODO:
+ * - move the connection weights into this structure
+ * - provide a custom serde for the connection weights
+ * 	
+ * 
+ * 
+ * @author josh
+ *
+ */
 public class NeuralNetworkWeightsDelta {
 	
 	public NeuralNetwork network = null;
