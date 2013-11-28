@@ -1,6 +1,8 @@
 package tv.floe.metronome.classification.neuralnetworks.learning.adagrad;
 
-public class AdagradLearningRate {
+import java.io.Serializable;
+
+public class AdagradLearningRate implements Serializable {
 
 	private double gamma = 10; // default for gamma (this is the numerator)
 	private double squaredGradientSum = 0;

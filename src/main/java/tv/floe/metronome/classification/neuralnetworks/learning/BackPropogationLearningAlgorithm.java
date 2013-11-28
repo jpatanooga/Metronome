@@ -158,6 +158,10 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
 	/**
 	 * Updated for adagrad
 	 * 
+	 * so with adagrad engaged, we are tracking/accumulating the gradient change
+	 * into the AdagradLearningRate object on each weight
+	 * - over time this drives the learning rate downwards
+	 * 
 	 */
 	@Override
     protected void updateNeuronWeights(Neuron neuron) {
@@ -187,6 +191,11 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
             } else { 
                 weight.weightChange += weightChange;
             }
+            
+        	if (this.adagradLearningOn) {
+        		alr = (AdagradLearningRate)connection.getWeight().trainingMetaData.get("adagrad");
+        		alr.addLastIterationGradient(weightChange);
+        	}            
             
             if (this.isMetricCollectionOn()) {
             	this.metrics.incWeightOpCount();
