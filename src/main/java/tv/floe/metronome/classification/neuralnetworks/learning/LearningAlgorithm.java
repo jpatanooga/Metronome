@@ -53,6 +53,9 @@ public abstract class LearningAlgorithm implements Serializable {
 		
 	}
 
+	public String Debug() {
+		return "";
+	}
 	
 	
 	

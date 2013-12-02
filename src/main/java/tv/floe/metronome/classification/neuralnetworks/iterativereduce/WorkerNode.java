@@ -153,12 +153,14 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 				}
 			}
 			
+			String alr_debug = "";//bp.Debug();
 			
-			this.metrics.printProgressiveStepDebugMsg(this.CurrentIteration, "Epoch: " + this.CurrentIteration + " > RMSE: " + bp.calcRMSError()  + ", Records Trainined: " + this.cachedVecReader.recordsInCache() + marker );
+			this.metrics.printProgressiveStepDebugMsg(this.CurrentIteration, "Epoch: " + this.CurrentIteration + " > RMSE: " + bp.calcRMSError()  + ", Records Trainined: " + this.cachedVecReader.recordsInCache() + marker + ", ALR: " + alr_debug );
 			if (this.metricsOn) {
 				bp.getMetrics().PrintMetrics();
 			}
 		
+			
 		
 		//long totalTime = System.currentTimeMillis() - startMS;
 		
@@ -303,11 +305,12 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 		if (this.adagradLearningRateOn) {
 			bp.turnOnAdagradLearning();
 			bp.setup(); // we may need to find a better place for this
+			System.out.println("Turning on Adagrad Learning...");
 		}
 		
-		System.out.println("Debug-Stall > stallMinErrordelta: " + this.stallMinErrorDelta);
-		System.out.println("Debug-Stall > stallMaxEpochs: " + this.stallMaxEpochs);
-		System.out.println("Debug-Stall > bp: " + bp.getSetMaxStalledEpochs());
+//		System.out.println("Debug-Stall > stallMinErrordelta: " + this.stallMinErrorDelta);
+//		System.out.println("Debug-Stall > stallMaxEpochs: " + this.stallMaxEpochs);
+//		System.out.println("Debug-Stall > bp: " + bp.getSetMaxStalledEpochs());
 		
 		if (this.metricsOn) {
 			bp.turnMetricsOn();

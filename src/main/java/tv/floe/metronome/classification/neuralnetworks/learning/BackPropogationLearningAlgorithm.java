@@ -202,6 +202,45 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
             }
         }
     }	
+
+	@Override
+	public String Debug() {
+		
+		String out = "";
+		
+		if (this.adagradLearningOn) {
+		for (int x = 1; x < this.nn.getLayersCount(); x++ ) {
+			
+			out += "L" + x + ":";
+			
+			int n  = 0;
+			
+			for ( Neuron neuron : this.nn.getLayerByIndex(x).getNeurons() ) {	
+				
+				out += "n" + n + "=";
+				
+		        for (Connection connection : neuron.getInConnections()) {
+
+		        	if (this.adagradLearningOn) {
+		        		AdagradLearningRate alr = (AdagradLearningRate)connection.getWeight().trainingMetaData.get("adagrad");
+		        		//lrTemp = alr.compute();
+		        		out += "" + alr.compute() +",";
+		        	}
+
+		        }
+		        
+		        n++;
+									
+			} // for
+			
+		} // for	
+		}
+		
+		return out;
+		
+		
+	}
+
 	
 	
 	
