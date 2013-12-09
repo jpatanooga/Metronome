@@ -20,13 +20,15 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
 
 	boolean adagradLearningOn = false;
 	boolean momentumLearningOn = false;
+	double adagradInitLearningRate = 10;
 	
 	public BackPropogationLearningAlgorithm() {
 		super();
 	}
 	
-	public void turnOnAdagradLearning() {
+	public void turnOnAdagradLearning(double adagradLearningRate) {
 		this.adagradLearningOn = true;
+		this.adagradInitLearningRate = adagradLearningRate;
 	}
 	
 	public void turnOnMomentumLearning() {
@@ -65,7 +67,7 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
                 	
                     for (Connection connection : neuron.getInConnections()) {
                     	
-                        connection.getWeight().trainingMetaData.put("adagrad", new AdagradLearningRate(10.0));
+                        connection.getWeight().trainingMetaData.put("adagrad", new AdagradLearningRate(this.adagradInitLearningRate));
                         
                     }
                     
@@ -241,7 +243,35 @@ public class BackPropogationLearningAlgorithm extends SigmoidDeltaLearningAlgori
 		
 	}
 
-	
+	public String DebugAdagrad() {
+		
+		String out = "";
+		
+		if (this.adagradLearningOn) {
+			
+			Neuron neuron = this.nn.getLayerByIndex(1).getNeurons().get(1);
+				
+
+				
+			Connection c = neuron.getInConnections().get(0);
+		        		
+			AdagradLearningRate alr = (AdagradLearningRate)c.getWeight().trainingMetaData.get("adagrad");
+		        		//lrTemp = alr.compute();
+		    
+			out += "[Ada: " + alr.compute() +" ]";
+
+			c = neuron.getInConnections().get(1);
+    		
+			alr = (AdagradLearningRate)c.getWeight().trainingMetaData.get("adagrad");
+
+			out += "[Ada: " + alr.compute() +" ]";
+			
+		}
+		
+		return out;
+		
+		
+	}
 	
 	
 }

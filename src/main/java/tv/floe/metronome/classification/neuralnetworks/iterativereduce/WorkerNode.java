@@ -60,6 +60,7 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	double stallMinErrorDelta = -1; // take defaults
 	boolean stallBustingOn = true; // defaults to on
 	boolean adagradLearningRateOn = false;
+	double adagradLearningRateInitSetting = 10;
 	
 	RecordFactory rec_factory = null; // gotta be dynamically set!
 	
@@ -153,7 +154,7 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 				}
 			}
 			
-			String alr_debug = "";//bp.Debug();
+			String alr_debug = bp.DebugAdagrad();
 			
 			this.metrics.printProgressiveStepDebugMsg(this.CurrentIteration, "Epoch: " + this.CurrentIteration + " > RMSE: " + bp.calcRMSError()  + ", Records Trainined: " + this.cachedVecReader.recordsInCache() + marker + ", ALR: " + alr_debug );
 			if (this.metricsOn) {
@@ -231,9 +232,13 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 		          "tv.floe.metronome.neuralnetwork.conf.LearningRate", "0.1"));
 
 	      // tv.floe.metronome.neuralnetwork.conf.AdagradLearningRateOn
-		    String adagradOn = this.conf.get("tv.floe.metronome.neuralnetwork.conf.AdagradLearningRateOn");
+		    String adagradOn = this.conf.get("tv.floe.metronome.neuralnetwork.conf.Adagrad.On");
 		    if (adagradOn != null && adagradOn.equals("true")) {
 		    	this.adagradLearningRateOn = true;
+		    	
+		    	this.adagradLearningRateInitSetting = Double.parseDouble(this.conf.get(
+				          "tv.floe.metronome.neuralnetwork.conf.Adagrad.LearningRate", "10.0"));
+		    	
 		    }
 	      
 	      this.trainingErrorThreshold = Double.parseDouble(this.conf.get(
@@ -303,7 +308,7 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 		bp.setStallDetectionParams(this.stallMinErrorDelta, this.stallMaxEpochs);
 		
 		if (this.adagradLearningRateOn) {
-			bp.turnOnAdagradLearning();
+			bp.turnOnAdagradLearning(this.adagradLearningRateInitSetting);
 			bp.setup(); // we may need to find a better place for this
 			System.out.println("Turning on Adagrad Learning...");
 		}
