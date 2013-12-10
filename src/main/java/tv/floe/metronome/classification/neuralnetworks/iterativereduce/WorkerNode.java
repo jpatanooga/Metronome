@@ -106,16 +106,8 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 
 		// the vector to pull from the local read through cache
 		CachedVector cv = new CachedVector( this.nn.getInputsCount(), this.rec_factory.getOutputVectorSize() ) ;// rec_factory.getFeatureVectorSize() );
-
-//		System.out.println("NN Inputs Count: " + this.nn.getInputsCount() );
-//		System.out.println("RecFactory Inputs Count: " + this.rec_factory.getInputVectorSize() );
-//		System.out.println("RecFactory Outputs Count: " + this.rec_factory.getOutputVectorSize() );
-		
-		long startMS = System.currentTimeMillis();
 		
 		cachedVecReader.Reset();
-		
-		//Vector vec_function_output = new DenseVector( this.nn.getOutputsCount() );
 		
 		BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.nn.getLearningRule());
 		bp.clearTotalSquaredError();
@@ -160,12 +152,6 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 			if (this.metricsOn) {
 				bp.getMetrics().PrintMetrics();
 			}
-		
-			
-		
-		//long totalTime = System.currentTimeMillis() - startMS;
-		
-		//System.out.println("Worker Iteration Time: " + totalTime + " ms");
 
 		NeuralNetworkWeightsDelta nnwd = new NeuralNetworkWeightsDelta();
 		nnwd.network = this.nn;
@@ -386,13 +372,6 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	    }
 	    
 	    delta.CurrentIteration = this.CurrentIteration;
-	    
-//	    delta.AvgLogLikelihood = (new Double(metrics.AvgLogLikelihood))
-//	        .floatValue();
-//	    delta.PercentCorrect = (new Double(metrics.AvgCorrect * 100))
-//	        .floatValue();
-//	    delta.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
-//	        .intValue();
 	    
 	    return delta;
 	    
