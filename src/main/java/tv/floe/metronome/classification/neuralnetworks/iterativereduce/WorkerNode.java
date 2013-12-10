@@ -73,12 +73,10 @@ public class WorkerNode implements ComputableWorker<NetworkWeightsUpdateable> {
 	
 	private boolean metricsOn = false;
 	private String layerNeuronCounts = "2,3,1"; // default XOR network
-//	private double learningRate = 0.1d;
 	private double trainingErrorThreshold = 0.2d;
 	private boolean useVectorCaching = true;
 	private String vectorSchema = ""; // tv.floe.metronome.neuralnetwork.conf.InputRecordSchema
 	
-//	private int inputVectorSize = 0; // in the event you'd use libsvm... FIX?
 	
 	/**
 	 * 

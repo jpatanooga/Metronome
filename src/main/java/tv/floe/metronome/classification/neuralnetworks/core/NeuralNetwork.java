@@ -22,7 +22,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 import org.apache.mahout.math.DenseVector;
+import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.MatrixWritable;
+import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Vector;
 
 import tv.floe.metronome.classification.neuralnetworks.conf.Config;
@@ -533,6 +535,42 @@ public class NeuralNetwork implements Serializable {
 		System.out.println("> Total Connections: " + this.getTotalConnectionCount());
 		//System.out.
 		System.out.println("---------- Network Stats --------- ");
+		
+	}
+	
+	/**
+	 * Get the connection weights as Vectors
+	 * - Each vector represents the incoming connection weights
+	 * - each vector maps to the corresponding indexed+1 layer
+	 * 
+	 * @return
+	 */
+	public ArrayList<Vector> getWeightsAsArrayOfVectors() {
+		
+		ArrayList<Vector> vecs = new ArrayList<Vector>();
+		
+		for ( int x = 1; x < this.getLayersCount(); x++ ) {
+			
+			vecs.add( this.getLayerByIndex(x).getIncomingConnectionsAsVector() );
+			
+		}
+		
+		return vecs;
+		
+	}
+	
+	public Matrix getWeightsAsMatrix() {
+		
+		//Matrix weightsMatrix = new DenseMatrix();
+		
+		
+		
+		return null;
+		
+	}
+	
+	public void setWeightsFromMatrix(Matrix weightsMatrix) {
+		
 		
 	}
 

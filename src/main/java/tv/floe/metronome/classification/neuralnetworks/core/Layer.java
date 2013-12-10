@@ -3,6 +3,9 @@ package tv.floe.metronome.classification.neuralnetworks.core;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.apache.mahout.math.RandomAccessSparseVector;
+import org.apache.mahout.math.Vector;
+
 
 import tv.floe.metronome.classification.neuralnetworks.conf.Config;
 import tv.floe.metronome.classification.neuralnetworks.core.neurons.Neuron;
@@ -241,6 +244,59 @@ public class Layer implements Serializable {
 		}
 		
 		return connections;
+	}
+	
+	/**
+	 * This allows us to provide more fine-grain SerDe mechanics
+	 * - we get each layer's set of incoming connections as a vector
+	 * - each Mahout vector can easily and cleanly be written to the underlying SerDe stream
+	 * 
+	 * 
+	 * Today's Assumptions
+	 * - fully connected network
+	 * 
+	 * @return
+	 */
+	public Vector getIncomingConnectionsAsVector() {
+		
+		Vector v_out = new RandomAccessSparseVector( this.getIncomingConnectionCount() );
+		int v_index = 0;
+		
+		for (Neuron neuron : this.layer_neurons) {
+
+			//connections += neuron.inConnections.size();
+			for ( int x = 0; x < neuron.inConnections.size(); x++ ) {
+				
+				v_out.set(v_index, neuron.inConnections.get(x).getWeight().value);
+				v_index++;
+				
+			}
+			
+		}
+		
+
+		return v_out;
+		
+	}
+	
+	public void loadConnectingWeights(Vector weights) {
+		
+		int v_index = 0;
+		
+		for (Neuron neuron : this.layer_neurons) {
+
+			//connections += neuron.inConnections.size();
+			for ( int x = 0; x < neuron.inConnections.size(); x++ ) {
+				
+				//v_out.set(v_index, neuron.inConnections.get(x).getWeight().value);
+				neuron.inConnections.get(x).getWeight().setValue(weights.get(v_index));
+				v_index++;
+				
+			}
+			
+		}
+				
+		
 	}
 	
 
