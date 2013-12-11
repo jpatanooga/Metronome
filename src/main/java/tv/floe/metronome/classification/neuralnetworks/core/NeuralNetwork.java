@@ -573,6 +573,19 @@ public class NeuralNetwork implements Serializable {
 		
 		
 	}
+	
+	public void setWeightsFromArrayOfVectors(ArrayList<Vector> vecs) {
+		
+		for ( int x = 1; x < this.getLayersCount(); x++ ) {
+			
+//			vecs.add( this.getLayerByIndex(x).getIncomingConnectionsAsVector() );
+			this.getLayerByIndex(x).loadConnectingWeights( vecs.get(x - 1));
+			
+		}
+		
+		
+		
+	}
 
     
 	

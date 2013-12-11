@@ -85,6 +85,7 @@ public class TestLayerToVectorSerde {
 		
 		NeuralNetwork nn0 = buildXORMLP();
 
+		nn0.randomizeWeights();
 		
 		// 2. export weights to vector array
 		ArrayList<Vector> vecs = nn0.getWeightsAsArrayOfVectors();
@@ -97,6 +98,29 @@ public class TestLayerToVectorSerde {
 		
 		// 3. import weights into new network
 		
+		NeuralNetwork nn1 = buildXORMLP();
+		nn1.clearNetworkConnectionWeights();
+		
+		ArrayList<Vector> vecs_1 = nn1.getWeightsAsArrayOfVectors();
+		
+		for ( int x = 0; x < vecs_1.get(0).size(); x++ ) {
+			
+			assertEquals(0.0, vecs_1.get(0).get(x), 0.0);
+			
+		}
+		
+		nn1.setWeightsFromArrayOfVectors(vecs);
+		for (int n = 0; n < nn0.getLayerByIndex(1).getNeurons().size(); n++) {
+
+			for ( int c = 0; c < nn0.getLayerByIndex(1).getNeuronAt(n).inConnections.size(); c++ ) {
+				
+				assertEquals( nn0.getLayerByIndex(1).getNeuronAt(n).inConnections.get(c).getWeight().value, nn1.getLayerByIndex(1).getNeuronAt(n).inConnections.get(c).getWeight().value, 0.0 );
+				System.out.println("conn: " + nn0.getLayerByIndex(1).getNeuronAt(n).inConnections.get(c).getWeight().value);
+				
+			}
+			
+		}
+						
 		
 		
 		
