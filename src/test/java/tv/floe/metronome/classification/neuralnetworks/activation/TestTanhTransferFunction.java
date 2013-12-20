@@ -85,6 +85,59 @@ public class TestTanhTransferFunction {
 	    }
       */ 
     }	
+    
+    @Test
+    public void showRangeOfFunction() {
+ 	   
+    	Tanh instance;
+ 	    double input, expected, expected_derivative;
+
+         instance = new Tanh();
+         instance.setSlope(1.0);
+
+         double[] inputs = {
+         		-11.0,
+         		-8.0,
+         		-4.0,
+         		-3.0,
+         		-2.0,
+         		-1.0,
+         		-0.9,
+         		-0.8,
+         		-0.7,
+         		-0.6,
+         		-0.5,
+         		-0.4,
+         		-0.3,
+         		-0.2,
+         		-0.1,
+         		0.0,
+         		0.1,
+         		0.2,
+         		0.3,
+         		0.4,
+         		0.5,
+         		0.6,
+         		0.7,
+         		0.8,
+         		0.9,
+         		1.0,
+         		1.1,
+         		10
+         };
+         
+ 	    for (int x = 0; x < inputs.length; x++ ) {
+
+	    	input = inputs[x];
+		   
+		   
+	        double result = instance.getOutput(input);
+
+	        System.out.println("tanh(" + input + "): " + result );
+	    	
+	    }	            
+         
+    }
 	
 
 }
