@@ -96,4 +96,26 @@ public class TestMatrixUtils {
 		
 		
 	}
+	
+	@Test
+	public void testMatrixOnes() {
+		
+		Matrix ones = MatrixUtils.ones(3, 4);
+		
+		assertEquals( 3, ones.numRows());
+		assertEquals( 4, ones.numCols());
+		
+		for ( int r = 0; r < ones.numRows(); r++ ) {
+			
+			for ( int c = 0; c < ones.numCols(); c++ ) {
+				
+				assertEquals(1.0, ones.getQuick(r, c), 0.0);
+				
+			}
+			
+		}
+		
+		
+	}
+	
 }

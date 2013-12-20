@@ -114,11 +114,26 @@ public class MatrixUtils {
 	}
 	
 	public Matrix sigmoid(Matrix m) {
+		
+//		DoubleMatrix ones = DoubleMatrix.ones(x.rows, x.columns);
+//	    return ones.div(ones.add(MatrixFunctions.exp(x.neg())));
+		
+		
 		return null;
 	}
 	
-	public Matrix ones(Matrix m) {
-		return null;
+	/**
+	 * Creates a new matrix in which all values are equal 1.
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static Matrix ones(int rows, int cols) {
+		
+		Matrix ret = new DenseMatrix(rows, cols);
+		ret.assign(1.0);
+		
+		return ret;
 	}
 	
 	public Matrix binomial(Matrix m) {
