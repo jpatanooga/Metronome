@@ -83,6 +83,13 @@ public class MatrixUtils {
 		
 	}
 
+	/**
+	 * Computes either a row-wise mean or a column-wise mean on the input Matrix m
+	 * 
+	 * @param m - Matrix to perform Mean operation on
+	 * @param axis - 0 for a column-wise mean, 1 for a row-wise mean
+	 * @return
+	 */
 	public static Matrix mean(Matrix m, int axis) {
 		
 		// create a vector of r-x-1 size

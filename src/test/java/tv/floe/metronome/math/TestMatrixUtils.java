@@ -48,6 +48,14 @@ public class TestMatrixUtils {
 		assertEquals( 6.0, row_means_matrix.get(0, 0), 0.0);
 		assertEquals( 5.0, row_means_matrix.get(1, 0), 0.0);
 		
+		Matrix row_means_matrix_2 = MatrixUtils.mean(m, 1);
+
+		assertEquals(1, row_means_matrix_2.numCols() );
+		assertEquals(m.numRows(), row_means_matrix_2.numRows() );
+		
+		assertEquals( 6.0, row_means_matrix_2.get(0, 0), 0.0);
+		assertEquals( 5.0, row_means_matrix_2.get(1, 0), 0.0);
+
 	}		
 
 	@Test
@@ -75,6 +83,17 @@ public class TestMatrixUtils {
 		assertEquals( 3.5, col_means_matrix.get(0, 1), 0.0);
 		assertEquals( 5.5, col_means_matrix.get(0, 2), 0.0);
 
+		
+		Matrix col_mean_matrix_2 = MatrixUtils.mean(m, 0);
+
+		assertEquals(1, col_mean_matrix_2.numRows() );
+		assertEquals(m.numCols(), col_mean_matrix_2.numCols() );
+
+		assertEquals( 2.5, col_mean_matrix_2.get(0, 0), 0.0);
+		assertEquals( 3.5, col_mean_matrix_2.get(0, 1), 0.0);
+		assertEquals( 5.5, col_mean_matrix_2.get(0, 2), 0.0);
+		
+		
 		
 	}
 }
