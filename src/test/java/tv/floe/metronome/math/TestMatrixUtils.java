@@ -252,6 +252,26 @@ public class TestMatrixUtils {
 
 		
 	}
+
+	@Test
+	public void testMatrixLog() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(1, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+		
+		Matrix logs = MatrixUtils.log(m0);
+		
+		assertEquals( Math.log(2), logs.get(0,0), 0.0 );
+		assertEquals( Math.log(3), logs.get(0,1), 0.0 );
+		assertEquals( Math.log(5), logs.get(0,2), 0.0 );
+
+		
+	}
+	
 	
 	@Test
 	public void testMatrixBinomialGeneration() {
