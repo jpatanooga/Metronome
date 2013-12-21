@@ -127,10 +127,14 @@ public class MatrixUtils {
 		Matrix ones = new DenseMatrix(m.numRows(), m.numCols());
 		ones.assign(1.0);
 		
+		MatrixUtils.neg( m );
+		MatrixUtils.exp( m );
+		Matrix denom = ones.plus( m );
+		Matrix out = MatrixUtils.div(ones, denom);
+				
 		
 		
-		
-		return null;
+		return out;
 	}
 	
 	/**
@@ -151,6 +155,8 @@ public class MatrixUtils {
 				m.set(r, c, -1.0 * cell  );
 			}
 		}
+		
+		//return m;
 
 	}
 	
@@ -169,6 +175,7 @@ public class MatrixUtils {
 			}
 		}
         
+		//return m;
 	}
 		
 	
@@ -179,15 +186,19 @@ public class MatrixUtils {
 	 * @param m
 	 * @return
 	 */
-	public static void div(Matrix numerator, Matrix denominator) {
+	public static Matrix div(Matrix numerator, Matrix denominator) {
+		
+		Matrix ret = numerator.like();
 		
 		for (int r = 0; r < numerator.numRows(); r++) {
 			for ( int c = 0; c < numerator.numCols(); c++ ) {
 		
-				numerator.set(r, c, numerator.get(r, c) / denominator.get(r, c)  );
+				ret.set(r, c, numerator.get(r, c) / denominator.get(r, c)  );
 				
 			}
 		}
+		
+		return ret;
 	}
 	
 	/**
