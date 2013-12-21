@@ -100,6 +100,8 @@ public class TestMatrixUtils {
 	@Test
 	public void testMatrixOnes() {
 		
+		Matrix ones_alt = MatrixUtils.ones(3, 4);
+		
 		Matrix ones = MatrixUtils.ones(3, 4);
 		
 		assertEquals( 3, ones.numRows());
@@ -115,6 +117,18 @@ public class TestMatrixUtils {
 			
 		}
 		
+		Matrix twos = ones.plus(ones_alt);
+
+		for ( int r = 0; r < twos.numRows(); r++ ) {
+			
+			for ( int c = 0; c < twos.numCols(); c++ ) {
+				
+				assertEquals(2.0, twos.getQuick(r, c), 0.0);
+				
+			}
+			
+		}
+
 		
 	}
 	

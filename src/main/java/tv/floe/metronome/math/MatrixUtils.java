@@ -113,13 +113,81 @@ public class MatrixUtils {
 		return null;
 	}
 	
+	/**
+	 * Calculate the sigmoid function in place over a matrix
+	 * 
+	 * @param m
+	 * @return
+	 */
 	public Matrix sigmoid(Matrix m) {
 		
 //		DoubleMatrix ones = DoubleMatrix.ones(x.rows, x.columns);
 //	    return ones.div(ones.add(MatrixFunctions.exp(x.neg())));
 		
+		Matrix ones = new DenseMatrix(m.numRows(), m.numCols());
+		ones.assign(1.0);
+		
+		
+		
 		
 		return null;
+	}
+	
+	/**
+	 * Negate each elemente in the Matrix
+	 * 
+	 * @param m - input matrix
+	 * @return
+	 */
+	public static void neg(Matrix m) {
+		
+		for ( int r = 0; r < m.numRows(); r++ ) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				
+				
+				double cell = m.get(r, c);
+				
+				
+				m.set(r, c, -1.0 * cell  );
+			}
+		}
+
+	}
+	
+	/**
+	 * Applies Math.exp() function to each element of the vector in-place
+	 * 
+	 * @param m
+	 */
+	public static void exp(Matrix m) {
+		
+		for (int r = 0; r < m.numRows(); r++) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+		
+				m.set(r, c, (double) Math.exp( m.get(r, c) ) );
+				
+			}
+		}
+        
+	}
+		
+	
+	
+	/**
+	 * Elementwise divide by a matrix (in place).
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static void div(Matrix numerator, Matrix denominator) {
+		
+		for (int r = 0; r < numerator.numRows(); r++) {
+			for ( int c = 0; c < numerator.numCols(); c++ ) {
+		
+				numerator.set(r, c, numerator.get(r, c) / denominator.get(r, c)  );
+				
+			}
+		}
 	}
 	
 	/**
