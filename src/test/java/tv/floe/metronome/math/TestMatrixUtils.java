@@ -132,4 +132,44 @@ public class TestMatrixUtils {
 		
 	}
 	
+	
+	@Test
+	public void testMatrixDiv() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(2, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+
+		m0.setQuick(1, 0, 3);
+		m0.setQuick(1, 1, 4);
+		m0.setQuick(1, 2, 6);
+		
+		Matrix m1 = new DenseMatrix(2, 3);
+		m1.setQuick(0, 0, 2);
+		m1.setQuick(0, 1, 3);
+		m1.setQuick(0, 2, 5);
+
+		m1.setQuick(1, 0, 3);
+		m1.setQuick(1, 1, 4);
+		m1.setQuick(1, 2, 6);
+		
+		
+		MatrixUtils.div(m0, m1);
+		
+		for ( int r = 0; r < m0.numRows(); r++ ) {
+			
+			for ( int c = 0; c < m0.numCols(); c++ ) {
+				
+				assertEquals(1.0, m0.getQuick(r, c), 0.0);
+				
+			}
+			
+		}
+		
+		
+	}
+	
 }
