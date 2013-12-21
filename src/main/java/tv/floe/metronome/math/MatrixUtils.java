@@ -110,8 +110,29 @@ public class MatrixUtils {
 		return ret;
 	}
 
-	public Matrix log(Matrix m) {
-		return null;
+	
+	/**
+	 * Applies the natural logarithm function element-wise on this matrix. 
+	 * 
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static Matrix log(Matrix m) {
+		
+		Matrix ret = m.like();
+		
+		for ( int r = 0; r < m.numRows(); r++ ) {
+
+			for ( int c = 0; c < m.numCols(); c++ ) {
+			
+				ret.set(r,  c, Math.log(m.get(r, c)));
+				
+			}
+			
+		}
+		
+		return ret;
 	}
 	
 	/**
