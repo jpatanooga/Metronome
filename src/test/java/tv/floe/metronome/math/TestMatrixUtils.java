@@ -172,4 +172,34 @@ public class TestMatrixUtils {
 		
 	}
 	
+
+	@Test
+	public void testMatrixNeg() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(2, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+
+		m0.setQuick(1, 0, 3);
+		m0.setQuick(1, 1, 4);
+		m0.setQuick(1, 2, 6);
+		
+		
+		
+		MatrixUtils.neg(m0);
+
+		assertEquals(-2.0, m0.get(0, 0), 0.0);
+		assertEquals(-3.0, m0.get(0, 1), 0.0);
+		assertEquals(-5.0, m0.get(0, 2), 0.0);
+
+		assertEquals(-3.0, m0.get(1, 0), 0.0);
+		assertEquals(-4.0, m0.get(1, 1), 0.0);
+		assertEquals(-6.0, m0.get(1, 2), 0.0);
+		
+		
+	}	
+	
 }
