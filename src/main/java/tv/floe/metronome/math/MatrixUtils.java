@@ -1,8 +1,12 @@
 package tv.floe.metronome.math;
 
+import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
+import org.jblas.DoubleMatrix;
+
+import com.ccc.sendalyzeit.textanalytics.util.MathUtils;
 
 /**
  *  
@@ -220,9 +224,69 @@ public class MatrixUtils {
 		return ret;
 	}
 	
-	public Matrix binomial(Matrix m) {
-		return null;
+	/**
+	 * Generate a binomial distribution based on the given random number generator,
+	 * a matrix of p values, and a max number.
+	 * 
+	 * 
+	 * @param p the p matrix to use
+	 * @param n the n to use
+	 * @param rng the rng to use
+	 * @return a binomial distribution based on the one n, the passed in p values, and rng
+	 */	
+	public Matrix genBinomialDistribution(Matrix pValues, int max, RandomGenerator rndNumberGenerator) {
+
+		Matrix dist = pValues.like(); 
+		
+		//for(int i = 0; i < ret.length; i++) {
+			//ret.put(i,MathUtils.binomial(rng, n, p.get(i)));
+		//}
+		
+		for (int r = 0; r < dist.numRows(); r++) {
+			for ( int c = 0; c < dist.numCols(); c++ ) {
+		
+				dist.set(r, c, binomial(rndNumberGenerator, max, pValues.get(r,  c) ) );
+				
+			}
+		}
+		
+		
+		return dist;
+		
+	
 	}
+	
+	/**
+	 * Generates a binomial distributed number using the given random number generator
+	 * 
+	 * Based on: http://luc.devroye.org/chapter_ten.pdf
+	 * 
+	 * @param rng
+	 * @param n
+	 * @param p
+	 * @return
+	 */
+	public static int binomial(RandomGenerator rng, int max, double p) {
+		
+		if (p < 0 || p > 1) {
+			return 0;
+		}
+		
+		int c = 0;
+		double r;
+		
+		for (int i = 0; i < max; i++) {
+			
+			r = rng.nextDouble();
+			
+			if (r < p) { 
+				c++;
+			}
+			
+		}
+		
+		return c;
+	}	
 	
 	public void addRowVector(Matrix m, Vector row) {
 		
