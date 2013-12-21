@@ -231,7 +231,7 @@ public class MatrixUtils {
 	 * @param rng the rng to use
 	 * @return a binomial distribution based on the one n, the passed in p values, and rng
 	 */	
-	public Matrix genBinomialDistribution(Matrix pValues, int max, RandomGenerator rndNumberGenerator) {
+	public static Matrix genBinomialDistribution(Matrix pValues, int max, RandomGenerator rndNumberGenerator) {
 
 		Matrix dist = pValues.like(); 
 		

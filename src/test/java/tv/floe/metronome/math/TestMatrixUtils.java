@@ -3,6 +3,8 @@ package tv.floe.metronome.math;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
@@ -248,6 +250,25 @@ public class TestMatrixUtils {
 		assertEquals( (1.0 / (1.0 + (double)Math.exp(-1.0*3.0))), sig.get(0,1), 0.0 );
 		assertEquals( (1.0 / (1.0 + (double)Math.exp(-1.0*5.0))), sig.get(0,2), 0.0 );
 
+		
+	}
+	
+	@Test
+	public void testMatrixBinomialGeneration() {
+
+		RandomGenerator g = new MersenneTwister(123);
+		
+		Matrix m0 = new DenseMatrix(1, 3);
+		m0.setQuick(0, 0, 0.5);
+		m0.setQuick(0, 1, 0.5);
+		m0.setQuick(0, 2, 0.1);
+		
+		for ( int x = 0; x < 10; x++ ) {
+			Matrix bin = MatrixUtils.genBinomialDistribution(m0, 1, g);
+			
+			MatrixUtils.debug_print(bin);
+
+		}
 		
 	}
 	
