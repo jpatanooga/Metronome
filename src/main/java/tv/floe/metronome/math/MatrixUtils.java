@@ -4,9 +4,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
-import org.jblas.DoubleMatrix;
-
-import com.ccc.sendalyzeit.textanalytics.util.MathUtils;
 
 /**
  *  
