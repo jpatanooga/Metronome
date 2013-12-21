@@ -6,7 +6,7 @@ import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 
 /**
- *  
+ *  Collection of Matrix opertations
  * 
  * @author josh
  *
@@ -255,10 +255,6 @@ public class MatrixUtils {
 	public static Matrix genBinomialDistribution(Matrix pValues, int max, RandomGenerator rndNumberGenerator) {
 
 		Matrix dist = pValues.like(); 
-		
-		//for(int i = 0; i < ret.length; i++) {
-			//ret.put(i,MathUtils.binomial(rng, n, p.get(i)));
-		//}
 		
 		for (int r = 0; r < dist.numRows(); r++) {
 			for ( int c = 0; c < dist.numCols(); c++ ) {
