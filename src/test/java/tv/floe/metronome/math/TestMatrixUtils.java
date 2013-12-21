@@ -157,13 +157,13 @@ public class TestMatrixUtils {
 		m1.setQuick(1, 2, 6);
 		
 		
-		MatrixUtils.div(m0, m1);
+		Matrix mDiv = MatrixUtils.div(m0, m1);
 		
 		for ( int r = 0; r < m0.numRows(); r++ ) {
 			
 			for ( int c = 0; c < m0.numCols(); c++ ) {
 				
-				assertEquals(1.0, m0.getQuick(r, c), 0.0);
+				assertEquals(1.0, mDiv.getQuick(r, c), 0.0);
 				
 			}
 			
@@ -232,6 +232,24 @@ public class TestMatrixUtils {
 		
 	}
 			
+	@Test
+	public void testMatrixSigmoid() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(1, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+		
+		Matrix sig = MatrixUtils.sigmoid(m0);
+		
+		assertEquals( (1.0 / (1.0 + (double)Math.exp(-1.0*2.0))), sig.get(0,0), 0.0 );
+		assertEquals( (1.0 / (1.0 + (double)Math.exp(-1.0*3.0))), sig.get(0,1), 0.0 );
+		assertEquals( (1.0 / (1.0 + (double)Math.exp(-1.0*5.0))), sig.get(0,2), 0.0 );
+
+		
+	}
 	
 	
 }

@@ -119,7 +119,7 @@ public class MatrixUtils {
 	 * @param m
 	 * @return
 	 */
-	public Matrix sigmoid(Matrix m) {
+	public static Matrix sigmoid(Matrix m) {
 		
 //		DoubleMatrix ones = DoubleMatrix.ones(x.rows, x.columns);
 //	    return ones.div(ones.add(MatrixFunctions.exp(x.neg())));
@@ -127,8 +127,13 @@ public class MatrixUtils {
 		Matrix ones = new DenseMatrix(m.numRows(), m.numCols());
 		ones.assign(1.0);
 		
+		
 		MatrixUtils.neg( m );
+		
+		
 		MatrixUtils.exp( m );
+		
+		
 		Matrix denom = ones.plus( m );
 		Matrix out = MatrixUtils.div(ones, denom);
 				
@@ -222,6 +227,23 @@ public class MatrixUtils {
 	public void addRowVector(Matrix m, Vector row) {
 		
 	}
+	
+	public static void debug_print(Matrix m) {
+		
+		
+		System.out.println("Print Matrix ------- ");
+		for (int r = 0; r < m.numRows(); r++) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+		
+				//ret.set(r, c, numerator.get(r, c) / denominator.get(r, c)  );
+				System.out.print(" " + m.get(r, c));
+			}
+			System.out.println(" ");
+		}
+		System.out.println("Print Matrix ------- ");
+		
+		
+	}	
 	
 	
 	
