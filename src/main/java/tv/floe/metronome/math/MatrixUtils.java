@@ -4,6 +4,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
+import org.apache.mahout.math.function.Functions;
 
 /**
  *  Collection of Matrix opertations
@@ -327,7 +328,26 @@ public class MatrixUtils {
 		return k - 1;
 	}
 	
-	public void addRowVector(Matrix m, Vector row) {
+	/**
+	 * Add a row to all rows of the matrix
+	 * 
+	 * @param m
+	 * @param row
+	 * @return a new matrix with the target vector row added to each row
+	 */
+	public static Matrix addRowVector(Matrix m, Vector row) {
+		
+		Matrix ret = m.like();
+		ret.assign(m);
+		
+		for (int r = 0; r < m.numRows(); r++) {
+
+			ret.viewRow(r).assign(row, Functions.PLUS);
+		
+		}
+		
+		
+		return ret;
 		
 	}
 	

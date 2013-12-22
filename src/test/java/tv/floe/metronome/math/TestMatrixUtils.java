@@ -6,7 +6,9 @@ import static org.junit.Assert.*;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
+import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.Vector;
 
 import org.junit.Test;
 
@@ -291,6 +293,40 @@ public class TestMatrixUtils {
 		}
 		
 	}
+	
+	
+	@Test
+	public void testMatrixAddRowVector() {
+
+		
+		Matrix m0 = new DenseMatrix(2, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+
+		m0.setQuick(1, 0, 3);
+		m0.setQuick(1, 1, 4);
+		m0.setQuick(1, 2, 6);
+	
+		Vector v0 = new DenseVector(3);
+		v0.setQuick(0, 1);
+		v0.setQuick(1, 2);
+		v0.setQuick(2, 3);
+		
+		Matrix m1 = MatrixUtils.addRowVector(m0, v0);
+		
+		
+		assertEquals(3.0, m1.get(0, 0), 0.0);
+		assertEquals(5.0, m1.get(0, 1), 0.0);
+		assertEquals(8.0, m1.get(0, 2), 0.0);
+
+		assertEquals(4.0, m1.get(1, 0), 0.0);
+		assertEquals(6.0, m1.get(1, 1), 0.0);
+		assertEquals(9.0, m1.get(1, 2), 0.0);
+
+		
+	}	
+	
 	
 	
 }
