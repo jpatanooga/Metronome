@@ -106,6 +106,17 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public void contrastiveDivergence(int k) {
 
+		/*
+		 * 
+		 * we initialize the Gibbs chain with the hidden sample 
+		 * generated during the positive phase, therefore implementing CD. 
+		 * Once we have established the starting point of the chain, 
+		 * we can then compute the sample at the end of the Gibbs chain, 
+		 * sample that we need for getting the gradient
+		 */
+		
+		
+		
 		
 		
 	}
@@ -124,6 +135,8 @@ public class RestrictedBoltzmannMachine {
 
 	
 	/**
+	 * "Compute Activations"
+	 * 
 	 * Generate probabilities for each hidden unit being set to 1
 	 * Equation (7) in Hinton
 	 * 
@@ -157,6 +170,8 @@ public class RestrictedBoltzmannMachine {
 	
 	
 	/**
+	 * "Compute Activations"
+	 * 
 	 * Generate probabilities for each visible unit being set to 1 given hidden states
 	 * Equation (8) in Hinton
 	 * 
@@ -164,6 +179,8 @@ public class RestrictedBoltzmannMachine {
 	 * the visible units
 	 * 
 	 * Aka "Propagate Down"
+	 * 
+	 * TODO: can this also mean "reconstruction" ?
 	 * 
 	 * @param visible
 	 * @return
@@ -218,6 +235,11 @@ public class RestrictedBoltzmannMachine {
 		
 		Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden);
 		Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible_sampled);
+		
+	}
+	
+	public void computeFreeEnergy() {
+		
 		
 	}
 	
