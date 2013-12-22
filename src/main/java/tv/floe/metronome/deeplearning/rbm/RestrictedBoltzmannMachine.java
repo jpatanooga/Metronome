@@ -1,6 +1,9 @@
 package tv.floe.metronome.deeplearning.rbm;
 
+import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.math.MatrixUtils;
@@ -34,6 +37,58 @@ public class RestrictedBoltzmannMachine {
 	
 	public Matrix trainingDataset;
 
+	/**
+	 * CTOR
+	 * 
+	 * So at some point we make this a more elaborate setup to build RBMs?
+	 * 
+	 * @param numVisibleNeurons
+	 * @param numHiddenNeurons
+	 */
+	public RestrictedBoltzmannMachine(int numVisibleNeurons, int numHiddenNeurons, RandomGenerator rnd) {
+		
+		this.numberVisibleNeurons = numVisibleNeurons;
+		this.numberHiddenNeurons = numHiddenNeurons;
+		
+		if (rnd == null) {
+			
+			this.randNumGenerator = new MersenneTwister(1234);
+
+		} else {
+			
+			this.randNumGenerator = rnd;
+			
+		}
+		
+		double a = 1.0 / (double) this.numberVisibleNeurons;
+		
+		UniformRealDistribution realDistributionGenerator = new UniformRealDistribution(this.randNumGenerator,-a,a,UniformRealDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
+
+		this.connectionWeights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons );
+		this.connectionWeights.assign(0.0);
+		
+		for (int r = 0; r < this.connectionWeights.numRows(); r++) {
+			
+			for(int c = 0; c < this.connectionWeights.numCols(); c++) { 
+			
+				this.connectionWeights.setQuick( r, c, realDistributionGenerator.sample() );
+			
+			}
+
+		}
+		
+
+ 
+		this.hiddenBiasNeurons = new DenseMatrix( 1, this.numberHiddenNeurons );
+		this.hiddenBiasNeurons.assign(0.0);
+
+		this.visibleBiasNeurons = new DenseMatrix( 1, this.numberVisibleNeurons );
+		this.visibleBiasNeurons.assign(0.0);
+
+		
+		
+		
+	}
 	
 	public void contrastiveDivergence(int k) {
 
