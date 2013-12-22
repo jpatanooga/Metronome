@@ -3,6 +3,8 @@ package tv.floe.metronome.deeplearning.rbm;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.math.MatrixUtils;
+
 
 
 /**
@@ -56,28 +58,35 @@ public class RestrictedBoltzmannMachine {
 		
 	}
 	
-	/*
-	 * 
-	public DoubleMatrix propUp(DoubleMatrix v) {
-		DoubleMatrix preSig = v.mmul(W);
-		preSig = preSig.addRowVector(hBias);
-		return MatrixUtil.sigmoid(preSig);
-
-	}
-
-	 * 
-	 */
-
 	/**
-	 * 
+	 * Generate probabilities for each hidden unit being set to 1
+	 * Equation (7) in Hinton
 	 * 
 	 * @param visible
 	 * @return
 	 */
-	public Matrix propUp(Matrix visible) {
+	public Matrix generateProbabilitiesForHiddenStatesBasedOnVisibleStates(Matrix visible) {
 		
 		Matrix preSigmoid = visible.times( this.connectionWeights );
-		
+		preSigmoid = MatrixUtils.addRowVector(preSigmoid, this.hiddenBiasNeurons.viewRow(0));
+
+		return MatrixUtils.sigmoid(preSigmoid);
 	}
+
+	/**
+	 * Generate probabilities for each visible unit being set to 1 given hidden states
+	 * Equation (8) in Hinton
+	 * 
+	 * @param visible
+	 * @return
+	 */
+	public Matrix generateProbabilitiesForVisibleStatesBasedOnHiddenStates(Matrix hidden) {
+		
+		Matrix preSigmoid = hidden.times( this.connectionWeights );
+		preSigmoid = MatrixUtils.addRowVector(preSigmoid, this.visibleBiasNeurons.viewRow(0));
+
+		return MatrixUtils.sigmoid(preSigmoid);
+	}
+	
 	
 }
