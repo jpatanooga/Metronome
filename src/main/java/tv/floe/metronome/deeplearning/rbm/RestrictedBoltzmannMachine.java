@@ -90,8 +90,24 @@ public class RestrictedBoltzmannMachine {
 		
 	}
 	
+	/**
+	 * Based on Hinton's explanation on CD from (Hinton, 2002)
+	 * 
+	 * 1. start by setting the states of the visible units to a training vector
+	 * 
+	 * 2. the binary states of the hidden units are all computed in parallel using Equation (7)
+	 * 
+	 * 3. Once binary states have been chosen for the hidden units, a "reconstruction" is produced by setting each vi to 1
+	 * with a probability given by equation (8)
+	 * 
+	 * 4. The change in weights is given by Equation (9)
+	 * 
+	 * @param k
+	 */
 	public void contrastiveDivergence(int k) {
 
+		
+		
 	}
 	
 	public void setLearningRate(double alpha) {
@@ -105,17 +121,14 @@ public class RestrictedBoltzmannMachine {
 		return 0;
 	}
 	
-	public void sampleHiddenGivenVisible(Matrix visible) {
-		
-	}
 
-	public void sampleVisibleGivenHidden(Matrix hidden) {
-		
-	}
 	
 	/**
 	 * Generate probabilities for each hidden unit being set to 1
 	 * Equation (7) in Hinton
+	 * 
+	 * This function propagates the visible units activation upwards to 
+	 * the hidden units, aka "propagate up"
 	 * 
 	 * @param visible
 	 * @return
@@ -129,8 +142,28 @@ public class RestrictedBoltzmannMachine {
 	}
 
 	/**
+	 * This function infers state of hidden units given visible units
+	 * 
+	 * @param visible
+	 */
+	public Matrix sampleHiddenGivenVisible(Matrix visible) {
+				
+		Matrix hiddenProbs = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
+
+		Matrix hiddenBinomialSamples = MatrixUtils.genBinomialDistribution(hiddenProbs, 1, this.randNumGenerator);
+		
+		return hiddenBinomialSamples;
+	}
+	
+	
+	/**
 	 * Generate probabilities for each visible unit being set to 1 given hidden states
 	 * Equation (8) in Hinton
+	 * 
+	 * This function propagates the hidden units activation downwards to 
+	 * the visible units
+	 * 
+	 * Aka "Propagate Down"
 	 * 
 	 * @param visible
 	 * @return
@@ -142,6 +175,23 @@ public class RestrictedBoltzmannMachine {
 
 		return MatrixUtils.sigmoid(preSigmoid);
 	}
+	
+	/**
+	 * This function infers state of visible units given hidden units
+	 * 
+	 * @param hidden
+	 */
+	public Matrix sampleVisibleGivenHidden(Matrix hidden) {
+		
+
+		Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
+
+		Matrix visibleBinomialSample = MatrixUtils.genBinomialDistribution(visibleProb, 1, this.randNumGenerator);
+
+		return visibleBinomialSample;
+		
+	}
+	
 	
 	
 }
