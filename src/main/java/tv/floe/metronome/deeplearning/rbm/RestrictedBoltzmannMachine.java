@@ -192,6 +192,35 @@ public class RestrictedBoltzmannMachine {
 		
 	}
 	
+	/**
+	 * based on: 
+	 * "gibbs_vhv" which performs a step of Gibbs sampling starting from the visible units.
+	 * 
+	 * TODO: how do we return things?
+	 * 
+	 */
+	public void gibbsSamplingStepFromVisible(Matrix visible) {
+	
+		Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible);
+		Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden_sampled);
+		
+		
+	}
+	
+	/**
+	 * based on: "gibbs_hvh"
+	 * - This function implements one step of Gibbs sampling, 
+	 * starting from the visible state
+	 * 
+	 * @param hidden
+	 */
+	public void gibbsSamplingStepFromHidden(Matrix hidden) {
+		
+		Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden);
+		Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible_sampled);
+		
+	}
+	
 	
 	
 }
