@@ -115,7 +115,54 @@ public class RestrictedBoltzmannMachine {
 		 * sample that we need for getting the gradient
 		 */
 		
+		// init CDk
 		
+		// do gibbs sampling given V to get the Hidden states based on the training input
+		// compute positive phase
+		
+		Matrix hidden_sample_init = this.sampleHiddenGivenVisible( null );
+		
+		Matrix hiddenSample = null;
+		
+		// now run k full steps of alternating Gibbs sampling
+		
+		for ( int x = 0; x < k; x++ ) {
+			
+			if (0 == x) {
+				
+				this.gibbsSamplingStepFromHidden( hidden_sample_init );
+				
+			} else {
+				
+				this.gibbsSamplingStepFromHidden( hiddenSample );
+				
+			}
+			
+			// TODO: gibbs sampling functions need to 
+			// return something and we need to update the matrix samples
+			
+			
+		}
+		
+		// end of gibbs sampling (k full alternating sampling passes)
+		
+		// ----- now calculate equation (9) to get the weight changes ------
+
+		// now compute the <vi hj>data		
+//		DoubleMatrix inputTimesPhSample =  this.input.transpose().mmul(ph.getSecond());
+// TODO: look at how the training dataset x hiddenSample works out wrt matrix sizes
+		Matrix trainingDataTimesHiddenStates = this.trainingDataset.transpose().times(hidden_sample_init);
+
+		// now compute the <vi hj>model
+//		DoubleMatrix nvSamplesTTimesNhMeans = nvSamples.transpose().mmul(nhMeans);
+		
+		// data - model
+//		DoubleMatrix diff = inputTimesPhSample.sub(nvSamplesTTimesNhMeans);
+		
+		// learningRate * delta(data - model)
+//		DoubleMatrix wAdd = diff.mul(learningRate);
+		
+		// ---- end of equation (9) section -----------------
 		
 		
 		
@@ -238,7 +285,7 @@ public class RestrictedBoltzmannMachine {
 		
 	}
 	
-	public void computeFreeEnergy() {
+	public void computeFreeEnergy(Matrix visibleSample) {
 		
 		
 	}
