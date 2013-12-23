@@ -7,6 +7,7 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.math.MatrixUtils;
+import tv.floe.metronome.types.Pair;
 
 
 
@@ -120,7 +121,7 @@ public class RestrictedBoltzmannMachine {
 		// do gibbs sampling given V to get the Hidden states based on the training input
 		// compute positive phase
 		
-		Matrix hidden_sample_init = this.sampleHiddenGivenVisible( null );
+		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible( null );
 		
 		Matrix hiddenSample = null;
 		
@@ -130,7 +131,7 @@ public class RestrictedBoltzmannMachine {
 			
 			if (0 == x) {
 				
-				this.gibbsSamplingStepFromHidden( hidden_sample_init );
+				this.gibbsSamplingStepFromHidden( hiddenProbsAndSamples.getSecond() );
 				
 			} else {
 				
@@ -151,7 +152,7 @@ public class RestrictedBoltzmannMachine {
 		// now compute the <vi hj>data		
 //		DoubleMatrix inputTimesPhSample =  this.input.transpose().mmul(ph.getSecond());
 // TODO: look at how the training dataset x hiddenSample works out wrt matrix sizes
-		Matrix trainingDataTimesHiddenStates = this.trainingDataset.transpose().times(hidden_sample_init);
+//		Matrix trainingDataTimesHiddenStates = this.trainingDataset.transpose().times(hidden_sample_init);
 
 		// now compute the <vi hj>model
 //		DoubleMatrix nvSamplesTTimesNhMeans = nvSamples.transpose().mmul(nhMeans);
@@ -206,13 +207,13 @@ public class RestrictedBoltzmannMachine {
 	 * 
 	 * @param visible
 	 */
-	public Matrix sampleHiddenGivenVisible(Matrix visible) {
+	public Pair<Matrix, Matrix> sampleHiddenGivenVisible(Matrix visible) {
 				
 		Matrix hiddenProbs = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
 
 		Matrix hiddenBinomialSamples = MatrixUtils.genBinomialDistribution(hiddenProbs, 1, this.randNumGenerator);
 		
-		return hiddenBinomialSamples;
+		return new Pair<Matrix, Matrix>(hiddenProbs, hiddenBinomialSamples);
 	}
 	
 	
@@ -245,14 +246,15 @@ public class RestrictedBoltzmannMachine {
 	 * 
 	 * @param hidden
 	 */
-	public Matrix sampleVisibleGivenHidden(Matrix hidden) {
+	public Pair<Matrix, Matrix> sampleVisibleGivenHidden(Matrix hidden) {
 		
 
+		// dont understand why this is referred to as "mean" in some codebases
 		Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
 
 		Matrix visibleBinomialSample = MatrixUtils.genBinomialDistribution(visibleProb, 1, this.randNumGenerator);
 
-		return visibleBinomialSample;
+		return new Pair<Matrix, Matrix>(visibleProb, visibleBinomialSample);
 		
 	}
 	
@@ -263,12 +265,14 @@ public class RestrictedBoltzmannMachine {
 	 * TODO: how do we return things?
 	 * 
 	 */
-	public void gibbsSamplingStepFromVisible(Matrix visible) {
+	public Pair<Matrix, Matrix> gibbsSamplingStepFromVisible(Matrix visible) {
 	
-		Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible);
-		Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden_sampled);
-		
-		
+		//Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible);
+		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible(visible);
+		//Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden_sampled);
+		Pair<Matrix, Matrix> visibleProbsAndSamples = this.sampleVisibleGivenHidden( hiddenProbsAndSamples.getSecond() );
+
+		return visibleProbsAndSamples;
 	}
 	
 	/**
@@ -278,11 +282,12 @@ public class RestrictedBoltzmannMachine {
 	 * 
 	 * @param hidden
 	 */
-	public void gibbsSamplingStepFromHidden(Matrix hidden) {
+	public Pair<Matrix, Matrix> gibbsSamplingStepFromHidden(Matrix hidden) {
 		
-		Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden);
-		Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible_sampled);
+		Pair<Matrix, Matrix> visibleProbsAndSamples = this.sampleVisibleGivenHidden(hidden);
+		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible(visibleProbsAndSamples.getSecond());
 		
+		return hiddenProbsAndSamples;
 	}
 	
 	public void computeFreeEnergy(Matrix visibleSample) {
