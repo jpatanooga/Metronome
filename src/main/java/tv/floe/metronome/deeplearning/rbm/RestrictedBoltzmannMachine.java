@@ -103,6 +103,11 @@ public class RestrictedBoltzmannMachine {
 	 * 
 	 * 4. The change in weights is given by Equation (9)
 	 * 
+	 * 
+	 * Current Major Questions
+	 * - why keep the probabilites around?
+	 * - why call the matrix "means" instead of "probabilities" ?
+	 * 
 	 * @param k
 	 */
 	public void contrastiveDivergence(int k, Matrix input) {
@@ -115,17 +120,12 @@ public class RestrictedBoltzmannMachine {
 		 * we can then compute the sample at the end of the Gibbs chain, 
 		 * sample that we need for getting the gradient
 		 */
-		
-		//MatrixUtils.debug_print(connectionWeights);
-		
+				
 		// init CDk
 		
 		// do gibbs sampling given V to get the Hidden states based on the training input
 		// compute positive phase
-		//Pair<DoubleMatrix,DoubleMatrix> ph = this.sampleHGivenV(this.input);
 		Pair<Matrix, Matrix> hiddenProbsAndSamplesStart = this.sampleHiddenGivenVisible( input );
-
-		//MatrixUtils.debug_print(hiddenProbsAndSamples.getSecond());
 		
 		Matrix hiddenSample = null;
 		
@@ -138,9 +138,7 @@ public class RestrictedBoltzmannMachine {
 			if (0 == x) {
 				
 				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenProbsAndSamplesStart.getSecond() );
-				
-				//MatrixUtils.debug_print(gibbsSamplingMatrices.getSecond());
-				
+								
 			} else {
 				
 				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenSample );
@@ -156,7 +154,6 @@ public class RestrictedBoltzmannMachine {
 		// TODO: document this section WRT Hinton math/equations
 		
 		// now compute the <vi hj>data		
-//		DoubleMatrix inputTimesPhSample =  this.input.transpose().mmul(ph.getSecond());
 		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
 		// now compute the <vi hj>model
@@ -191,11 +188,7 @@ public class RestrictedBoltzmannMachine {
 //		DoubleMatrix hBiasAdd = MatrixUtil.mean(probHidden.getSecond().sub(nhMeans), 0).mul(learningRate);
 
 
-//		hBiasAdd = hBiasAdd.mul(learningRate);
-
-//		hBias = hBias.add(hBiasAdd);		
-		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( gibbsSamplingMatrices.getSecond().getFirst() ) , 0).times(this.learningRate);
-
+		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( gibbsSamplingMatrices.getSecond().getFirst() ) , 0); //.times(this.learningRate);
 		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times(this.learningRate) );
 		
 		
