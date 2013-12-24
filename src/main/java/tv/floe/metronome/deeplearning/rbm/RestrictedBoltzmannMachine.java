@@ -18,6 +18,10 @@ import tv.floe.metronome.types.Pair;
  * A restricted Boltzmann machine (RBM) is a generative stochastic neural
  *  network that can learn a probability distribution over its set of inputs.
  * 
+ * Applications
+ * 
+ * - dimensionality reduction, classification, collaborative filtering, feature learning and topic modelling
+ * 
  * Based on work by Hinton, et al 2006
  * 
  * And inspired by the RBM Implementation of Adam Gibson:
@@ -322,6 +326,26 @@ public class RestrictedBoltzmannMachine {
 		
 		
 	}
+	
+	/**
+	 * 
+	 * Reconstructs the visible input.
+	 * A reconstruction is a propagation down of the reconstructed hidden input.
+	 * 
+	 */
+	public Matrix reconstructVisibleInput(Matrix visible) {
+
+		// TODO: can we not just use propUp here instead? 
+		
+		Matrix preSig = visible.times(this.connectionWeights);
+		preSig = MatrixUtils.addRowVector(preSig, this.hiddenBiasNeurons.viewRow(0));
+		Matrix hidden = MatrixUtils.sigmoid(preSig);
+		
+
+		
+		//return propDown(h);
+	}
+	
 	
 	
 	
