@@ -6,6 +6,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
+
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -105,7 +106,7 @@ public class RestrictedBoltzmannMachine {
 	 * 
 	 * @param k
 	 */
-	public void contrastiveDivergence(int k) {
+	public void contrastiveDivergence(int k, Matrix input) {
 
 		/*
 		 * 
@@ -116,14 +117,20 @@ public class RestrictedBoltzmannMachine {
 		 * sample that we need for getting the gradient
 		 */
 		
+		//MatrixUtils.debug_print(connectionWeights);
+		
 		// init CDk
 		
 		// do gibbs sampling given V to get the Hidden states based on the training input
 		// compute positive phase
-		
-		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible( null );
+		//Pair<DoubleMatrix,DoubleMatrix> ph = this.sampleHGivenV(this.input);
+		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible( input );
+
+		//MatrixUtils.debug_print(hiddenProbsAndSamples.getSecond());
 		
 		Matrix hiddenSample = null;
+		
+		Pair<Matrix, Matrix> gibbsSamplingMatrices = null;
 		
 		// now run k full steps of alternating Gibbs sampling
 		
@@ -131,11 +138,13 @@ public class RestrictedBoltzmannMachine {
 			
 			if (0 == x) {
 				
-				this.gibbsSamplingStepFromHidden( hiddenProbsAndSamples.getSecond() );
+				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenProbsAndSamples.getSecond() );
+				
+				//MatrixUtils.debug_print(gibbsSamplingMatrices.getSecond());
 				
 			} else {
 				
-				this.gibbsSamplingStepFromHidden( hiddenSample );
+				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenSample );
 				
 			}
 			
@@ -152,7 +161,7 @@ public class RestrictedBoltzmannMachine {
 		// now compute the <vi hj>data		
 //		DoubleMatrix inputTimesPhSample =  this.input.transpose().mmul(ph.getSecond());
 // TODO: look at how the training dataset x hiddenSample works out wrt matrix sizes
-//		Matrix trainingDataTimesHiddenStates = this.trainingDataset.transpose().times(hidden_sample_init);
+		Matrix trainingDataTimesHiddenStates = input.transpose().times( hiddenProbsAndSamples.getSecond() );
 
 		// now compute the <vi hj>model
 //		DoubleMatrix nvSamplesTTimesNhMeans = nvSamples.transpose().mmul(nhMeans);
@@ -189,12 +198,18 @@ public class RestrictedBoltzmannMachine {
 	 * Equation (7) in Hinton
 	 * 
 	 * This function propagates the visible units activation upwards to 
-	 * the hidden units, aka "propagate up"
+	 * the hidden units, 
+	 * 
+	 * aka "propagate up"
 	 * 
 	 * @param visible
 	 * @return
 	 */
 	public Matrix generateProbabilitiesForHiddenStatesBasedOnVisibleStates(Matrix visible) {
+		
+		//MatrixUtils.debug_print(connectionWeights);
+		//MatrixUtils.debug_print(connectionWeights.transpose());
+		//MatrixUtils.debug_print(visible);
 		
 		Matrix preSigmoid = visible.times( this.connectionWeights );
 		preSigmoid = MatrixUtils.addRowVector(preSigmoid, this.hiddenBiasNeurons.viewRow(0));
@@ -235,7 +250,7 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Matrix generateProbabilitiesForVisibleStatesBasedOnHiddenStates(Matrix hidden) {
 		
-		Matrix preSigmoid = hidden.times( this.connectionWeights );
+		Matrix preSigmoid = hidden.times( this.connectionWeights.transpose() );
 		preSigmoid = MatrixUtils.addRowVector(preSigmoid, this.visibleBiasNeurons.viewRow(0));
 
 		return MatrixUtils.sigmoid(preSigmoid);
@@ -283,6 +298,10 @@ public class RestrictedBoltzmannMachine {
 	 * @param hidden
 	 */
 	public Pair<Matrix, Matrix> gibbsSamplingStepFromHidden(Matrix hidden) {
+		
+		System.out.println("gibbsSamplingStepFromHidden ------");
+		
+		MatrixUtils.debug_print(hidden);
 		
 		Pair<Matrix, Matrix> visibleProbsAndSamples = this.sampleVisibleGivenHidden(hidden);
 		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible(visibleProbsAndSamples.getSecond());

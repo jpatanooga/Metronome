@@ -8,6 +8,7 @@ import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
 import tv.floe.metronome.math.MatrixUtils;
+import tv.floe.metronome.types.Pair;
 
 public class TestRestrictedBoltzmannMachine {
 
@@ -15,11 +16,12 @@ public class TestRestrictedBoltzmannMachine {
 		
 		double[][] data = new double[][]
 				{
-					{1,1,1,0,0,0},
-					{1,0,1,0,0,0},
-					{1,1,1,0,0,0},
-					{0,0,1,1,1,0},
-					{0,0,1,1,0,0},
+//					{1,1,1,0,0,0},
+//					{1,0,1,0,0,0},
+	//				{1,1,1,0,0,0},
+		//			{0,0,1,1,1,0},
+		//			{0,0,1,1,0,0},
+			//		{0,0,1,1,0,0},
 					{0,0,1,1,1,0}
 				};
 		
@@ -42,14 +44,19 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
 		
-		Matrix hidden_sample_init = rbm.sampleHiddenGivenVisible( input );
+		Pair<Matrix, Matrix> hiddenProbsAndSample = rbm.sampleHiddenGivenVisible( input );
 
+		Matrix hidden_sample_init = hiddenProbsAndSample.getSecond();
+		
 		System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
 		
-		Matrix visible_sample = rbm.gibbsSamplingStepFromHidden(hidden_sample_init);
-
-		System.out.println( "visible_sample size: " + visible_sample.numRows() + " x " + visible_sample.numCols() );
+		Pair<Matrix, Matrix> visibleProbsAndSample = rbm.gibbsSamplingStepFromHidden(hidden_sample_init);
+/*
+		Matrix visible_sample = visibleProbsAndSample.getSecond();
 		
+		System.out.println( "visible_sample size: " + visible_sample.numRows() + " x " + visible_sample.numCols() );
+		*/
+		System.out.println("-------------");
 		
 	}
 
@@ -83,8 +90,10 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
 		
-		Matrix hidden_sample_init = rbm.sampleHiddenGivenVisible( input );
+		Pair<Matrix, Matrix> hiddenProbsAndSample = rbm.sampleHiddenGivenVisible( input );
 
+		Matrix hidden_sample_init = hiddenProbsAndSample.getSecond();
+		
 		System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
 		MatrixUtils.debug_print(hidden_sample_init);
 		
@@ -95,6 +104,62 @@ public class TestRestrictedBoltzmannMachine {
 		
 		
 		MatrixUtils.debug_print( out );
+		
+	}
+	
+	/**
+	 * Will return a Matrix of size [ inputRowCount, HiddenNeuronCount ]
+	 * 
+	 */
+	@Test
+	public void testPropUp() {
+		
+		Matrix input = buildTestInputDataset();
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
+
+		Matrix hidden = rbm.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(input);
+		
+		/**
+		 * For every single row we get the 2 hidden states in the "hidden" matrix
+		 * 
+		 */
+		
+		MatrixUtils.debug_print( hidden );
+		
+	}
+	
+	@Test
+	public void testPropDown() {
+		
+		Matrix input = buildTestInputDataset();
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
+
+		Matrix hidden = rbm.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(input);
+		
+		/**
+		 * For every single row we get the 2 hidden states in the "hidden" matrix
+		 * 
+		 */
+		
+//		MatrixUtils.debug_print( hidden );
+		
+		rbm.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
+		
+		
+		
+	}
+	
+	@Test
+	public void testBaseCD() {
+		
+		Matrix input = buildTestInputDataset();
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
+		
+		rbm.contrastiveDivergence(1, input);
+		
 		
 	}
 	
