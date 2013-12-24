@@ -134,12 +134,12 @@ public class RestrictedBoltzmannMachine {
 		
 		// now run k full steps of alternating Gibbs sampling
 		
-		//negative visble means or expected values
+		//negative visble "means" or "expected values"
 		Matrix negativeVisibleExpectedValues = null;
 		//negative value samples
 		Matrix negativeVisibleSamples = null;
 		//negative hidden means or expected values
-		Matrix negativeHiddenMeans = null;
+		Matrix negativeHiddenExpectedValues = null;
 		//negative hidden samples
 		Matrix negativeHiddenSamples = null;
 		
@@ -159,7 +159,7 @@ public class RestrictedBoltzmannMachine {
 			// now create some easier to use aliases
 			negativeVisibleExpectedValues = gibbsSamplingMatrices.getFirst().getFirst();
 			negativeVisibleSamples = gibbsSamplingMatrices.getFirst().getSecond();
-			negativeHiddenMeans = gibbsSamplingMatrices.getSecond().getFirst();
+			negativeHiddenExpectedValues = gibbsSamplingMatrices.getSecond().getFirst();
 			negativeHiddenSamples = gibbsSamplingMatrices.getSecond().getSecond();
 			
 			
@@ -175,7 +175,7 @@ public class RestrictedBoltzmannMachine {
 		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
 		// now compute the <vi hj>model
-		Matrix nvSamplesTTimesNhMeans = negativeVisibleSamples.transpose().times( negativeHiddenMeans );
+		Matrix nvSamplesTTimesNhMeans = negativeVisibleSamples.transpose().times( negativeHiddenExpectedValues );
 				
 		// calc the delta between: data - model
 		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( nvSamplesTTimesNhMeans );
@@ -192,7 +192,7 @@ public class RestrictedBoltzmannMachine {
 		Matrix vBiasAdd = MatrixUtils.mean( input.minus( negativeVisibleSamples ) , 0); 
 		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd.times( this.learningRate ) );
 
-		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenMeans ) , 0); //.times(this.learningRate);
+		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0); //.times(this.learningRate);
 		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times(this.learningRate) );
 		
 		

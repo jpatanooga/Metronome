@@ -38,7 +38,7 @@ public class TestRestrictedBoltzmannMachine {
 	@Test
 	public void testGenerateProbabilitiesForSettingHiddenStatesToOne() {
 		
-		System.out.println("------ testGenerateProbabilitiesForSettingHiddenStatesToOne -------");
+		//System.out.println("------ testGenerateProbabilitiesForSettingHiddenStatesToOne -------");
 		
 		Matrix input = buildTestInputDataset();
 		
@@ -48,7 +48,7 @@ public class TestRestrictedBoltzmannMachine {
 
 		Matrix hidden_sample_init = hiddenProbsAndSample.getSecond();
 		
-		System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
+		//System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
 		
 //		Pair<Matrix, Matrix> visibleProbsAndSample = rbm.gibbsSamplingStepFromHidden(hidden_sample_init);
 /*
@@ -56,7 +56,7 @@ public class TestRestrictedBoltzmannMachine {
 		
 		System.out.println( "visible_sample size: " + visible_sample.numRows() + " x " + visible_sample.numCols() );
 		*/
-		System.out.println("-------------");
+		//System.out.println("-------------");
 		
 	}
 
@@ -94,16 +94,16 @@ public class TestRestrictedBoltzmannMachine {
 
 		Matrix hidden_sample_init = hiddenProbsAndSample.getSecond();
 		
-		System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
+		//System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
 		MatrixUtils.debug_print(hidden_sample_init);
 		
 		Matrix out = input.transpose().times(hidden_sample_init);
 		
-		System.out.println( "input size: " + input.transpose().numRows() + " x " + input.transpose().numCols() );
+		//System.out.println( "input size: " + input.transpose().numRows() + " x " + input.transpose().numCols() );
 		
 		
 		
-		MatrixUtils.debug_print( out );
+		//MatrixUtils.debug_print( out );
 		
 	}
 	
@@ -125,7 +125,7 @@ public class TestRestrictedBoltzmannMachine {
 		 * 
 		 */
 		
-		MatrixUtils.debug_print( hidden );
+		//MatrixUtils.debug_print( hidden );
 		
 	}
 	
