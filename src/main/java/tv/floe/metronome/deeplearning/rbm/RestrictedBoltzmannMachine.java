@@ -153,9 +153,10 @@ public class RestrictedBoltzmannMachine {
 		
 		// ----- now calculate equation (9) to get the weight changes ------
 
+		// TODO: document this section WRT Hinton math/equations
+		
 		// now compute the <vi hj>data		
 //		DoubleMatrix inputTimesPhSample =  this.input.transpose().mmul(ph.getSecond());
-// TODO: look at how the training dataset x hiddenSample works out wrt matrix sizes
 		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
 		// now compute the <vi hj>model
@@ -164,13 +165,12 @@ public class RestrictedBoltzmannMachine {
 		Matrix nvSamplesTTimesNhMeans = gibbsSamplingMatrices.getFirst().getSecond().transpose().times( gibbsSamplingMatrices.getSecond().getFirst() );
 		
 		
-		// data - model
+		// calc the delta between: data - model
 //		DoubleMatrix diff = inputTimesPhSample.sub(nvSamplesTTimesNhMeans);
 		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus(nvSamplesTTimesNhMeans);
 		
 		// learningRate * delta(data - model)
-//		DoubleMatrix wAdd = diff.mul(learningRate);
-		
+		// we're simply updating the connection weights at this point
 		Matrix connectionWeightChanges = dataModelDelta.times(this.learningRate);
 		
 		// ---- end of equation (9) section -----------------
@@ -230,11 +230,7 @@ public class RestrictedBoltzmannMachine {
 	 * @return
 	 */
 	public Matrix generateProbabilitiesForHiddenStatesBasedOnVisibleStates(Matrix visible) {
-		
-		//MatrixUtils.debug_print(connectionWeights);
-		//MatrixUtils.debug_print(connectionWeights.transpose());
-		//MatrixUtils.debug_print(visible);
-		
+				
 		Matrix preSigmoid = visible.times( this.connectionWeights );
 		preSigmoid = MatrixUtils.addRowVector(preSigmoid, this.hiddenBiasNeurons.viewRow(0));
 
@@ -306,12 +302,9 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> gibbsSamplingStepFromVisible(Matrix visible) {
 	
-		//Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible);
 		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible(visible);
-		//Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden_sampled);
 		Pair<Matrix, Matrix> visibleProbsAndSamples = this.sampleVisibleGivenHidden( hiddenProbsAndSamples.getSecond() );
 
-		//return visibleProbsAndSamples;
 		return new Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>>(hiddenProbsAndSamples, visibleProbsAndSamples);
 	}
 	
@@ -324,9 +317,6 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> gibbsSamplingStepFromHidden(Matrix hidden) {
 		
-		System.out.println("gibbsSamplingStepFromHidden ------");
-		
-		MatrixUtils.debug_print(hidden);
 		
 		Pair<Matrix, Matrix> visibleProbsAndSamples = this.sampleVisibleGivenHidden(hidden);
 		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible(visibleProbsAndSamples.getSecond());
