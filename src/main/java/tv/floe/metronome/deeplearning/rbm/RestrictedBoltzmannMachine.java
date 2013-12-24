@@ -175,10 +175,10 @@ public class RestrictedBoltzmannMachine {
 		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
 		// now compute the <vi hj>model
-		Matrix nvSamplesTTimesNhMeans = negativeVisibleSamples.transpose().times( negativeHiddenExpectedValues );
+		Matrix negativeVisibleSamplesTransposeTimesNegHiddenExpValues = negativeVisibleSamples.transpose().times( negativeHiddenExpectedValues );
 				
 		// calc the delta between: data - model
-		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( nvSamplesTTimesNhMeans );
+		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( negativeVisibleSamplesTransposeTimesNegHiddenExpValues );
 		
 		// learningRate * delta(data - model)
 		// we're simply updating the connection weights at this point
