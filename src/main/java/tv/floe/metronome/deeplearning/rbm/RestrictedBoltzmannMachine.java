@@ -6,7 +6,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
-
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -175,6 +174,29 @@ public class RestrictedBoltzmannMachine {
 		Matrix connectionWeightChanges = dataModelDelta.times(this.learningRate);
 		
 		// ---- end of equation (9) section -----------------
+		
+		// update the connection weights
+		this.connectionWeights = this.connectionWeights.plus(connectionWeightChanges);
+
+		//
+		// TODO: review this area - the bias for both hidden and visible 
+		// are update differently, review this.
+		//
+
+//		DoubleMatrix  vBiasAdd = MatrixUtil.mean(this.input.sub(nvSamples), 0).mul(learningRate);
+//		vBias = vBiasAdd.mul(learningRate);
+		Matrix vBiasAdd = MatrixUtils.mean( input.minus( gibbsSamplingMatrices.getFirst().getSecond() ) , 0).times(this.learningRate);
+		this.visibleBiasNeurons = vBiasAdd.times(learningRate);
+
+//		DoubleMatrix hBiasAdd = MatrixUtil.mean(probHidden.getSecond().sub(nhMeans), 0).mul(learningRate);
+
+
+//		hBiasAdd = hBiasAdd.mul(learningRate);
+
+//		hBias = hBias.add(hBiasAdd);		
+		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( gibbsSamplingMatrices.getSecond().getFirst() ) , 0).times(this.learningRate);
+
+		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times(this.learningRate) );
 		
 		
 		
