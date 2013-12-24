@@ -6,6 +6,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
+
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -127,11 +128,21 @@ public class RestrictedBoltzmannMachine {
 		// compute positive phase
 		Pair<Matrix, Matrix> hiddenProbsAndSamplesStart = this.sampleHiddenGivenVisible( input );
 		
-		Matrix hiddenSample = null;
+		//Matrix hiddenSample = null;
 		
 		Pair<Pair<Matrix, Matrix>,Pair<Matrix, Matrix>> gibbsSamplingMatrices = null;
 		
 		// now run k full steps of alternating Gibbs sampling
+		
+		//negative visble means or expected values
+		Matrix negativeVisibleExpectedValues = null;
+		//negative value samples
+		Matrix negativeVisibleSamples = null;
+		//negative hidden means or expected values
+		Matrix negativeHiddenMeans = null;
+		//negative hidden samples
+		Matrix negativeHiddenSamples = null;
+		
 		
 		for ( int x = 0; x < k; x++ ) {
 			
@@ -141,9 +152,16 @@ public class RestrictedBoltzmannMachine {
 								
 			} else {
 				
-				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenSample );
+				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( negativeHiddenSamples );
 				
 			}
+			
+			// now create some easier to use aliases
+			negativeVisibleExpectedValues = gibbsSamplingMatrices.getFirst().getFirst();
+			negativeVisibleSamples = gibbsSamplingMatrices.getFirst().getSecond();
+			negativeHiddenMeans = gibbsSamplingMatrices.getSecond().getFirst();
+			negativeHiddenSamples = gibbsSamplingMatrices.getSecond().getSecond();
+			
 			
 		}
 		
@@ -157,35 +175,24 @@ public class RestrictedBoltzmannMachine {
 		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
 		// now compute the <vi hj>model
-//		DoubleMatrix nvSamplesTTimesNhMeans = nvSamples.transpose().mmul(nhMeans);
-		// .getSecond().getFirst()
-		Matrix nvSamplesTTimesNhMeans = gibbsSamplingMatrices.getFirst().getSecond().transpose().times( gibbsSamplingMatrices.getSecond().getFirst() );
-		
-		
+		Matrix nvSamplesTTimesNhMeans = negativeVisibleSamples.transpose().times( negativeHiddenMeans );
+				
 		// calc the delta between: data - model
-//		DoubleMatrix diff = inputTimesPhSample.sub(nvSamplesTTimesNhMeans);
-		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus(nvSamplesTTimesNhMeans);
+		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( nvSamplesTTimesNhMeans );
 		
 		// learningRate * delta(data - model)
 		// we're simply updating the connection weights at this point
-		Matrix connectionWeightChanges = dataModelDelta.times(this.learningRate);
+		Matrix connectionWeightChanges = dataModelDelta.times( this.learningRate );
 		
 		// ---- end of equation (9) section -----------------
 		
-		// update the connection weights
-		this.connectionWeights = this.connectionWeights.plus(connectionWeightChanges);
+		// update the connection weights and bias terms for visible/hidden units
+		this.connectionWeights = this.connectionWeights.plus( connectionWeightChanges );
 
-		//
-		// TODO: review this area - the bias for both hidden and visible 
-		// are update differently, review this.
-		//
+		Matrix vBiasAdd = MatrixUtils.mean( input.minus( negativeVisibleSamples ) , 0); 
+		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd.times( this.learningRate ) );
 
-//		DoubleMatrix  vBiasAdd = MatrixUtil.mean(this.input.sub(nvSamples), 0).mul(learningRate);
-		Matrix vBiasAdd = MatrixUtils.mean( input.minus( gibbsSamplingMatrices.getFirst().getSecond() ) , 0); //.times(this.learningRate);
-		this.visibleBiasNeurons = vBiasAdd.times(learningRate);
-
-//		DoubleMatrix hBiasAdd = MatrixUtil.mean(probHidden.getSecond().sub(nhMeans), 0).mul(learningRate);
-		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( gibbsSamplingMatrices.getSecond().getFirst() ) , 0); //.times(this.learningRate);
+		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenMeans ) , 0); //.times(this.learningRate);
 		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times(this.learningRate) );
 		
 		
