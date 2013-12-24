@@ -181,13 +181,10 @@ public class RestrictedBoltzmannMachine {
 		//
 
 //		DoubleMatrix  vBiasAdd = MatrixUtil.mean(this.input.sub(nvSamples), 0).mul(learningRate);
-//		vBias = vBiasAdd.mul(learningRate);
-		Matrix vBiasAdd = MatrixUtils.mean( input.minus( gibbsSamplingMatrices.getFirst().getSecond() ) , 0).times(this.learningRate);
+		Matrix vBiasAdd = MatrixUtils.mean( input.minus( gibbsSamplingMatrices.getFirst().getSecond() ) , 0); //.times(this.learningRate);
 		this.visibleBiasNeurons = vBiasAdd.times(learningRate);
 
 //		DoubleMatrix hBiasAdd = MatrixUtil.mean(probHidden.getSecond().sub(nhMeans), 0).mul(learningRate);
-
-
 		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( gibbsSamplingMatrices.getSecond().getFirst() ) , 0); //.times(this.learningRate);
 		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times(this.learningRate) );
 		
