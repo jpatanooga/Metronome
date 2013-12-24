@@ -124,13 +124,13 @@ public class RestrictedBoltzmannMachine {
 		// do gibbs sampling given V to get the Hidden states based on the training input
 		// compute positive phase
 		//Pair<DoubleMatrix,DoubleMatrix> ph = this.sampleHGivenV(this.input);
-		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible( input );
+		Pair<Matrix, Matrix> hiddenProbsAndSamplesStart = this.sampleHiddenGivenVisible( input );
 
 		//MatrixUtils.debug_print(hiddenProbsAndSamples.getSecond());
 		
 		Matrix hiddenSample = null;
 		
-		Pair<Matrix, Matrix> gibbsSamplingMatrices = null;
+		Pair<Pair<Matrix, Matrix>,Pair<Matrix, Matrix>> gibbsSamplingMatrices = null;
 		
 		// now run k full steps of alternating Gibbs sampling
 		
@@ -138,7 +138,7 @@ public class RestrictedBoltzmannMachine {
 			
 			if (0 == x) {
 				
-				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenProbsAndSamples.getSecond() );
+				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenProbsAndSamplesStart.getSecond() );
 				
 				//MatrixUtils.debug_print(gibbsSamplingMatrices.getSecond());
 				
@@ -147,10 +147,6 @@ public class RestrictedBoltzmannMachine {
 				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenSample );
 				
 			}
-			
-			// TODO: gibbs sampling functions need to 
-			// return something and we need to update the matrix samples
-			
 			
 		}
 		
@@ -161,16 +157,22 @@ public class RestrictedBoltzmannMachine {
 		// now compute the <vi hj>data		
 //		DoubleMatrix inputTimesPhSample =  this.input.transpose().mmul(ph.getSecond());
 // TODO: look at how the training dataset x hiddenSample works out wrt matrix sizes
-		Matrix trainingDataTimesHiddenStates = input.transpose().times( hiddenProbsAndSamples.getSecond() );
+		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
 		// now compute the <vi hj>model
 //		DoubleMatrix nvSamplesTTimesNhMeans = nvSamples.transpose().mmul(nhMeans);
+		// .getSecond().getFirst()
+		Matrix nvSamplesTTimesNhMeans = gibbsSamplingMatrices.getFirst().getSecond().transpose().times( gibbsSamplingMatrices.getSecond().getFirst() );
+		
 		
 		// data - model
 //		DoubleMatrix diff = inputTimesPhSample.sub(nvSamplesTTimesNhMeans);
+		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus(nvSamplesTTimesNhMeans);
 		
 		// learningRate * delta(data - model)
 //		DoubleMatrix wAdd = diff.mul(learningRate);
+		
+		Matrix connectionWeightChanges = dataModelDelta.times(this.learningRate);
 		
 		// ---- end of equation (9) section -----------------
 		
@@ -280,14 +282,15 @@ public class RestrictedBoltzmannMachine {
 	 * TODO: how do we return things?
 	 * 
 	 */
-	public Pair<Matrix, Matrix> gibbsSamplingStepFromVisible(Matrix visible) {
+	public Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> gibbsSamplingStepFromVisible(Matrix visible) {
 	
 		//Matrix hidden_sampled = this.sampleHiddenGivenVisible(visible);
 		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible(visible);
 		//Matrix visible_sampled = this.sampleVisibleGivenHidden(hidden_sampled);
 		Pair<Matrix, Matrix> visibleProbsAndSamples = this.sampleVisibleGivenHidden( hiddenProbsAndSamples.getSecond() );
 
-		return visibleProbsAndSamples;
+		//return visibleProbsAndSamples;
+		return new Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>>(hiddenProbsAndSamples, visibleProbsAndSamples);
 	}
 	
 	/**
@@ -297,7 +300,7 @@ public class RestrictedBoltzmannMachine {
 	 * 
 	 * @param hidden
 	 */
-	public Pair<Matrix, Matrix> gibbsSamplingStepFromHidden(Matrix hidden) {
+	public Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> gibbsSamplingStepFromHidden(Matrix hidden) {
 		
 		System.out.println("gibbsSamplingStepFromHidden ------");
 		
@@ -306,7 +309,7 @@ public class RestrictedBoltzmannMachine {
 		Pair<Matrix, Matrix> visibleProbsAndSamples = this.sampleVisibleGivenHidden(hidden);
 		Pair<Matrix, Matrix> hiddenProbsAndSamples = this.sampleHiddenGivenVisible(visibleProbsAndSamples.getSecond());
 		
-		return hiddenProbsAndSamples;
+		return new Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>>(visibleProbsAndSamples, hiddenProbsAndSamples);
 	}
 	
 	public void computeFreeEnergy(Matrix visibleSample) {

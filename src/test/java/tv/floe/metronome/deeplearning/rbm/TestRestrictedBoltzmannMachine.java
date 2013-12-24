@@ -50,7 +50,7 @@ public class TestRestrictedBoltzmannMachine {
 		
 		System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
 		
-		Pair<Matrix, Matrix> visibleProbsAndSample = rbm.gibbsSamplingStepFromHidden(hidden_sample_init);
+//		Pair<Matrix, Matrix> visibleProbsAndSample = rbm.gibbsSamplingStepFromHidden(hidden_sample_init);
 /*
 		Matrix visible_sample = visibleProbsAndSample.getSecond();
 		
