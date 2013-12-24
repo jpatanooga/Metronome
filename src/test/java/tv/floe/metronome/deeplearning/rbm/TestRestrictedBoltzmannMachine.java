@@ -157,7 +157,22 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
 		
-		rbm.contrastiveDivergence(1, input);
+		for (int x = 0; x < 5000; x++) {
+			rbm.contrastiveDivergence(1, input);
+		}
+		
+		Matrix v = new DenseMatrix(new double[][]
+				{
+					{1, 1, 0, 0, 0, 0},
+					{0, 0, 0, 1, 1, 0}
+				}
+		);	
+
+
+		Matrix recon = rbm.reconstructVisibleInput(v);
+		
+		MatrixUtils.debug_print(recon);
+		
 		
 		
 	}

@@ -341,6 +341,8 @@ public class RestrictedBoltzmannMachine {
 		preSig = MatrixUtils.addRowVector(preSig, this.hiddenBiasNeurons.viewRow(0));
 		Matrix hidden = MatrixUtils.sigmoid(preSig);
 		*/
+		
+		// propUp
 		Matrix propUpHiddenResult = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
 
 		
