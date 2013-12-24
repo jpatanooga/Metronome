@@ -336,14 +336,16 @@ public class RestrictedBoltzmannMachine {
 	public Matrix reconstructVisibleInput(Matrix visible) {
 
 		// TODO: can we not just use propUp here instead? 
-		
+		/*
 		Matrix preSig = visible.times(this.connectionWeights);
 		preSig = MatrixUtils.addRowVector(preSig, this.hiddenBiasNeurons.viewRow(0));
 		Matrix hidden = MatrixUtils.sigmoid(preSig);
-		
+		*/
+		Matrix propUpHiddenResult = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
 
 		
 		//return propDown(h);
+		return this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(propUpHiddenResult);
 	}
 	
 	
