@@ -13,6 +13,11 @@ import tv.floe.metronome.types.Pair;
 
 
 /**
+ * Basic Implementation of a Restricted Boltzmann Machine
+ * 
+ * A restricted Boltzmann machine (RBM) is a generative stochastic neural
+ *  network that can learn a probability distribution over its set of inputs.
+ * 
  * Based on work by Hinton, et al 2006
  * 
  * And inspired by the RBM Implementation of Adam Gibson:
@@ -127,9 +132,7 @@ public class RestrictedBoltzmannMachine {
 		// do gibbs sampling given V to get the Hidden states based on the training input
 		// compute positive phase
 		Pair<Matrix, Matrix> hiddenProbsAndSamplesStart = this.sampleHiddenGivenVisible( input );
-		
-		//Matrix hiddenSample = null;
-		
+				
 		Pair<Pair<Matrix, Matrix>,Pair<Matrix, Matrix>> gibbsSamplingMatrices = null;
 		
 		// now run k full steps of alternating Gibbs sampling
@@ -142,7 +145,6 @@ public class RestrictedBoltzmannMachine {
 		Matrix negativeHiddenExpectedValues = null;
 		//negative hidden samples
 		Matrix negativeHiddenSamples = null;
-		
 		
 		for ( int x = 0; x < k; x++ ) {
 			
@@ -164,24 +166,19 @@ public class RestrictedBoltzmannMachine {
 			
 			
 		}
-		
-		// end of gibbs sampling (k full alternating sampling passes)
-		
+				
 		// ----- now calculate equation (9) to get the weight changes ------
-
-		// TODO: document this section WRT Hinton math/equations
 		
 		// now compute the <vi hj>data		
 		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
-		// now compute the <vi hj>model
+		// now compute the <vi hj>model (this may be vi * phj --- double check)
 		Matrix negativeVisibleSamplesTransposeTimesNegHiddenExpValues = negativeVisibleSamples.transpose().times( negativeHiddenExpectedValues );
 				
 		// calc the delta between: data - model
 		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( negativeVisibleSamplesTransposeTimesNegHiddenExpValues );
 		
 		// learningRate * delta(data - model)
-		// we're simply updating the connection weights at this point
 		Matrix connectionWeightChanges = dataModelDelta.times( this.learningRate );
 		
 		// ---- end of equation (9) section -----------------
