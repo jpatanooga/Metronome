@@ -52,7 +52,8 @@ public class NeuralNetwork implements Serializable {
 		OUTSTAR,
 		RBF_NETWORK,
 		BAM,
-	    BOLTZMAN
+	    BOLTZMAN,
+	    RESTRICTED_BOLTZMANN_MACHINE
 		
 	};
 
