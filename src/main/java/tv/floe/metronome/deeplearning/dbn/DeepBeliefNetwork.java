@@ -17,6 +17,11 @@ import tv.floe.metronome.math.MatrixUtils;
  * Base draft of a Deep Belief Network based on RBMs
  * (based on concepts by Hinton)
  * 
+ * Literature Review and Notes
+ * 
+ * 1. http://www.iro.umontreal.ca/~lisa/twiki/bin/view.cgi/Public/DBNPseudoCode
+ * 
+ * 
  *  1. Setup as a normal MLPN 
  *  - but it also has a set of RBM layers that matches the number of hidden layers
  *  
