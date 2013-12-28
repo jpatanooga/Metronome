@@ -12,6 +12,7 @@ import tv.floe.metronome.classification.neuralnetworks.core.Layer;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
+import tv.floe.metronome.types.Pair;
 
 /**
  * Base draft of a Deep Belief Network based on RBMs
@@ -46,7 +47,8 @@ import tv.floe.metronome.math.MatrixUtils;
  * 		to make this as one continuous job
  * 		-	need a way to save layers in progress to view in viewer
  *
- *
+ * TODO:
+ * - need to figure out how the greedy-per-layer SGD pass works in this case
  *
  *
  */
@@ -162,7 +164,7 @@ public class DeepBeliefNetwork {
 			// TODO: thought: cna we not simply sample directly from the RBM itself?
 			// - what advantage is there loading into the hidden layer and then sampling from there?
 			
-			layerTrainingInput = this.sample_h_given_v(layerTrainingInput, mlpnLayer);
+			layerTrainingInput = this.sampleHiddenGivenVisible(layerTrainingInput, mlpnLayer);
 			
 		}
 		
@@ -175,7 +177,7 @@ public class DeepBeliefNetwork {
 	 * 
 	 * @return
 	 */
-	public Matrix outputMatrix(Matrix input ) {
+	public Matrix outputMatrix( Matrix input ) {
 //		Matrix mult = input.mmul(W);
 //		mult = mult.addRowVector(b);
 //		return MatrixUtil.sigmoid(mult);
@@ -183,10 +185,28 @@ public class DeepBeliefNetwork {
 	}
 	
 	
-	public Matrix sample_h_given_v(Matrix input, Layer mlpnLayer) {
+	/**
+	 * This function infers state of visible units given hidden units
+	 * 
+	 *  
+	 * @param input
+	 * @param mlpnLayer
+	 * @return
+	 */
+	public Matrix sampleHiddenGivenVisible(Matrix visible, Layer mlpnLayer) {
+		
+		
+/*		
+		Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
+
+		Matrix visibleBinomialSample = MatrixUtils.genBinomialDistribution(visibleProb, 1, this.randNumGenerator);
+
+		return new Pair<Matrix, Matrix>(visibleProb, visibleBinomialSample);
+	*/	
+		
 		//reset the seed to ensure consistent generation of data
 		//Matrix ret = MatrixUtils.binomial(outputMatrix(input), 1, this.randomGen);
-		Matrix ret = MatrixUtils.genBinomialDistribution( outputMatrix(input), 1, this.randomGen);
+		Matrix ret = MatrixUtils.genBinomialDistribution( outputMatrix(visible), 1, this.randomGen);
 		//return ret;
 		return ret;
 	}
