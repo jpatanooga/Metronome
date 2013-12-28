@@ -207,7 +207,31 @@ public class RestrictedBoltzmannMachine {
 		
 	}
 	
+	/**
+	 * Used to calculate how well trained the RBM is currently
+	 * 
+	 * @return
+	 */
 	public double getReConstructionCrossEntropy() {
+/*		
+	       cross_entropy = T.mean(
+	                T.sum(self.input * T.log(T.nnet.sigmoid(pre_sigmoid_nv)) +
+	                (1 - self.input) * T.log(1 - T.nnet.sigmoid(pre_sigmoid_nv)),
+	                      axis=1))
+	*/	
+		
+		// 1. get sigmoid of the inputMatrix x weights
+		
+		
+		
+		
+		// 2. get sigmoid of the ( sigH from #1 x transpose(weights) )
+		
+		
+		
+		// 3. get 1 - log( #2 )
+		
+		// 4. 
 
 		return 0;
 	}
@@ -282,8 +306,6 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Pair<Matrix, Matrix> sampleVisibleGivenHidden(Matrix hidden) {
 		
-
-		// dont understand why this is referred to as "mean" in some codebases
 		Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
 
 		Matrix visibleBinomialSample = MatrixUtils.genBinomialDistribution(visibleProb, 1, this.randNumGenerator);
