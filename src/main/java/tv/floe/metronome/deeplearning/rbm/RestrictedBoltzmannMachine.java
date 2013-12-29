@@ -6,7 +6,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
-
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -131,6 +130,8 @@ public class RestrictedBoltzmannMachine {
 		 * we can then compute the sample at the end of the Gibbs chain, 
 		 * sample that we need for getting the gradient
 		 */
+		
+		this.trainingDataset = input;
 				
 		// init CDk
 		
@@ -222,17 +223,37 @@ public class RestrictedBoltzmannMachine {
 		
 		// 1. get sigmoid of the inputMatrix x weights
 		
+		// probably could just call the propUp call w the training dataset as param
+		Matrix preSigmoidHidden = this.trainingDataset.times( this.connectionWeights );
+		preSigmoidHidden = MatrixUtils.addRowVector(preSigmoidHidden, this.hiddenBiasNeurons.viewRow(0));
+		Matrix sigHidden = MatrixUtils.sigmoid(preSigmoidHidden);
 		
 		
 		
 		// 2. get sigmoid of the ( sigH from #1 x transpose(weights) )
 		
+		// could use propDown here
+		Matrix preSigmoidVis = sigHidden.times( this.connectionWeights.transpose() );
+		preSigmoidVis = MatrixUtils.addRowVector(preSigmoidVis, this.visibleBiasNeurons.viewRow(0));
+		Matrix sigVis = MatrixUtils.sigmoid( preSigmoidVis );
 		
-		
-		// 3. get 1 - log( #2 )
-		
-		// 4. 
+		Matrix logSigmoidVis = MatrixUtils.log(sigVis);
+		Matrix oneMinusSigmoidVis = MatrixUtils.ones(sigVis.numRows(), sigVis.numCols()).minus(sigVis);
 
+		Matrix logOneMinusSigVisible = MatrixUtils.log(oneMinusSigmoidVis);
+		
+		Matrix inputTimesLogSigVisible = this.trainingDataset.times( logSigmoidVis );
+		
+
+		// --
+		Matrix oneMinusInput = MatrixUtils.ones(this.trainingDataset.numRows(), this.trainingDataset.numCols());
+
+//		DoubleMatrix crossEntropyMatrix = MatrixUtil.mean(inputTimesLogSigV.add(oneMinusInput).mul(logOneMinusSigV).rowSums(),1);
+		// row sums???
+		//Matrix crossEntropyMatrix = MatrixUtils.mean( inputTimesLogSigVisible.plus(oneMinusInput).times(logOneMinusSigVisible) );
+
+//		return -crossEntropyMatrix.mean();
+		
 		return 0;
 	}
 	
@@ -254,6 +275,9 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Matrix generateProbabilitiesForHiddenStatesBasedOnVisibleStates(Matrix visible) {
 				
+		// why are we using the bias neurons for the hidden layer wrt the visible data?
+		//
+		
 		Matrix preSigmoid = visible.times( this.connectionWeights );
 		preSigmoid = MatrixUtils.addRowVector(preSigmoid, this.hiddenBiasNeurons.viewRow(0));
 
