@@ -287,6 +287,8 @@ public class RestrictedBoltzmannMachine {
 	/**
 	 * This function infers state of hidden units given visible units
 	 * 
+	 * Used in Gibbs Sampling
+	 * 
 	 * @param visible
 	 */
 	public Pair<Matrix, Matrix> sampleHiddenGivenVisible(Matrix visible) {
@@ -325,6 +327,8 @@ public class RestrictedBoltzmannMachine {
 	
 	/**
 	 * This function infers state of visible units given hidden units
+	 * 
+	 * Used in Gibbs Sampling
 	 * 
 	 * @param hidden
 	 */
