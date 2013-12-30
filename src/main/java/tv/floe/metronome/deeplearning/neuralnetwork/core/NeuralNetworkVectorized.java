@@ -1,4 +1,4 @@
-package tv.floe.metronome.deeplearning.neuralnetwork;
+package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
 
 /**
