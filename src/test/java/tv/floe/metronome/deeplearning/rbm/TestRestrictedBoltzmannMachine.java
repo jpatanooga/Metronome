@@ -124,7 +124,7 @@ public class TestRestrictedBoltzmannMachine {
 			rbm.contrastiveDivergence(1, input);
 		}
 
-		Matrix hidden = rbm.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(input);
+		Matrix hidden = rbm.propUp(input);
 		Matrix recon = rbm.reconstructVisibleInput(input);
 
 		
@@ -144,7 +144,7 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
 
-		Matrix hidden = rbm.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(input);
+		Matrix hidden = rbm.propUp(input);
 		
 		/**
 		 * For every single row we get the 2 hidden states in the "hidden" matrix
@@ -153,7 +153,7 @@ public class TestRestrictedBoltzmannMachine {
 		
 //		MatrixUtils.debug_print( hidden );
 		
-		rbm.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
+		rbm.propDown(hidden);
 		
 		
 		

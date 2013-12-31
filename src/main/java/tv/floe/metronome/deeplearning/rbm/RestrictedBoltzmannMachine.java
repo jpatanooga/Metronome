@@ -270,7 +270,9 @@ public class RestrictedBoltzmannMachine {
 	 * @param visible
 	 * @return
 	 */
-	public Matrix generateProbabilitiesForHiddenStatesBasedOnVisibleStates(Matrix visible) {
+	//public Matrix generateProbabilitiesForHiddenStatesBasedOnVisibleStates(Matrix visible) {
+	public Matrix propUp(Matrix visible) {
+	
 				
 		// why are we using the bias neurons for the hidden layer wrt the visible data?
 		//
@@ -292,7 +294,8 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Pair<Matrix, Matrix> sampleHiddenGivenVisible(Matrix visible) {
 				
-		Matrix hiddenProbs = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
+		//Matrix hiddenProbs = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
+		Matrix hiddenProbs = this.propUp(visible);
 
 		Matrix hiddenBinomialSamples = MatrixUtils.genBinomialDistribution(hiddenProbs, 1, this.randNumGenerator);
 		
@@ -316,7 +319,8 @@ public class RestrictedBoltzmannMachine {
 	 * @param visible
 	 * @return
 	 */
-	public Matrix generateProbabilitiesForVisibleStatesBasedOnHiddenStates(Matrix hidden) {
+	//public Matrix generateProbabilitiesForVisibleStatesBasedOnHiddenStates(Matrix hidden) {
+	public Matrix propDown(Matrix hidden) {
 		
 		Matrix preSigmoid = hidden.times( this.connectionWeights.transpose() );
 		preSigmoid = MatrixUtils.addRowVector(preSigmoid, this.visibleBiasNeurons.viewRow(0));
@@ -333,7 +337,8 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Pair<Matrix, Matrix> sampleVisibleGivenHidden(Matrix hidden) {
 		
-		Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
+		//Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
+		Matrix visibleProb = this.propDown(hidden);
 
 		Matrix visibleBinomialSample = MatrixUtils.genBinomialDistribution(visibleProb, 1, this.randNumGenerator);
 
@@ -386,11 +391,13 @@ public class RestrictedBoltzmannMachine {
 	public Matrix reconstructVisibleInput(Matrix visible) {
 
 		// propUp
-		Matrix propUpHiddenResult = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
+//		Matrix propUpHiddenResult = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
+		Matrix propUpHiddenResult = this.propUp(visible);
 
 		
 		//return propDown(h);
-		return this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(propUpHiddenResult);
+//		return this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(propUpHiddenResult);
+		return this.propDown(propUpHiddenResult);
 	}
 	
 	
