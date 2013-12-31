@@ -248,11 +248,26 @@ public class RestrictedBoltzmannMachine {
 		// --
 		Matrix oneMinusInput = MatrixUtils.ones(this.trainingDataset.numRows(), this.trainingDataset.numCols());
 
+		// ---- compute the cross entropy matrix --------
 //		DoubleMatrix crossEntropyMatrix = MatrixUtil.mean(inputTimesLogSigV.add(oneMinusInput).mul(logOneMinusSigV).rowSums(),1);
 		// row sums???
 		//Matrix crossEntropyMatrix = MatrixUtils.mean( inputTimesLogSigVisible.plus(oneMinusInput).times(logOneMinusSigVisible) );
+/*
+		DoubleMatrix inner = 
+				input.mul(MatrixUtil.log(sigV))
+				.add(MatrixUtil.oneMinus(input)
+						.mul(MatrixUtil.log(MatrixUtil.oneMinus(sigV)))
+		
+						);
+		
+		return - inner.rowSums().mean();
 
-		oneMinusInput.
+ */
+		Matrix crossEntropyMatrix_partial = inputTimesLogSigVisible.plus(oneMinusInput);
+		// .mul(logOneMinusSigV).
+		Matrix crossEntropyMatrix_timesLogOneMinusSigV = crossEntropyMatrix_partial.times(logOneMinusSigVisible);
+		Matrix crossEntRowSums = MatrixUtils.rowSums(crossEntropyMatrix_timesLogOneMinusSigV);
+		Matrix crossEntFinal = MatrixUtils.mean(crossEntRowSums, 1);
 		
 //		return -crossEntropyMatrix.mean();
 		

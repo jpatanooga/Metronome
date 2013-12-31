@@ -142,6 +142,42 @@ public class MatrixUtils {
 		return ret;
 	}
 
+	/**
+	 * Computes the mean value of all elements in the matrix, that is, x.sum() / x.length.
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static double mean(Matrix m) {
+		
+		double ret = sum(m);
+		int count = m.numCols() * m.numRows();
+		
+		return ret / (double)count;
+	}
+	
+	/**
+	 * Returns sum of all elements in Matrix
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static double sum(Matrix m) {
+		
+		double ret = 0;
+		
+		
+		for ( int r = 0; r < m.numRows(); r++ ) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				
+				ret += m.get(r, c);
+				
+			}
+		}		
+		
+		return ret;
+		
+	}
 	
 	/**
 	 * Applies the natural logarithm function element-wise on this matrix. 

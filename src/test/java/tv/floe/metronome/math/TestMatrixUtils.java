@@ -12,12 +12,30 @@ import org.apache.mahout.math.Vector;
 
 import org.junit.Test;
 
-
-
-//import tv.floe.ml_workbench.jblas.MatrixDebug;
-
 public class TestMatrixUtils {
 
+	@Test
+	public void testSumAndMean() {
+		
+		Matrix m = new DenseMatrix(2, 3);
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+		m.setQuick(0, 2, 3);
+
+		m.setQuick(1, 0, 5);
+		m.setQuick(1, 1, 10);
+		m.setQuick(1, 2, 0);
+
+		double sum = MatrixUtils.sum(m);
+		
+		double mean = MatrixUtils.mean(m);
+		
+		assertEquals(33.0, sum, 0.0);
+		
+		assertEquals( 33.0 / 6.0, mean, 0.0 );
+		
+		
+	}
 	
 	/**
 	 * 
