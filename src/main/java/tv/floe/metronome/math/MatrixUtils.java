@@ -84,6 +84,37 @@ public class MatrixUtils {
 				
 		
 	}
+	
+	/**
+	 * Computes each row as a sum and outputs a column vector of the sums
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static Matrix rowSums(Matrix m) {
+		
+		Matrix ret_row_sums = new DenseMatrix(m.numRows(), 1);
+		//int col_count = m.numCols();
+		
+		//System.out.println("col count: " + col_count);;
+		
+		ret_row_sums.assign(0.0);
+
+		// sum into 1 row matrix
+		for ( int r = 0; r < m.numRows(); r++ ) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				
+				double row_sum = ret_row_sums.get(r, 0);
+								
+				ret_row_sums.set(r, 0, m.get(r, c) + row_sum );
+			}
+		}
+
+		
+		return ret_row_sums;
+				
+		
+	}	
 
 	/**
 	 * Computes either a row-wise mean or a column-wise mean on the input Matrix m

@@ -252,6 +252,8 @@ public class RestrictedBoltzmannMachine {
 		// row sums???
 		//Matrix crossEntropyMatrix = MatrixUtils.mean( inputTimesLogSigVisible.plus(oneMinusInput).times(logOneMinusSigVisible) );
 
+		oneMinusInput.
+		
 //		return -crossEntropyMatrix.mean();
 		
 		return 0;
@@ -285,6 +287,8 @@ public class RestrictedBoltzmannMachine {
 	}
 
 	/**
+	 * Binomial sampling of the hidden values given visible
+	 * 
 	 * This function infers state of hidden units given visible units
 	 * 
 	 * Used in Gibbs Sampling
