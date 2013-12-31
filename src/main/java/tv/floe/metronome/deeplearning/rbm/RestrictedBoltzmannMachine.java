@@ -209,18 +209,11 @@ public class RestrictedBoltzmannMachine {
 	}
 	
 	/**
-	 * Used to calculate how well trained the RBM is currently
+	 * Used to calculate how well trained the RBM currently is
 	 * 
 	 * @return
 	 */
 	public double getReConstructionCrossEntropy() {
-/*		
-	       cross_entropy = T.mean(
-	                T.sum(self.input * T.log(T.nnet.sigmoid(pre_sigmoid_nv)) +
-	                (1 - self.input) * T.log(1 - T.nnet.sigmoid(pre_sigmoid_nv)),
-	                      axis=1))
-	*/	
-		
 		// 1. get sigmoid of the inputMatrix x weights
 		
 		// probably could just call the propUp call w the training dataset as param
@@ -237,11 +230,11 @@ public class RestrictedBoltzmannMachine {
 		preSigmoidVis = MatrixUtils.addRowVector(preSigmoidVis, this.visibleBiasNeurons.viewRow(0));
 		Matrix sigVis = MatrixUtils.sigmoid( preSigmoidVis );
 		
+		// 3. put together the partials to build the cross entropy
+		
 		Matrix logSigmoidVis = MatrixUtils.log(sigVis);
 		Matrix oneMinusSigmoidVis = MatrixUtils.ones(sigVis.numRows(), sigVis.numCols()).minus(sigVis);
-
 		Matrix logOneMinusSigVisible = MatrixUtils.log(oneMinusSigmoidVis);
-		
 		Matrix inputTimesLogSigVisible = this.trainingDataset.times( logSigmoidVis );
 		
 
@@ -249,29 +242,12 @@ public class RestrictedBoltzmannMachine {
 		Matrix oneMinusInput = MatrixUtils.ones(this.trainingDataset.numRows(), this.trainingDataset.numCols());
 
 		// ---- compute the cross entropy matrix --------
-//		DoubleMatrix crossEntropyMatrix = MatrixUtil.mean(inputTimesLogSigV.add(oneMinusInput).mul(logOneMinusSigV).rowSums(),1);
-		// row sums???
-		//Matrix crossEntropyMatrix = MatrixUtils.mean( inputTimesLogSigVisible.plus(oneMinusInput).times(logOneMinusSigVisible) );
-/*
-		DoubleMatrix inner = 
-				input.mul(MatrixUtil.log(sigV))
-				.add(MatrixUtil.oneMinus(input)
-						.mul(MatrixUtil.log(MatrixUtil.oneMinus(sigV)))
-		
-						);
-		
-		return - inner.rowSums().mean();
-
- */
 		Matrix crossEntropyMatrix_partial = inputTimesLogSigVisible.plus(oneMinusInput);
-		// .mul(logOneMinusSigV).
 		Matrix crossEntropyMatrix_timesLogOneMinusSigV = crossEntropyMatrix_partial.times(logOneMinusSigVisible);
 		Matrix crossEntRowSums = MatrixUtils.rowSums(crossEntropyMatrix_timesLogOneMinusSigV);
-		Matrix crossEntFinal = MatrixUtils.mean(crossEntRowSums, 1);
-		
-//		return -crossEntropyMatrix.mean();
-		
-		return 0;
+		double crossEntFinal = -1 * MatrixUtils.mean(crossEntRowSums);
+				
+		return crossEntFinal;
 	}
 	
 
@@ -405,13 +381,6 @@ public class RestrictedBoltzmannMachine {
 	 */
 	public Matrix reconstructVisibleInput(Matrix visible) {
 
-		// TODO: can we not just use propUp here instead? 
-		/*
-		Matrix preSig = visible.times(this.connectionWeights);
-		preSig = MatrixUtils.addRowVector(preSig, this.hiddenBiasNeurons.viewRow(0));
-		Matrix hidden = MatrixUtils.sigmoid(preSig);
-		*/
-		
 		// propUp
 		Matrix propUpHiddenResult = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
 
