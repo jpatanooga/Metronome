@@ -71,11 +71,6 @@ public class TestRestrictedBoltzmannMachine {
 		
 	}
 	
-	@Test
-	public void testContrastiveDivergenceLearning() {
-		
-		
-	}
 	
 	@Test 
 	public void testMatrixSizingOnInputTimes() {
@@ -109,6 +104,8 @@ public class TestRestrictedBoltzmannMachine {
 	/**
 	 * Will return a Matrix of size [ inputRowCount, HiddenNeuronCount ]
 	 * 
+	 * Generates a set of probabilites for hidden states for input sample
+	 * 
 	 */
 	@Test
 	public void testPropUp() {
@@ -117,14 +114,26 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
 
-		Matrix hidden = rbm.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(input);
 		
 		/**
 		 * For every single row we get the 2 hidden states in the "hidden" matrix
 		 * 
 		 */
 		
+		for (int x = 0; x < 5000; x++) {
+			rbm.contrastiveDivergence(1, input);
+		}
+
+		Matrix hidden = rbm.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(input);
+		Matrix recon = rbm.reconstructVisibleInput(input);
+
+		
 		//MatrixUtils.debug_print( hidden );
+		
+		assertEquals( 2, hidden.numCols() );
+		assertEquals( 6, hidden.numRows() );
+		
+		MatrixUtils.debug_print(recon);
 		
 	}
 	
@@ -173,6 +182,26 @@ public class TestRestrictedBoltzmannMachine {
 		
 		MatrixUtils.debug_print(recon);
 		
+		
+		
+	}
+	
+	@Test
+	public void testCrossEntropyReconstruction() {
+		
+		Matrix input = buildTestInputDataset();
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
+
+		for (int x = 0; x < 5000; x++) {
+			rbm.contrastiveDivergence(1, input);
+
+			double ce = rbm.getReConstructionCrossEntropy();
+			
+			System.out.println("ce: " + ce);
+		
+		}
+
 		
 		
 	}

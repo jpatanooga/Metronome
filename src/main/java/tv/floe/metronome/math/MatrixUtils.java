@@ -178,6 +178,19 @@ public class MatrixUtils {
 		return ret;
 		
 	}
+
+	/**
+	 * Syntactic Sugar for (1 - MatrixOther)
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static Matrix oneMinus(Matrix m) {
+				
+		return MatrixUtils.ones(m.numRows(), m.numCols()).minus(m);
+		
+	}
+	
 	
 	/**
 	 * Applies the natural logarithm function element-wise on this matrix. 

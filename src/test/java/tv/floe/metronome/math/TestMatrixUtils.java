@@ -180,7 +180,32 @@ public class TestMatrixUtils {
 
 		
 	}
-	
+
+	@Test
+	public void testMatrixOneMinus() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(2, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+
+		m0.setQuick(1, 0, 3);
+		m0.setQuick(1, 1, 4);
+		m0.setQuick(1, 2, 6);
+		
+		Matrix oneMinus = MatrixUtils.oneMinus(m0);
+		
+		assertEquals( -1.0, oneMinus.get(0, 0), 0.0 );
+		assertEquals( -2.0, oneMinus.get(0, 1), 0.0 );
+		assertEquals( -4.0, oneMinus.get(0, 2), 0.0 );
+		
+		assertEquals( -2.0, oneMinus.get(1, 0), 0.0 );
+		assertEquals( -3.0, oneMinus.get(1, 1), 0.0 );
+		assertEquals( -5.0, oneMinus.get(1, 2), 0.0 );
+
+	}
 	
 	@Test
 	public void testMatrixDiv() {

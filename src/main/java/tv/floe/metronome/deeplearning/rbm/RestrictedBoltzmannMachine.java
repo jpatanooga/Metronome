@@ -211,6 +211,8 @@ public class RestrictedBoltzmannMachine {
 	/**
 	 * Used to calculate how well trained the RBM currently is
 	 * 
+	 * [ TODO: Currently Broken - fix it ]
+	 * 
 	 * @return
 	 */
 	public double getReConstructionCrossEntropy() {
@@ -235,12 +237,14 @@ public class RestrictedBoltzmannMachine {
 		Matrix logSigmoidVis = MatrixUtils.log(sigVis);
 		Matrix oneMinusSigmoidVis = MatrixUtils.ones(sigVis.numRows(), sigVis.numCols()).minus(sigVis);
 		Matrix logOneMinusSigVisible = MatrixUtils.log(oneMinusSigmoidVis);
+		
 		Matrix inputTimesLogSigVisible = this.trainingDataset.times( logSigmoidVis );
 		
 
 		// --
-		Matrix oneMinusInput = MatrixUtils.ones(this.trainingDataset.numRows(), this.trainingDataset.numCols());
-
+		Matrix onesInput = MatrixUtils.ones(this.trainingDataset.numRows(), this.trainingDataset.numCols());
+		Matrix oneMinusInput = onesInput.minus(this.trainingDataset);
+		
 		// ---- compute the cross entropy matrix --------
 		Matrix crossEntropyMatrix_partial = inputTimesLogSigVisible.plus(oneMinusInput);
 		Matrix crossEntropyMatrix_timesLogOneMinusSigV = crossEntropyMatrix_partial.times(logOneMinusSigVisible);
