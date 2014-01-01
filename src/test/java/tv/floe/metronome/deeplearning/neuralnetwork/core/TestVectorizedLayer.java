@@ -7,8 +7,16 @@ import org.junit.Test;
 public class TestVectorizedLayer {
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void testComputeActivations() {
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 }

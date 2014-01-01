@@ -91,9 +91,13 @@ public class RestrictedBoltzmannMachine {
 
  
 		this.hiddenBiasNeurons = new DenseMatrix( 1, this.numberHiddenNeurons );
+		// switch to column vector ?
+		//this.hiddenBiasNeurons = new DenseMatrix( this.numberHiddenNeurons, 1 );
 		this.hiddenBiasNeurons.assign(0.0);
 
 		this.visibleBiasNeurons = new DenseMatrix( 1, this.numberVisibleNeurons );
+		// switch to column vector ?
+		//this.visibleBiasNeurons = new DenseMatrix( this.numberVisibleNeurons, 1 );
 		this.visibleBiasNeurons.assign(0.0);
 
 		
