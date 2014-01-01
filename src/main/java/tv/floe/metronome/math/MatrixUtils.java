@@ -448,6 +448,14 @@ public class MatrixUtils {
 		
 	}	
 	
+	public static void debug_print_matrix_stats(Matrix m, String label) {
+		
+		System.out.println("Print Matrix Stats [" + label + "] ------- ");
+		System.out.println("Rows: " + m.numRows() + ", Cols: " + m.numCols() );
+		System.out.println("Print Matrix Stats ------- ");
+		
+	}
+	
 	
 	
 	

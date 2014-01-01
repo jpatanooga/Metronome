@@ -21,6 +21,7 @@ public class TestRestrictedBoltzmannMachine {
 					{1,1,1,0,0,0},
 					{0,0,1,1,1,0},
 					{0,0,1,1,0,0},
+					{0,0,1,1,1,0},
 					{0,0,1,1,1,0}
 				};
 		
@@ -153,7 +154,9 @@ public class TestRestrictedBoltzmannMachine {
 		
 //		MatrixUtils.debug_print( hidden );
 		
-		rbm.propDown(hidden);
+		Matrix visRecon = rbm.propDown(hidden);
+		
+		MatrixUtils.debug_print_matrix_stats(visRecon, "visRecon");
 		
 		
 		
@@ -193,7 +196,9 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
 
-		for (int x = 0; x < 5000; x++) {
+		//MatrixUtils.debug_print(input);
+		
+		for (int x = 0; x < 2; x++) {
 			rbm.contrastiveDivergence(1, input);
 
 			double ce = rbm.getReConstructionCrossEntropy();
@@ -201,6 +206,24 @@ public class TestRestrictedBoltzmannMachine {
 			System.out.println("ce: " + ce);
 		
 		}
+		/*
+		Matrix v = new DenseMatrix(new double[][]
+				{
+					{1, 1, 0, 0, 0, 0},
+					{0, 0, 0, 1, 1, 0}
+				}
+		);	
+*/
+		Matrix v = new DenseMatrix(new double[][]
+				{
+					{1, 1, 1, 0, 0, 0},
+				}
+		);	
+
+		Matrix recon = rbm.reconstructVisibleInput(v);
+		
+		//MatrixUtils.debug_print(recon);
+		
 
 		
 		
