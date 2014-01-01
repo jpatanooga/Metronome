@@ -262,8 +262,8 @@ public class RestrictedBoltzmannMachine {
 		
 		Matrix logOneMinusSigVisible = MatrixUtils.log(oneMinusSigmoidVis);
 	
-		MatrixUtils.debug_print_matrix_stats(this.trainingDataset, "training dataset");
-		MatrixUtils.debug_print_matrix_stats( logSigmoidVis, "logSigV");
+//		MatrixUtils.debug_print_matrix_stats(this.trainingDataset, "training dataset");
+//		MatrixUtils.debug_print_matrix_stats( logSigmoidVis, "logSigV");
 		
 		
 		// D

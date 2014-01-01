@@ -198,7 +198,7 @@ public class TestRestrictedBoltzmannMachine {
 
 		//MatrixUtils.debug_print(input);
 		
-		for (int x = 0; x < 2; x++) {
+		for (int x = 0; x < 5000; x++) {
 			rbm.contrastiveDivergence(1, input);
 
 			double ce = rbm.getReConstructionCrossEntropy();

@@ -33,6 +33,7 @@ http://www.slideshare.net/jpatanooga/metronome-ml-confnov2013v20131113
 * [Running parallel linear regression with IRUnit on synthetic test data](https://github.com/jpatanooga/Metronome/wiki/Running-Parallel-Linear-Regression)
 
 # Contributors and Special Thanks
+* Adam Gibson
 * Michael Katzenellenbollen
 * Dr. Jason Baldridge
 * Dr. James Scott
