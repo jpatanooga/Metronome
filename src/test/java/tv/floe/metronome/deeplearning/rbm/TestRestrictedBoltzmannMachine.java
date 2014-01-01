@@ -132,7 +132,7 @@ public class TestRestrictedBoltzmannMachine {
 		//MatrixUtils.debug_print( hidden );
 		
 		assertEquals( 2, hidden.numCols() );
-		assertEquals( 6, hidden.numRows() );
+		assertEquals( 7, hidden.numRows() );
 		
 		MatrixUtils.debug_print(recon);
 		

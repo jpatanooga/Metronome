@@ -73,7 +73,7 @@ public class RestrictedBoltzmannMachine {
 		
 		double a = 1.0 / (double) this.numberVisibleNeurons;
 		
-		UniformRealDistribution realDistributionGenerator = new UniformRealDistribution(this.randNumGenerator,-a,a,UniformRealDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
+		UniformRealDistribution realDistributionGenerator = new UniformRealDistribution(this.randNumGenerator,-a,a);
 
 		this.connectionWeights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons );
 		this.connectionWeights.assign(0.0);
@@ -268,11 +268,11 @@ public class RestrictedBoltzmannMachine {
 		
 		// D
 		// self.input * T.log(T.nnet.sigmoid(pre_sigmoid_nv))
-		Matrix inputTimesLogSigVisible = this.trainingDataset.times( logSigmoidVis );
+		Matrix inputTimesLogSigVisible = MatrixUtils.elementWiseMultiplication(this.trainingDataset,logSigmoidVis);
 		
 		// E
 		// (1 - self.input) * T.log(1 - T.nnet.sigmoid(pre_sigmoid_nv))
-		Matrix oneMinusInputTimesLogOneMinusSigV = oneMinusInput.times(logOneMinusSigVisible);
+		Matrix oneMinusInputTimesLogOneMinusSigV = MatrixUtils.elementWiseMultiplication(oneMinusInput,logOneMinusSigVisible);
 		
 		// D + E
 		Matrix Inner = inputTimesLogSigVisible.plus(oneMinusInputTimesLogOneMinusSigV);
@@ -285,7 +285,7 @@ public class RestrictedBoltzmannMachine {
 		// now compute the average across the cross-entropies for each training example
 		double crossEntFinal = MatrixUtils.mean(crossEntRowSums);
 				
-		return crossEntFinal;
+		return -crossEntFinal;
 	}
 	
 
