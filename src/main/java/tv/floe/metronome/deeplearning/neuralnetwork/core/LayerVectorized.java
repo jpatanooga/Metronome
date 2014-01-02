@@ -22,7 +22,7 @@ public class LayerVectorized {
 	public Matrix biasTerms;
 	public RandomGenerator rndNumGenerator;
 	public Matrix input;
-	private ActivationFunction sigmoidFunction = new Sigmoid();
+	//private ActivationFunction sigmoidFunction = new Sigmoid();
 	
 	/**
 	 * LayerVectorized Ctor
@@ -59,7 +59,8 @@ public class LayerVectorized {
 		}	
 		
 		// init the bias terms (column vector)
-		this.biasTerms = new DenseMatrix( this.neuronCount, 1 );
+		// what operations use this Matrix / column vector?
+		this.biasTerms = new DenseMatrix( 1, this.neuronCount );
 		this.biasTerms.assign(0.0);
 		
 		
@@ -74,7 +75,7 @@ public class LayerVectorized {
 	 * @param layerInput
 	 */
 	public void setInput(Matrix layerInput) {
-		
+		this.input = layerInput;
 	}
 	
 	public void setWeights(Matrix weights) {
@@ -103,14 +104,19 @@ public class LayerVectorized {
 	 */
 	public Matrix computeActivationOutput() {
 		
-		//Matrix mult = this.input.mmul(W);
+		//Matrix mult = this.input.mmul(W); // matrix-matrix multiplication
 		Matrix mult = this.input.times(connectionWeights);
 		//mult = mult.addRowVector(b);
 		
-		// TODO: figure out how the add row vector will work here
-		//MatrixUtils.addRowVector(mult, row)
+		//MatrixUtils.debug_print_matrix_stats(mult, "mult");
+		//MatrixUtils.debug_print_matrix_stats(this.biasTerms, "bias");
+		
+		
+		Matrix multPlusBias = MatrixUtils.addRowVector(mult, this.biasTerms.viewRow(0));
 		//return activationFunction.apply(mult);
-		return null;
+		
+		
+		return MatrixUtils.sigmoid(multPlusBias);
 	}
 	
 	
