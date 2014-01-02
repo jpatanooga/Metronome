@@ -31,47 +31,7 @@ public class TestRestrictedBoltzmannMachine {
 		
 	}
 	
-	/**
-	 * Tests functionality for the code based on equation (7) from Hinton
-	 * 
-	 */
-	@Test
-	public void testGenerateProbabilitiesForSettingHiddenStatesToOne() {
-		
-		//System.out.println("------ testGenerateProbabilitiesForSettingHiddenStatesToOne -------");
-		
-		Matrix input = buildTestInputDataset();
-		
-		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
-		
-		Pair<Matrix, Matrix> hiddenProbsAndSample = rbm.sampleHiddenGivenVisible( input );
 
-		Matrix hidden_sample_init = hiddenProbsAndSample.getSecond();
-		
-		//System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
-		
-//		Pair<Matrix, Matrix> visibleProbsAndSample = rbm.gibbsSamplingStepFromHidden(hidden_sample_init);
-/*
-		Matrix visible_sample = visibleProbsAndSample.getSecond();
-		
-		System.out.println( "visible_sample size: " + visible_sample.numRows() + " x " + visible_sample.numCols() );
-		*/
-		//System.out.println("-------------");
-		
-	}
-
-	/**
-	 * Tests functionality for the code based on equation (8) from Hinton
-	 * 
-	 */
-	@Test
-	public void testGenerateProbabilitiesForSettingVisibleStatesToOne() {
-		
-		
-		
-		
-	}
-	
 	
 	@Test 
 	public void testMatrixSizingOnInputTimes() {
@@ -162,32 +122,7 @@ public class TestRestrictedBoltzmannMachine {
 		
 	}
 	
-	@Test
-	public void testBaseCD() {
-		
-		Matrix input = buildTestInputDataset();
-		
-		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
-		
-		for (int x = 0; x < 5000; x++) {
-			rbm.contrastiveDivergence(1, input);
-		}
-		
-		Matrix v = new DenseMatrix(new double[][]
-				{
-					{1, 1, 0, 0, 0, 0},
-					{0, 0, 0, 1, 1, 0}
-				}
-		);	
 
-
-		Matrix recon = rbm.reconstructVisibleInput(v);
-		
-		MatrixUtils.debug_print(recon);
-		
-		
-		
-	}
 	
 	@Test
 	public void testCrossEntropyReconstruction() {
@@ -195,25 +130,18 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix input = buildTestInputDataset();
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
-
-		//MatrixUtils.debug_print(input);
 		
-		for (int x = 0; x < 5000; x++) {
+		double ce = 0;
+		
+		for (int x = 0; x < 1000; x++) {
 			rbm.contrastiveDivergence(1, input);
 
-			double ce = rbm.getReConstructionCrossEntropy();
+			ce = rbm.getReConstructionCrossEntropy();
 			
 			System.out.println("ce: " + ce);
 		
 		}
-		/*
-		Matrix v = new DenseMatrix(new double[][]
-				{
-					{1, 1, 0, 0, 0, 0},
-					{0, 0, 0, 1, 1, 0}
-				}
-		);	
-*/
+
 		Matrix v = new DenseMatrix(new double[][]
 				{
 					{1, 1, 1, 0, 0, 0},
@@ -222,8 +150,8 @@ public class TestRestrictedBoltzmannMachine {
 
 		Matrix recon = rbm.reconstructVisibleInput(v);
 		
-		//MatrixUtils.debug_print(recon);
-		
+		// "get the cross entropy somewhere near 0.3 and we're good"
+		assertEquals(0.4, ce, 0.2 );
 
 		
 		
