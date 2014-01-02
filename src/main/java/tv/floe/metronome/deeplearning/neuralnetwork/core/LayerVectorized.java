@@ -6,7 +6,6 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
-import org.jblas.DoubleMatrix;
 
 
 import tv.floe.metronome.classification.neuralnetworks.activation.ActivationFunction;
@@ -109,9 +108,9 @@ public class LayerVectorized {
 		//mult = mult.addRowVector(b);
 		
 		// TODO: figure out how the add row vector will work here
-		MatrixUtils.addRowVector(mult, row)
+		//MatrixUtils.addRowVector(mult, row)
 		//return activationFunction.apply(mult);
-		
+		return null;
 	}
 	
 	
