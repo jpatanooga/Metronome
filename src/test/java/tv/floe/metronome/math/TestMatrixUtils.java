@@ -288,15 +288,26 @@ public class TestMatrixUtils {
 		
 		
 		
-		MatrixUtils.neg(m0);
+		Matrix m1 = MatrixUtils.neg(m0);
 
-		assertEquals(-2.0, m0.get(0, 0), 0.0);
-		assertEquals(-3.0, m0.get(0, 1), 0.0);
-		assertEquals(-5.0, m0.get(0, 2), 0.0);
+		assertEquals(-2.0, m1.get(0, 0), 0.0);
+		assertEquals(-3.0, m1.get(0, 1), 0.0);
+		assertEquals(-5.0, m1.get(0, 2), 0.0);
 
-		assertEquals(-3.0, m0.get(1, 0), 0.0);
-		assertEquals(-4.0, m0.get(1, 1), 0.0);
-		assertEquals(-6.0, m0.get(1, 2), 0.0);
+		assertEquals(-3.0, m1.get(1, 0), 0.0);
+		assertEquals(-4.0, m1.get(1, 1), 0.0);
+		assertEquals(-6.0, m1.get(1, 2), 0.0);
+		
+		
+		
+		assertEquals(2.0, m0.get(0, 0), 0.0);
+		assertEquals(3.0, m0.get(0, 1), 0.0);
+		assertEquals(5.0, m0.get(0, 2), 0.0);
+
+		assertEquals(3.0, m0.get(1, 0), 0.0);
+		assertEquals(4.0, m0.get(1, 1), 0.0);
+		assertEquals(6.0, m0.get(1, 2), 0.0);
+		
 		
 		
 	}	
@@ -317,17 +328,27 @@ public class TestMatrixUtils {
 		
 		
 		
-		MatrixUtils.exp(m0);
+		Matrix mRet = MatrixUtils.exp(m0);
 
-		System.out.println("exp: " +  m0.get(0, 0));
+		//System.out.println("exp: " +  m0.get(0, 0));
 		
-		assertEquals(Math.exp(2.0), m0.get(0, 0), 0.0);
-		assertEquals(Math.exp(3.0), m0.get(0, 1), 0.0);
-		assertEquals(Math.exp(5.0), m0.get(0, 2), 0.0);
+		assertEquals(Math.exp(2.0), mRet.get(0, 0), 0.0);
+		assertEquals(Math.exp(3.0), mRet.get(0, 1), 0.0);
+		assertEquals(Math.exp(5.0), mRet.get(0, 2), 0.0);
 
-		assertEquals(Math.exp(3.0), m0.get(1, 0), 0.0);
-		assertEquals(Math.exp(4.0), m0.get(1, 1), 0.0);
-		assertEquals(Math.exp(6.0), m0.get(1, 2), 0.0);
+		assertEquals(Math.exp(3.0), mRet.get(1, 0), 0.0);
+		assertEquals(Math.exp(4.0), mRet.get(1, 1), 0.0);
+		assertEquals(Math.exp(6.0), mRet.get(1, 2), 0.0);
+
+		
+		assertEquals( 2.0, m0.get(0, 0), 0.0);
+		assertEquals( 3.0, m0.get(0, 1), 0.0);
+		assertEquals( 5.0, m0.get(0, 2), 0.0);
+
+		assertEquals( 3.0, m0.get(1, 0), 0.0);
+		assertEquals( 4.0, m0.get(1, 1), 0.0);
+		assertEquals( 6.0, m0.get(1, 2), 0.0);
+		
 		
 	}
 			

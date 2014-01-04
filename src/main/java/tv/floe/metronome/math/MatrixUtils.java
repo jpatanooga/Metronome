@@ -270,13 +270,13 @@ public class MatrixUtils {
 		ones.assign(1.0);
 
 
-		MatrixUtils.neg( m );
+		Matrix m1 = MatrixUtils.neg( m );
 
 
-		MatrixUtils.exp( m );
+		Matrix m2 = MatrixUtils.exp( m1 );
 
 
-		Matrix denom = ones.plus( m );
+		Matrix denom = ones.plus( m2 );
 		Matrix out = MatrixUtils.div(ones, denom);
 
 
@@ -290,8 +290,10 @@ public class MatrixUtils {
 	 * @param m - input matrix
 	 * @return
 	 */
-	public static void neg(Matrix m) {
+	public static Matrix neg(Matrix m) {
 
+		Matrix ret = m.like();
+		
 		for ( int r = 0; r < m.numRows(); r++ ) {
 			for ( int c = 0; c < m.numCols(); c++ ) {
 
@@ -299,11 +301,11 @@ public class MatrixUtils {
 				double cell = m.get(r, c);
 
 
-				m.set(r, c, -1.0 * cell  );
+				ret.set(r, c, -1.0 * cell  );
 			}
 		}
 
-		//return m;
+		return ret;
 
 	}
 
@@ -312,17 +314,19 @@ public class MatrixUtils {
 	 * 
 	 * @param m
 	 */
-	public static void exp(Matrix m) {
+	public static Matrix exp(Matrix m) {
 
+		Matrix ret = m.like();		
+		
 		for (int r = 0; r < m.numRows(); r++) {
 			for ( int c = 0; c < m.numCols(); c++ ) {
 
-				m.set(r, c, (double) Math.exp( m.get(r, c) ) );
+				ret.set(r, c, (double) Math.exp( m.get(r, c) ) );
 
 			}
 		}
 
-		//return m;
+		return ret;
 	}
 
 
