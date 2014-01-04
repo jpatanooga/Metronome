@@ -29,13 +29,10 @@ public class ContinuousRestrictedBoltzmannMachines extends RestrictedBoltzmannMa
 		Matrix visibleProb = this.propDown(hidden);
 
 		// en
-		Matrix visibleProbNegExp = visibleProb.clone();
-		MatrixUtils.neg(visibleProbNegExp);
-		MatrixUtils.exp(visibleProbNegExp);
+		Matrix visibleProbNegExp = MatrixUtils.exp( MatrixUtils.neg(visibleProb) );
 		
 		// ep
-		Matrix visibleProbExp = visibleProb.clone();
-		MatrixUtils.exp(visibleProbExp);
+		Matrix visibleProbExp = MatrixUtils.exp(visibleProb);
 
 		// DoubleMatrix v1Mean = oneDiv(oneMinus(en).sub(oneDiv(aH)));		
 		Matrix v1Mean = MatrixUtils.oneDiv(MatrixUtils.oneMinus(visibleProbNegExp).minus(MatrixUtils.oneDiv(visibleProb)));
@@ -46,10 +43,17 @@ public class ContinuousRestrictedBoltzmannMachines extends RestrictedBoltzmannMa
 				.mul(oneMinus(ep)))
 				).div(aH);		
 		*/
-		Matrix v1Sample = MatrixUtils.log( 
+		Matrix v1Sample = MatrixUtils.div(
+				MatrixUtils.log( 
 				MatrixUtils.oneMinus(
+						MatrixUtils.uniform(this.randNumGenerator, v1Mean.numRows(), v1Mean.numCols())
+								.times(MatrixUtils.oneMinus( visibleProbExp ))
+								)
+								), visibleProb);
 		
-		return null;
+		// return new Pair<DoubleMatrix,DoubleMatrix>(v1Mean,v1Sample);
+		
+		return new Pair<Matrix, Matrix>(v1Mean, v1Sample);
 	}
 	
 	
