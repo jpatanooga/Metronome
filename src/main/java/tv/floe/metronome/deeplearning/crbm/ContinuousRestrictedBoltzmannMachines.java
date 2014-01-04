@@ -1,14 +1,8 @@
 package tv.floe.metronome.deeplearning.crbm;
 
 
-
-import static com.ccc.deeplearning.util.MatrixUtil.log;
-import static com.ccc.deeplearning.util.MatrixUtil.oneMinus;
-import static com.ccc.deeplearning.util.MatrixUtil.uniform;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
-import org.jblas.DoubleMatrix;
 
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
@@ -52,7 +46,8 @@ public class ContinuousRestrictedBoltzmannMachines extends RestrictedBoltzmannMa
 				.mul(oneMinus(ep)))
 				).div(aH);		
 		*/
-		//MatrixUtils.lo
+		Matrix v1Sample = MatrixUtils.log( 
+				MatrixUtils.oneMinus(
 		
 		return null;
 	}

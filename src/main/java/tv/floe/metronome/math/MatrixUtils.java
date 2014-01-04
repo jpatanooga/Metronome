@@ -1,5 +1,6 @@
 package tv.floe.metronome.math;
 
+import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
@@ -192,21 +193,6 @@ public class MatrixUtils {
 
 	}
 	
-/*
- * 
-	public static DoubleMatrix oneDiv(DoubleMatrix ep) {
-		for(int i = 0; i < ep.rows; i++) {
-			for(int j = 0; j < ep.columns; j++) {
-				if(ep.get(i,j) == 0) {
-					ep.put(i,j,0.01);
-				}
-			}
-		}
-		return DoubleMatrix.ones(ep.rows, ep.columns).div(ep);
-	}
-
- * 	
- */
 	public static Matrix oneDiv(Matrix m) {
 		
 		Matrix ones = MatrixUtils.ones(m.numRows(), m.numCols());
@@ -365,6 +351,21 @@ public class MatrixUtils {
 
 		return ret;
 	}
+	
+	public static Matrix uniform(RandomGenerator rng, int rows, int cols) {
+	
+		UniformRealDistribution uDist = new UniformRealDistribution(rng,0,1);
+		Matrix U = new DenseMatrix(rows, cols);
+		for (int r = 0; r < rows; r++) {
+			for ( int c = 0; c < cols; c++ ) {
+				U.set(r, c, uDist.sample());
+			}
+		}
+		
+		return U;
+		
+	}
+	
 
 	/**
 	 * Generate a binomial distribution based on the given random number generator,

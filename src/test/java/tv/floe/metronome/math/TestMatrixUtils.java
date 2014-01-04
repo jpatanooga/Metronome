@@ -443,6 +443,18 @@ public class TestMatrixUtils {
 		
 	}	
 	
+	@Test
+	public void testUniform() {
+		
+		RandomGenerator g = new MersenneTwister(123);
+		
+		Matrix u = MatrixUtils.uniform(g, 3, 4);
+		
+		assertEquals(3, u.numRows());
+		assertEquals(4, u.numCols());
+		
+	}
+	
 	
 	
 }
