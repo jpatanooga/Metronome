@@ -6,6 +6,7 @@ import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.function.Functions;
 
+
 /**
  *  Collection of Matrix opertations
  * 
@@ -189,6 +190,44 @@ public class MatrixUtils {
 
 		return MatrixUtils.ones(m.numRows(), m.numCols()).minus(m);
 
+	}
+	
+/*
+ * 
+	public static DoubleMatrix oneDiv(DoubleMatrix ep) {
+		for(int i = 0; i < ep.rows; i++) {
+			for(int j = 0; j < ep.columns; j++) {
+				if(ep.get(i,j) == 0) {
+					ep.put(i,j,0.01);
+				}
+			}
+		}
+		return DoubleMatrix.ones(ep.rows, ep.columns).div(ep);
+	}
+
+ * 	
+ */
+	public static Matrix oneDiv(Matrix m) {
+		
+		Matrix ones = MatrixUtils.ones(m.numRows(), m.numCols());
+		Matrix ret = m.clone();
+
+		for ( int r = 0; r < m.numRows(); r++ ) {
+
+			for ( int c = 0; c < m.numCols(); c++ ) {
+
+//				ret.set(r,  c, Math.log(m.get(r, c)));
+				if ( m.get(r, c) == 0.0) {
+					ret.set( r, c, 0.01 );
+				}
+
+			}
+
+		}
+		
+		return MatrixUtils.div(ones, ret);
+		
+		
 	}
 
 

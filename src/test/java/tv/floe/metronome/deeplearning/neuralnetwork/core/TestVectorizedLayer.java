@@ -46,6 +46,11 @@ public class TestVectorizedLayer {
 		
 		Matrix input = buildTestInputDataset();
 		
+		Matrix c = input.clone();
+		
+		MatrixUtils.debug_print(c);
+		
+		
 		RandomGenerator rnd = new MersenneTwister(1234);
 		
 		LayerVectorized layer = new LayerVectorized(3, 2, rnd);

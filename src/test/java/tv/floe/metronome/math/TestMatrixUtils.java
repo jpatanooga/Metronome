@@ -208,6 +208,31 @@ public class TestMatrixUtils {
 	}
 	
 	@Test
+	public void testMatrixOneDiv() {
+		
+		Matrix m0 = new DenseMatrix(2, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+
+		m0.setQuick(1, 0, 3);
+		m0.setQuick(1, 1, 4);
+		m0.setQuick(1, 2, 6);
+		
+		Matrix oneMinus = MatrixUtils.oneDiv(m0);
+		
+		assertEquals( 0.5, oneMinus.get(0, 0), 0.0 );
+		assertEquals( 0.33333, oneMinus.get(0, 1), 0.001 );
+		assertEquals( 0.2, oneMinus.get(0, 2), 0.0 );
+		
+		assertEquals( 0.33333, oneMinus.get(1, 0), 0.001 );
+		assertEquals( 0.25, oneMinus.get(1, 1), 0.0 );
+		assertEquals( 1.0/6.0, oneMinus.get(1, 2), 0.0 );
+		
+		
+	}
+	
+	@Test
 	public void testMatrixDiv() {
 
 		
