@@ -10,6 +10,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 import tv.floe.metronome.classification.neuralnetworks.core.Layer;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -52,7 +53,7 @@ import tv.floe.metronome.types.Pair;
  *
  *
  */
-public class DeepBeliefNetwork {
+public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	
 	private MultiLayerPerceptronNetwork mlpn = null;
 	private ArrayList<RestrictedBoltzmannMachine> rbmLayers = null;

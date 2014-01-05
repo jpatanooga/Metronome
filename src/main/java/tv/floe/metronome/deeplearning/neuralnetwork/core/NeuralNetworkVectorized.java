@@ -12,13 +12,6 @@ import org.apache.mahout.math.Matrix;
  * This namespace is designed differently from the mainline NN OOP-implementation
  * 
  * 
- * TODO
- * - base api
- * - get XOR training on this version
- * - adagrad
- * - L2 prior
- * - momentum
- * 
  * @author josh
  *
  */

@@ -3,7 +3,7 @@ package tv.floe.metronome.deeplearning.neuralnetwork.core;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
-public class MultiLayerNetworkVectorized {
+public class BaseMultiLayerNeuralNetworkVectorized {
 
 	public int inputNeuronCount;
 	
@@ -29,7 +29,7 @@ public class MultiLayerNetworkVectorized {
 	 * CTOR
 	 * 
 	 */
-	public MultiLayerNetworkVectorized() {
+	public BaseMultiLayerNeuralNetworkVectorized() {
 		
 	}
 	
