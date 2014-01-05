@@ -8,6 +8,12 @@ import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
+/**
+ * 
+ * 
+ * @author josh
+ *
+ */
 public class ContinuousRestrictedBoltzmannMachines extends RestrictedBoltzmannMachine {
 
 	public ContinuousRestrictedBoltzmannMachines(int numVisibleNeurons,
@@ -50,9 +56,7 @@ public class ContinuousRestrictedBoltzmannMachines extends RestrictedBoltzmannMa
 								.times(MatrixUtils.oneMinus( visibleProbExp ))
 								)
 								), visibleProb);
-		
-		// return new Pair<DoubleMatrix,DoubleMatrix>(v1Mean,v1Sample);
-		
+				
 		return new Pair<Matrix, Matrix>(v1Mean, v1Sample);
 	}
 	

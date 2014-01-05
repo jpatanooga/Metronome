@@ -36,7 +36,7 @@ import tv.floe.metronome.types.Pair;
 public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
 	private double learningRate = 0.1d;
-	
+/*	
 	public int numberVisibleNeurons;
 	public int numberHiddenNeurons;
 	
@@ -44,10 +44,10 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
 	public Matrix hiddenBiasNeurons;
 	public Matrix visibleBiasNeurons;
+	*/
+	//public RandomGenerator randNumGenerator;
 	
-	public RandomGenerator randNumGenerator;
-	
-	public Matrix trainingDataset;
+	//public Matrix trainingDataset;
 
 	/**
 	 * CTOR

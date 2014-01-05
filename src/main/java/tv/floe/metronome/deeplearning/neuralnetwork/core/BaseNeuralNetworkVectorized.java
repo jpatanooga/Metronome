@@ -17,27 +17,20 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	public int numberVisibleNeurons;
 	public int numberHiddenNeurons;
 	
-	public Matrix connectionWeights;
-	
 	public Matrix hiddenBiasNeurons;
 	public Matrix visibleBiasNeurons;
 
+	public Matrix connectionWeights;
 	
 	//the hidden layer sizes at each layer
-	public int[] hiddenLayerSizes;
-	
-	
-	//public int outputNeuronCount;
+	public int[] hiddenLayerSizes;	
 	public int numberLayers;
-	
 	//the hidden layers
 	public LayerVectorized[] hiddenLayers;	
 	
-	public RandomGenerator randomGenerator;
+	public RandomGenerator randNumGenerator;
 	
-	// the input data ---- how is this going to be handled?
-	// how was it handled with the OOP-MLPN version?
-	Matrix input = null;	
+	public Matrix trainingDataset = null;	
 
 	public double sparsity = 0.01;
 	/* momentum for learning */
