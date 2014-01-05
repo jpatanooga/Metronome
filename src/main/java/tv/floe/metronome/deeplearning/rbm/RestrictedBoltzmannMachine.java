@@ -6,6 +6,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -32,7 +33,7 @@ import tv.floe.metronome.types.Pair;
  * @author josh
  *
  */
-public class RestrictedBoltzmannMachine {
+public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
 	private double learningRate = 0.1d;
 	
@@ -433,6 +434,7 @@ public class RestrictedBoltzmannMachine {
 //		return this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(propUpHiddenResult);
 		return this.propDown(propUpHiddenResult);
 	}
+
 	
 	
 	
