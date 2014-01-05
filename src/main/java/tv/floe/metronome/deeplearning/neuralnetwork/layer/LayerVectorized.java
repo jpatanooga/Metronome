@@ -1,4 +1,4 @@
-package tv.floe.metronome.deeplearning.neuralnetwork.core;
+package tv.floe.metronome.deeplearning.neuralnetwork.layer;
 
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;

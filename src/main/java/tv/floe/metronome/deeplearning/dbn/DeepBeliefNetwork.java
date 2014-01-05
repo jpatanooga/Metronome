@@ -8,8 +8,6 @@ import org.apache.mahout.math.Vector;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 
-import tv.floe.metronome.classification.neuralnetworks.core.Layer;
-import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
@@ -55,12 +53,6 @@ import tv.floe.metronome.types.Pair;
  */
 public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	
-	private MultiLayerPerceptronNetwork mlpn = null;
-	private ArrayList<RestrictedBoltzmannMachine> rbmLayers = null;
-
-	private int preTrainEpochCount = 1000;
-	private double learningRate = 0.1d;
-	
 	private RandomGenerator randomGen = new MersenneTwister(1234);
 	
 	public DeepBeliefNetwork() {
@@ -68,47 +60,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 	}
 	
-	/**
-	 * create RBM layers based on the layers in the MLPN
-	 * 
-	 * @param nn
-	 */
-	public DeepBeliefNetwork(MultiLayerPerceptronNetwork nn) {
-		
-		
-	}
-	
-	/**
-	 * train against a single record coming in w its expected output
-	 * 
-	 * - mainly intended to be used in a streaming/online fashion, 
-	 * 		such as with a file reader in a hadoop env
-	 * 
-	 * 
-	 */
-	public void trainOnSingleRecord(Vector actualOutVals, Vector trainingInstance) {
-		
-		// 1. pre-train
-		
-		
-		// 2. fine tune
-		
-	}
 
-	/**
-	 * train against the entire dataset cached into a matrix of rows
-	 * - also includes the matrix of the outputs for each input record
-	 * 
-	 * 
-	 */
-	public void trainOnEntireDataset(Matrix trainingRecordOutputs, Matrix trainingRecords) {
-		
-		// 1. pre-train
-		
-		
-		// 2. fine tune
-		
-	}
 	
 	
 	/**
@@ -124,50 +76,6 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 		Matrix layerTrainingInput = trainingRecords;
 		
-		// for each of the RBM layers..
-		for ( int x = 0; x < this.rbmLayers.size(); x++ ) {
-			
-						
-			RestrictedBoltzmannMachine rbmLayer = this.rbmLayers.get(x);
-			
-			// TODO: GET reference to the layer in the MLPN that matches the rbmLayer
-			// we'll update its weights based on what we learn from the rbmLayer
-			
-			Layer mlpnLayer = this.mlpn.getLayerByIndex(x);
-			
-			for ( int epoch = 0; epoch < this.preTrainEpochCount; epoch++ ) {
-				
-				// 1. run CDk on the current rbmLayer
-				rbmLayer.contrastiveDivergence( 1, layerTrainingInput );
-				
-				// 2. now update the current hidden layer for the MLPN with the 
-				// weights and bias terms from the rbmLayer
-				
-				Vector weights = rbmLayer.connectionWeights.viewRow(0);
-				
-				mlpnLayer.loadConnectingWeights( weights );
-				
-				// TODO: figure out the bias issue here w MLPN
-				
-				
-				
-			}
-			
-			// now swap the training input
-			// layerInput = sigmoidLayers[i-1].sample_h_given_v(layerInput);
-			
-			// so based off the training of the previous layer, we want to see what the output
-			// of this previous layer looks like via "sample_h_given_v( layerTrainingInput )"
-			
-			// basically we're saying "based on distributions of the data (and input from last layer) give us a 
-			// representation to use as input for the next layer"
-			
-			// TODO: thought: cna we not simply sample directly from the RBM itself?
-			// - what advantage is there loading into the hidden layer and then sampling from there?
-			
-			layerTrainingInput = this.sampleHiddenGivenVisible(layerTrainingInput, mlpnLayer);
-			
-		}
 		
 		
 	}
@@ -194,7 +102,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 * @param mlpnLayer
 	 * @return
 	 */
-	public Matrix sampleHiddenGivenVisible(Matrix visible, Layer mlpnLayer) {
+	public Matrix sampleHiddenGivenVisible(Matrix visible) {
 		
 		
 /*		
@@ -210,6 +118,25 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		Matrix ret = MatrixUtils.genBinomialDistribution( outputMatrix(visible), 1, this.randomGen);
 		//return ret;
 		return ret;
+	}
+
+
+	@Override
+	public void trainNetwork(Matrix input, Matrix labels, Object[] otherParams) {
+
+
+		int k = (Integer) otherParams[0];
+		double lr = (Double) otherParams[1];
+		int epochs = (Integer) otherParams[2];
+		pretrain(input,k,lr,epochs);
+		if(otherParams.length < 3)
+			finetune(labels, lr, epochs);
+		else {
+			double finetuneLr = otherParams.length > 3 ? (double) otherParams[3] : lr;
+			int finetuneEpochs = otherParams.length > 4 ? (int) otherParams[4] : epochs;
+			finetune(labels,finetuneLr,finetuneEpochs);
+		}
+		
 	}
 
 	
