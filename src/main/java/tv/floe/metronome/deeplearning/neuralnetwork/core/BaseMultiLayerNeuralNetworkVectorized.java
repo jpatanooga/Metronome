@@ -53,30 +53,35 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 		int input_size;
 
 		// construct multi-layer
-		for(int i = 0; i < this.nLayers; i++) {
-			if(i == 0) 
-				input_size = this.nIns;
-			else 
-				input_size = this.hiddenLayerSizes[i-1];
+		for (int i = 0; i < this.numberLayers; i++) {
+			
+			if (i == 0) { 
+				
+				//input_size = this.nIns;
+				input_size = this.inputNeuronCount;
 
-			if(i == 0) {
 				// construct sigmoid_layer
-				this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
+				//this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
+				this.hiddenLayers[ i ] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, this.randomGenerator, layer_input );
 
-			}
-			else {
-				layer_input = sigmoidLayers[i - 1].sample_h_given_v();
+			} else {
+				
+				input_size = this.hiddenLayerSizes[ i - 1 ];
+				//layer_input = sigmoidLayers[i - 1].sample_h_given_v();
+				layer_input = this.hiddenLayers[i - 1]
 				// construct sigmoid_layer
-				this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
-
+				//this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
+				this.hiddenLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, this.randomGenerator,layer_input);
+				
 			}
+
 
 			// construct dA_layer
 			this.layers[i] = createLayer(layer_input,input_size, this.hiddenLayerSizes[i], this.sigmoidLayers[i].W, this.sigmoidLayers[i].b, null, rng,i);
 		}
 
 		// layer for output using LogisticRegression
-		this.logLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.nLayers-1], this.nOuts);
+		this.logLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.nOuts);
 
 	}
 

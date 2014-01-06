@@ -116,4 +116,53 @@ public class HiddenLayer {
 		return MatrixUtils.sigmoid(multPlusBias);
 	}
 	
+	
+	
+	/**
+	 * Initialize the layer with the given input
+	 * and return the activation for this layer
+	 * given this input
+	 * @param input the input to use
+	 * @return
+	 */
+	public Matrix computeOutputActivation(Matrix input) {
+		this.input = input;
+		return computeActivationOutput();
+	}
+
+	/**
+	 * Sample this hidden layer given the input
+	 * and initialize this layer with the given input
+	 * @param input the input to sample
+	 * @return the activation for this layer
+	 * given the input
+	 */
+	public Matrix sampleHiddenGivenVisible_Data(Matrix input) {
+		this.input = input;
+		
+		// should we propDown here?
+		
+		//Matrix ret = MatrixUtils.getBinomial(computeActivationOutput(), 1, this.rndNumGenerator);
+		
+		//return ret;
+		return null;
+	}
+
+	/**
+	 * Sample this hidden layer given the last input.
+	 * @return the activation for this layer given 
+	 * the previous input
+	 */
+	public Matrix sampleHiddenGivenLastVisible() {
+		Matrix output = computeActivationOutput();
+		//reset the seed to ensure consistent generation of data
+		//DoubleMatrix ret = MatrixUtil.binomial(output, 1, rng);
+		//return ret;
+		return null;
+	}	
+	
+	
+	
+	
+	
 }
