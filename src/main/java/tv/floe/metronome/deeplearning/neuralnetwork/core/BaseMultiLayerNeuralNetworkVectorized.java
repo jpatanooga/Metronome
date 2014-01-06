@@ -68,7 +68,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				
 				input_size = this.hiddenLayerSizes[ i - 1 ];
 				//layer_input = sigmoidLayers[i - 1].sample_h_given_v();
-				layer_input = this.hiddenLayers[i - 1]
+				layer_input = this.hiddenLayers[i - 1].sampleHiddenGivenLastVisible();
 				// construct sigmoid_layer
 				//this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
 				this.hiddenLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, this.randomGenerator,layer_input);
@@ -77,7 +77,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 
 			// construct dA_layer
-			this.layers[i] = createLayer(layer_input,input_size, this.hiddenLayerSizes[i], this.sigmoidLayers[i].W, this.sigmoidLayers[i].b, null, rng,i);
+			this.layers[i] = createLayer(layer_input,input_size, this.hiddenLayerSizes[i], this.sigmoidLayers[i].W, this.sigmoidLayers[i].b, null, this.randomGenerator,i);
 		}
 
 		// layer for output using LogisticRegression
