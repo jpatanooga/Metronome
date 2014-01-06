@@ -3,7 +3,7 @@ package tv.floe.metronome.deeplearning.neuralnetwork.core;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
-import tv.floe.metronome.deeplearning.neuralnetwork.layer.LayerVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 
 /**
  * Based on the NN design by Adam Gibson
@@ -11,7 +11,6 @@ import tv.floe.metronome.deeplearning.neuralnetwork.layer.LayerVectorized;
  * @author josh
  *
  */
-//public abstract class BaseNeuralNetwork implements NeuralNetwork,Persistable {
 public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVectorized {
 
 	//public int inputNeuronCount;
@@ -28,7 +27,7 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	public int[] hiddenLayerSizes;	
 	public int numberLayers;
 	//the hidden layers
-	public LayerVectorized[] hiddenLayers;	
+	public HiddenLayer[] hiddenLayers;	
 	
 	public RandomGenerator randNumGenerator;
 	

@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
-import tv.floe.metronome.deeplearning.neuralnetwork.layer.LayerVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 
 public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
@@ -23,7 +23,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	public int numberLayers;
 	
 	//the hidden layers
-	public LayerVectorized[] hiddenLayers;	
+	public HiddenLayer[] hiddenLayers;	
 	
 	public RandomGenerator randomGenerator;
 	
