@@ -82,6 +82,11 @@ public class OutputLayer {
 		Matrix sum = eleMul.plus(labelsMulSigAct);
 		//Matrix columnSum = MatrixUtils.co
 		
+		// TODO: finish column sums
+		
+		// TODO: finish mean
+		
+		// TODO: negative output
 		
 		
 	}
