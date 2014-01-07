@@ -45,9 +45,9 @@ public class OutputLayer {
 
 	}
 	
-	public void merge(HiddenLayer l,int batchSize) {
-		connectionWeights.addi(l.connectionWeights.subi(connectionWeights).div(batchSize));
-		b.addi(l.b.subi(b).div(batchSize));
+	public void merge(HiddenLayer layer,int batchSize) {
+		connectionWeights.addi(layer.connectionWeights.subi(connectionWeights).div(batchSize));
+		b.addi(layer.b.subi(b).div(batchSize));
 	}
 
 	/**

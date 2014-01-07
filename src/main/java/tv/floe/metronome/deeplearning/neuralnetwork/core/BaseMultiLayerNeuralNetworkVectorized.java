@@ -8,22 +8,31 @@ import java.io.OutputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
+import org.jblas.DoubleMatrix;
+
+import com.ccc.deeplearning.nn.matrix.jblas.CDBN;
+import com.ccc.deeplearning.nn.matrix.jblas.CRBM;
+import com.ccc.deeplearning.nn.matrix.jblas.NeuralNetwork;
+import com.ccc.deeplearning.nn.matrix.jblas.RBM;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
+import tv.floe.metronome.deeplearning.neuralnetwork.layer.OutputLayer;
 
 public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 	public int inputNeuronCount;
+	public int outputNeuronCount;
 	
 	//the hidden layer sizes at each layer
 	public int[] hiddenLayerSizes;
-	
-	
-	public int outputNeuronCount;
 	public int numberLayers;
 	
 	//the hidden layers
 	public HiddenLayer[] hiddenLayers;	
+	public OutputLayer outputLayer;
+	
+	// DA / RBM Layers
+	public NeuralNetworkVectorized[] preTrainingLayers;
 	
 	public RandomGenerator randomGenerator;
 	
@@ -46,6 +55,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	/**
 	 * Base class for initializing the layers based on the input.
 	 * This is meant for capturing numbers such as input columns or other things.
+	 * 
+	 * This method sets up two types of layers:
+	 * - normal ML-NN layers
+	 * - RBM / DA layers
+	 * 
 	 * @param input the input matrix for training
 	 */
 	protected void initializeLayers(Matrix input) {
@@ -62,7 +76,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 				// construct sigmoid_layer
 				//this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
-				this.hiddenLayers[ i ] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, this.randomGenerator, layer_input );
+				this.hiddenLayers[ i ] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], this.randomGenerator );
+				this.hiddenLayers[ i ].setInput( layer_input );
 
 			} else {
 				
@@ -71,19 +86,28 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				layer_input = this.hiddenLayers[i - 1].sampleHiddenGivenLastVisible();
 				// construct sigmoid_layer
 				//this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
-				this.hiddenLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, this.randomGenerator,layer_input);
+				this.hiddenLayers[ i ] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], this.randomGenerator);
+				this.hiddenLayers[ i ].setInput( layer_input );
 				
 			}
 
 
 			// construct dA_layer
-			this.layers[i] = createLayer(layer_input,input_size, this.hiddenLayerSizes[i], this.sigmoidLayers[i].W, this.sigmoidLayers[i].b, null, this.randomGenerator,i);
+			this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
 		}
 
-		// layer for output using LogisticRegression
-		this.logLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.nOuts);
+		this.outputLayer = new OutputLayer(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
 	}
+	
+	/**
+	 * Creates a layer depending on the index.
+	 * The main reason this matters is for continuous variations such as the {@link CDBN}
+	 * where the first layer needs to be an {@link CRBM} for continuous inputs
+	 * 
+	 */
+	public abstract NeuralNetworkVectorized createPreTrainingLayer(Matrix input, int nVisible, int nHidden, Matrix weights, Matrix hbias, Matrix vBias, RandomGenerator rng, int index);
+	
 
 
 	public void finetune(double lr, int epochs) {
