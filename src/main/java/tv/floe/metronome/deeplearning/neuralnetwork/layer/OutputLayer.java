@@ -3,6 +3,8 @@ package tv.floe.metronome.deeplearning.neuralnetwork.layer;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.math.MatrixUtils;
+
 
 public class OutputLayer {
 
@@ -11,16 +13,17 @@ public class OutputLayer {
 	public int numInputNeurons;
 	public int numOutputNeurons;
 	
-	public Matrix input;
-	public Matrix labels;
+	public Matrix inputTrainingData = null;
+	public Matrix outputTrainingLabels = null;
+	
 	public Matrix connectionWeights;
 	public Matrix biasTerms;
 
 
 
 	public OutputLayer(Matrix input,Matrix labels, int nIn, int nOut) {
-		this.input = input;
-		this.labels = labels;
+		this.inputTrainingData = input;
+		this.outputTrainingLabels = labels;
 		this.numInputNeurons = nIn;
 		this.numOutputNeurons = nOut;
 		//connectionWeights = Matrix.zeros( nIn, nOut );
@@ -37,12 +40,12 @@ public class OutputLayer {
 
 
 	public void train(double learningRate) {
-		train( input, labels, learningRate );
+		train( inputTrainingData, outputTrainingLabels, learningRate );
 	}
 
 
 	public void train( Matrix x, double learningRate ) {
-		train( x, labels, learningRate );
+		train( x, outputTrainingLabels, learningRate );
 
 	}
 	
@@ -56,15 +59,31 @@ public class OutputLayer {
 	 * @return the negative log likelihood of the model
 	 */
 	public double negativeLogLikelihood() {
-		
-		Matrix sigAct = softmax(input.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
-		//Matrix sigAct = 
-		
+				
+		Matrix mult = this.inputTrainingData.times(connectionWeights);
+		Matrix multPlusBias = MatrixUtils.addRowVector(mult, this.biasTerms.viewRow(0));
+		Matrix sigAct = MatrixUtils.softmax(multPlusBias); 
+/*		
 		return - labels.mul(log(sigAct)).add(
 				oneMinus(labels).mul(
 						log(oneMinus(sigAct))
 				))
 				.columnSums().mean();
+				*/
+		
+		Matrix eleMul = MatrixUtils.elementWiseMultiplication( this.outputTrainingLabels, MatrixUtils.log(sigAct) );
+
+//		oneMinus(labels).mul(
+//				log(oneMinus(sigAct))
+		Matrix oneMinusLabels = MatrixUtils.oneMinus( this.outputTrainingLabels );
+		Matrix logOneMinusSigAct = MatrixUtils.log( MatrixUtils.oneMinus(sigAct) );
+		Matrix labelsMulSigAct = MatrixUtils.elementWiseMultiplication(oneMinusLabels, logOneMinusSigAct);
+
+		Matrix sum = eleMul.plus(labelsMulSigAct);
+		//Matrix columnSum = MatrixUtils.co
+		
+		
+		
 	}
 
 	/**
@@ -80,7 +99,7 @@ public class OutputLayer {
 		
 		//ensureValidOutcomeMatrix(y);
 
-		this.input = x;
+		this.inputTrainingData = x;
 		this.labels = y;
 
 		if(x.rows != y.rows)
