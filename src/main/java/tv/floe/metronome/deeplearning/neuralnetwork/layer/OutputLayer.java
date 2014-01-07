@@ -14,7 +14,7 @@ public class OutputLayer {
 	public Matrix input;
 	public Matrix labels;
 	public Matrix connectionWeights;
-	public Matrix b;
+	public Matrix biasTerms;
 
 
 
@@ -27,7 +27,8 @@ public class OutputLayer {
 		this.connectionWeights = new DenseMatrix( nIn, nOut );
 		this.connectionWeights.assign(0.0);
 		
-		b = Matrix.zeros(nOut);
+		this.biasTerms = new DenseMatrix(nOut, 1); //Matrix.zeros(nOut);
+		this.biasTerms.assign(0.0);
 	}
 
 	public OutputLayer(Matrix input, int nIn, int nOut) {
@@ -47,7 +48,7 @@ public class OutputLayer {
 	
 	public void merge(HiddenLayer layer,int batchSize) {
 		connectionWeights.addi(layer.connectionWeights.subi(connectionWeights).div(batchSize));
-		b.addi(layer.b.subi(b).div(batchSize));
+		biasTerms.addi(layer.biasTerms.subi(biasTerms).div(batchSize));
 	}
 
 	/**
@@ -55,7 +56,7 @@ public class OutputLayer {
 	 * @return the negative log likelihood of the model
 	 */
 	public double negativeLogLikelihood() {
-		Matrix sigAct = softmax(input.mmul(connectionWeights).addRoconnectionWeightsVector(b));
+		Matrix sigAct = softmax(input.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
 		
 		return - labels.mul(log(sigAct)).add(
 				oneMinus(labels).mul(
@@ -83,12 +84,12 @@ public class OutputLayer {
 		if(x.rows != y.rows)
 			throw new IllegalArgumentException("Can't train on the 2 given inputs and labels");
 
-		Matrix p_y_given_x = softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(b));
+		Matrix p_y_given_x = softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
 		
 		Matrix dy = y.sub(p_y_given_x);
 
 		connectionWeights = connectionWeights.add(x.transpose().mmul(dy).mul(lr));
-		b = b.add(dy.columnMeans().mul(lr));
+		biasTerms = biasTerms.add(dy.columnMeans().mul(lr));
 
 	}
 
@@ -105,7 +106,7 @@ public class OutputLayer {
 	 * @return a probability distribution for each roconnectionWeights
 	 */
 	public Matrix predict(Matrix x) {
-		return softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(b));
+		return softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
 	}	
 
 }

@@ -8,12 +8,6 @@ import java.io.OutputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
-import org.jblas.DoubleMatrix;
-
-import com.ccc.deeplearning.nn.matrix.jblas.CDBN;
-import com.ccc.deeplearning.nn.matrix.jblas.CRBM;
-import com.ccc.deeplearning.nn.matrix.jblas.NeuralNetwork;
-import com.ccc.deeplearning.nn.matrix.jblas.RBM;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.OutputLayer;
@@ -38,7 +32,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	
 	// the input data ---- how is this going to be handled?
 	// how was it handled with the OOP-MLPN version?
-	Matrix input = null;
+	Matrix inputTrainingData = null;
+	Matrix outputTrainingLabels = null;
 	
 	public double learningRateUpdate = 0.95;
 	
@@ -110,8 +105,9 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	
 
 
-	public void finetune(double lr, int epochs) {
-		finetune(this.labels,lr,epochs);
+	public void finetune(double learningRate, int epochs) {
+		
+		finetune( this.outputTrainingLabels, learningRate, epochs );
 
 	}
 
@@ -121,9 +117,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	 * @param lr the learning rate during training
 	 * @param epochs the number of times to iterate
 	 */
-	public void finetune(Matrix labels,double lr, int epochs) {
-		optimizer = new MultiLayerNetworkOptimizer(this,lr);
-		optimizer.optimize(labels, lr,epochs);
+	public void finetune(Matrix outputLabels, double learningRate, int epochs) {
+		
+	//	optimizer = new MultiLayerNetworkOptimizer(this,learningRate);
+	//	optimizer.optimize( outputLabels, learningRate, epochs );
+		
 	}
 
 
@@ -136,14 +134,19 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	 * 
 	 * This is typically of the form:
 	 * [0.5, 0.5] or some other probability distribution summing to one
+	 * 
+	 * 
 	 */
 	public Matrix predict(Matrix x) {
+		
 		Matrix input = x;
-		for(int i = 0; i < nLayers; i++) {
-			HiddenLayer layer = sigmoidLayers[i];
-			input = layer.outputMatrix(input);
+		
+		for(int i = 0; i < this.numberLayers; i++) {
+			HiddenLayer layer = this.hiddenLayers[i];
+			input = layer.computeOutputActivation(input);
 		}
-		return logLayer.predict(input);
+		
+		return this.outputLayer.predict(input);
 	}
 
 
@@ -164,11 +167,10 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 
 	/**
-	 * Negative log likelihood of the model
 	 * @return the negative log likelihood of the model
 	 */
 	public double negativeLogLikelihood() {
-		return logLayer.negativeLogLikelihood();
+		return this.outputLayer.negativeLogLikelihood();
 	}
 	
 	/**
