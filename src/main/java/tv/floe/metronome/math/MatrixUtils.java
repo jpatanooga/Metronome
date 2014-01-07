@@ -302,16 +302,8 @@ public class MatrixUtils {
 	 */
 	public static Matrix softmax(Matrix m) {
 		
-		 //double max = input.max();
 		 double max = max(m);
          double sum = 0.0;
-         
-/*         
-         for(int i = 0; i < input.length; i++) {
-                 input.put(i,Math.exp(input.get(i) - max));                
-                
-         }
- */
          
  		Matrix ret = m.like();
 
@@ -325,15 +317,9 @@ public class MatrixUtils {
 
  		}
          
-         
-         //sum += input.sum();
          sum = sum(ret);
-/*         
-         for(int i = 0; i< input.length; i++) {
-        	 input.put(i,input.get(i) / sum);
-         }
-  */
-  		for ( int r = 0; r < m.numRows(); r++ ) {
+
+        for ( int r = 0; r < m.numRows(); r++ ) {
 
  			for ( int c = 0; c < m.numCols(); c++ ) {
 

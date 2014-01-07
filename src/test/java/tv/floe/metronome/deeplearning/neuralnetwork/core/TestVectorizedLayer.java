@@ -27,7 +27,7 @@ public class TestVectorizedLayer {
 		
 	}	
 	
-	@Test
+/*	@Test
 	public void testBuildLayer( ) {
 		
 		RandomGenerator rnd = new MersenneTwister(1234);
@@ -39,9 +39,9 @@ public class TestVectorizedLayer {
 		
 		
 	}
+	*/
 	
-	
-	@Test
+/*	@Test
 	public void testComputeActivations() {
 		
 		Matrix input = buildTestInputDataset();
@@ -72,5 +72,6 @@ public class TestVectorizedLayer {
 		
 		
 	}
+	*/
 
 }

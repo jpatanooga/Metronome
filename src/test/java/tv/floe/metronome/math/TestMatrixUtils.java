@@ -371,6 +371,34 @@ public class TestMatrixUtils {
 		
 	}
 
+	
+	@Test
+	public void testMatrixSoftmax() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(1, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+		
+		Matrix sig = MatrixUtils.softmax(m0);
+		
+		double max = 5;
+		double val_0_exp_minus_max = Math.exp(2 - max);
+		double val_1_exp_minus_max = Math.exp(3 - max);
+		double val_2_exp_minus_max = Math.exp(5 - max);
+		
+		double sum = val_0_exp_minus_max + val_1_exp_minus_max + val_2_exp_minus_max;
+		
+		
+		assertEquals( val_0_exp_minus_max / sum, sig.get(0,0), 0.0 );
+		assertEquals( val_1_exp_minus_max / sum, sig.get(0,1), 0.0 );
+		assertEquals( val_2_exp_minus_max / sum, sig.get(0,2), 0.0 );
+
+		
+	}	
+	
 	@Test
 	public void testMatrixLog() {
 
