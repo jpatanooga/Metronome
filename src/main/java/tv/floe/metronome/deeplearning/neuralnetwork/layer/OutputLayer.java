@@ -46,17 +46,19 @@ public class OutputLayer {
 
 	}
 	
-	public void merge(HiddenLayer layer,int batchSize) {
+/*	public void merge(HiddenLayer layer,int batchSize) {
 		connectionWeights.addi(layer.connectionWeights.subi(connectionWeights).div(batchSize));
 		biasTerms.addi(layer.biasTerms.subi(biasTerms).div(batchSize));
 	}
-
+*/
 	/**
 	 * Objective function:  minimize negative log likelihood
 	 * @return the negative log likelihood of the model
 	 */
 	public double negativeLogLikelihood() {
+		
 		Matrix sigAct = softmax(input.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
+		//Matrix sigAct = 
 		
 		return - labels.mul(log(sigAct)).add(
 				oneMinus(labels).mul(

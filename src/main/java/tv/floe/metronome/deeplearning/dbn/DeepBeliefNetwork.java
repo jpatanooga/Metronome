@@ -9,6 +9,7 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -124,7 +125,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	@Override
 	public void trainNetwork(Matrix input, Matrix labels, Object[] otherParams) {
 
-
+/*
 		int k = (Integer) otherParams[0];
 		double lr = (Double) otherParams[1];
 		int epochs = (Integer) otherParams[2];
@@ -136,7 +137,18 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			int finetuneEpochs = otherParams.length > 4 ? (int) otherParams[4] : epochs;
 			finetune(labels,finetuneLr,finetuneEpochs);
 		}
-		
+*/		
+	}
+
+
+
+
+	@Override
+	public NeuralNetworkVectorized createPreTrainingLayer(Matrix input,
+			int nVisible, int nHidden, Matrix weights, Matrix hbias,
+			Matrix vBias, RandomGenerator rng, int index) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

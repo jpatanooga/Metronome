@@ -269,6 +269,85 @@ public class MatrixUtils {
 
 		return out;
 	}
+	
+	/**
+	 * Finds the max value in the input matrix
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static double max(Matrix m) {
+		
+		double max_tmp = m.viewRow(0).maxValue();
+		
+		for ( int r = 0; r < m.rowSize(); r++ ) {
+			
+			if (m.viewRow(r).maxValue() > max_tmp ) {
+				max_tmp = m.viewRow(r).maxValue();
+			}
+			
+		}
+		
+		return max_tmp;
+		
+	}
+	
+	
+	
+	/**
+	 * Returns a new matrix with softmax function applied to input Matrix
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static Matrix softmax(Matrix m) {
+		
+		 //double max = input.max();
+		 double max = max(m);
+         double sum = 0.0;
+         
+/*         
+         for(int i = 0; i < input.length; i++) {
+                 input.put(i,Math.exp(input.get(i) - max));                
+                
+         }
+ */
+         
+ 		Matrix ret = m.like();
+
+ 		for ( int r = 0; r < m.numRows(); r++ ) {
+
+ 			for ( int c = 0; c < m.numCols(); c++ ) {
+
+ 				ret.set(r,  c, Math.exp( m.get(r, c) - max ));
+
+ 			}
+
+ 		}
+         
+         
+         //sum += input.sum();
+         sum = sum(ret);
+/*         
+         for(int i = 0; i< input.length; i++) {
+        	 input.put(i,input.get(i) / sum);
+         }
+  */
+  		for ( int r = 0; r < m.numRows(); r++ ) {
+
+ 			for ( int c = 0; c < m.numCols(); c++ ) {
+
+ 				ret.set(r,  c, ret.get(r, c) / sum );
+
+ 			}
+
+ 		}
+         
+         
+         return ret;		
+		
+	}
+	
 
 	/**
 	 * Negate each elemente in the Matrix
