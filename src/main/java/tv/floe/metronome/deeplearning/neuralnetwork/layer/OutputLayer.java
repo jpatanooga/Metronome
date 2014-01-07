@@ -63,32 +63,19 @@ public class OutputLayer {
 		Matrix mult = this.inputTrainingData.times(connectionWeights);
 		Matrix multPlusBias = MatrixUtils.addRowVector(mult, this.biasTerms.viewRow(0));
 		Matrix sigAct = MatrixUtils.softmax(multPlusBias); 
-/*		
-		return - labels.mul(log(sigAct)).add(
-				oneMinus(labels).mul(
-						log(oneMinus(sigAct))
-				))
-				.columnSums().mean();
-				*/
 		
 		Matrix eleMul = MatrixUtils.elementWiseMultiplication( this.outputTrainingLabels, MatrixUtils.log(sigAct) );
 
-//		oneMinus(labels).mul(
-//				log(oneMinus(sigAct))
 		Matrix oneMinusLabels = MatrixUtils.oneMinus( this.outputTrainingLabels );
 		Matrix logOneMinusSigAct = MatrixUtils.log( MatrixUtils.oneMinus(sigAct) );
 		Matrix labelsMulSigAct = MatrixUtils.elementWiseMultiplication(oneMinusLabels, logOneMinusSigAct);
 
 		Matrix sum = eleMul.plus(labelsMulSigAct);
-		//Matrix columnSum = MatrixUtils.co
 		
-		// TODO: finish column sums
 		Matrix colSumsMatrix = MatrixUtils.columnSums(sum);
 		
-		// TODO: finish mean
 		double matrixMean = MatrixUtils.mean(colSumsMatrix);
 		
-		// TODO: negative output
 		return -matrixMean;
 		
 	}
