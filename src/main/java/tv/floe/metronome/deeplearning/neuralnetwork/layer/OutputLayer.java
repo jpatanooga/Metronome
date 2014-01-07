@@ -83,11 +83,13 @@ public class OutputLayer {
 		//Matrix columnSum = MatrixUtils.co
 		
 		// TODO: finish column sums
+		Matrix colSumsMatrix = MatrixUtils.columnSums(sum);
 		
 		// TODO: finish mean
+		double matrixMean = MatrixUtils.mean(colSumsMatrix);
 		
 		// TODO: negative output
-		
+		return -matrixMean;
 		
 	}
 
