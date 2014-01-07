@@ -16,6 +16,37 @@ import org.apache.mahout.math.function.Functions;
  */
 public class MatrixUtils {
 
+	
+	/**
+	 * For each column, sum all the values in the column
+	 * 
+	 * input: N rows x M column matrix
+	 * 
+	 * output: 1 row, M columns
+	 * 
+	 */	
+	public static Matrix columnSums(Matrix m) {
+
+		//m.aggregateRows(arg0)
+		Matrix ret_col_sums = new DenseMatrix(1, m.numCols());
+		//int row_count = m.numRows();
+
+		ret_col_sums.assign(0.0);
+
+		// sum into 1 row matrix
+		for ( int r = 0; r < m.numRows(); r++ ) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				double val = ret_col_sums.get(0, c); 
+				ret_col_sums.set(0, c, m.get(r, c) + val );
+			}
+		}
+
+
+		return ret_col_sums;
+
+
+	}	
+	
 
 	/**
 	 * For each column, sum all the values in the column and average them together

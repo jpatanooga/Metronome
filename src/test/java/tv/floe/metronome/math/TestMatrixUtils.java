@@ -146,6 +146,38 @@ public class TestMatrixUtils {
 		
 	}
 	
+	
+	@Test
+	public void testMatrixColumnSums() {
+		
+		//System.out.println("------- testRowSums ------- ");
+		
+		Matrix m = new DenseMatrix(2, 3);
+		
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+		m.setQuick(0, 2, 3);
+
+		m.setQuick(1, 0, 5);
+		m.setQuick(1, 1, 10);
+		m.setQuick(1, 2, 0);
+		
+		
+		//Matrix row_sums_matrix = MatrixUtils.rowSums(m);
+		Matrix colSums = MatrixUtils.columnSums(m);
+		
+		assertEquals(m.numCols(), colSums.numCols() );
+		assertEquals(1, colSums.numRows() );
+		
+		assertEquals( 11.0, colSums.get(0, 0), 0.0);
+		assertEquals( 19.0, colSums.get(0, 1), 0.0);
+		assertEquals( 3.0, colSums.get(0, 2), 0.0);
+		
+		
+	}	
+	
+	
+	
 	@Test
 	public void testMatrixOnes() {
 		
