@@ -91,7 +91,6 @@ public class OutputLayer {
 	 */
 	public void train(Matrix input, Matrix labels, double lr) {
 		
-		//ensureValidOutcomeMatrix(y);
 		MatrixUtils.ensureValidOutcomeMatrix(labels);
 
 		this.inputTrainingData = input;
@@ -108,12 +107,11 @@ public class OutputLayer {
 		//Matrix dy = y.sub(p_y_given_x);
 		Matrix dy = labels.minus(p_LabelsGivenInput);
 
-		//connectionWeights = connectionWeights.add(x.transpose().mmul(dy).mul(lr));
-		
+		//connectionWeights = connectionWeights.add(x.transpose().mmul(dy).mul(lr));		
 		Matrix baseConnectionUpdate = input.transpose().times(dy);
 		this.connectionWeights = this.connectionWeights.plus( baseConnectionUpdate.times(lr) );
-		//biasTerms = biasTerms.add(dy.columnMeans().mul(lr));
 		
+		//biasTerms = biasTerms.add(dy.columnMeans().mul(lr));
 		this.biasTerms = this.biasTerms.plus( MatrixUtils.columnMeans(dy).times(lr) );
 
 	}
@@ -130,8 +128,14 @@ public class OutputLayer {
 	 * Each roconnectionWeights connectionWeightsill be the likelihood of a label given that example
 	 * @return a probability distribution for each roconnectionWeights
 	 */
-	public Matrix predict(Matrix x) {
-		return softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
+	public Matrix predict(Matrix input) {
+		
+		//return softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
+		Matrix prediction = input.times(this.connectionWeights);
+		prediction = MatrixUtils.softmax(MatrixUtils.addRowVector(prediction, this.biasTerms.viewRow(0)));
+		
+		return prediction;
+		
 	}	
 
 }
