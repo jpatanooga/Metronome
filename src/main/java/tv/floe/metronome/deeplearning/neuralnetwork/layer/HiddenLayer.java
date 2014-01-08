@@ -139,13 +139,10 @@ public class HiddenLayer {
 	 */
 	public Matrix sampleHiddenGivenVisible_Data(Matrix input) {
 		this.input = input;
+				
+		Matrix ret = MatrixUtils.genBinomialDistribution(computeActivationOutput(), 1, this.rndNumGenerator);
 		
-		// should we propDown here?
-		
-		//Matrix ret = MatrixUtils.getBinomial(computeActivationOutput(), 1, this.rndNumGenerator);
-		
-		//return ret;
-		return null;
+		return ret;
 	}
 
 	/**
