@@ -154,8 +154,9 @@ public class HiddenLayer {
 		Matrix output = computeActivationOutput();
 		//reset the seed to ensure consistent generation of data
 		//DoubleMatrix ret = MatrixUtil.binomial(output, 1, rng);
-		//return ret;
-		return null;
+		Matrix ret = MatrixUtils.genBinomialDistribution(output, 1, this.rndNumGenerator);
+
+		return ret;
 	}	
 	
 	
