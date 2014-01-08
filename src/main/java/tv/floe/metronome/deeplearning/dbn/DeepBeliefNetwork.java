@@ -29,13 +29,14 @@ import tv.floe.metronome.types.Pair;
  *  2. as each RBM is trained
  *  - its weights and bias are transferred into the weights/bias of the MLPN
  * 
+ * Deep Belief Network. This is a MultiLayer Perceptron Model
+ * using Restricted Boltzmann Machines.
+ *  See Hinton's practical guide to RBMs for great examples on
+ *  how to train and tune parameters.
+ * 
+ * 
  * @author josh
  * 
- * TODO
- * 
- * -	decide on a strategy for working with input samples
- * 		-	as we going to look at all the samples in memory at once for the MLPN?
- * 		-	how do we balance out the implementation styles?
  *
  *
  * TODO:
@@ -47,8 +48,6 @@ import tv.floe.metronome.types.Pair;
  * 		to make this as one continuous job
  * 		-	need a way to save layers in progress to view in viewer
  *
- * TODO:
- * - need to figure out how the greedy-per-layer SGD pass works in this case
  *
  *
  */
@@ -147,6 +146,9 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	public NeuralNetworkVectorized createPreTrainingLayer(Matrix input,
 			int nVisible, int nHidden, Matrix weights, Matrix hbias,
 			Matrix vBias, RandomGenerator rng, int index) {
+		
+		
+		
 		// TODO Auto-generated method stub
 		return null;
 	}
