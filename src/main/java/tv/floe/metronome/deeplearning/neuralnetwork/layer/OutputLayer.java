@@ -89,22 +89,32 @@ public class OutputLayer {
 	 * @param y the labels to train on
 	 * @param lr the learning rate
 	 */
-	public void train(Matrix input, Matrix y, double lr) {
+	public void train(Matrix input, Matrix labels, double lr) {
 		
-		ensureValidOutcomeMatrix(y);
+		//ensureValidOutcomeMatrix(y);
+		MatrixUtils.ensureValidOutcomeMatrix(labels);
 
 		this.inputTrainingData = input;
-		this.outputTrainingLabels = y;
+		this.outputTrainingLabels = labels;
 
-		if(x.rows != y.rows)
+		if (input.numRows() != labels.numRows()) {
 			throw new IllegalArgumentException("Can't train on the 2 given inputs and labels");
+		}
 
-		Matrix p_y_given_x = softmax(input.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
+		//Matrix p_y_given_x = softmax(input.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
+		Matrix p_LabelsGivenInput = input.times(this.connectionWeights);
+		p_LabelsGivenInput = MatrixUtils.softmax(MatrixUtils.addRowVector(p_LabelsGivenInput, this.biasTerms.viewRow(0)));
 		
-		Matrix dy = y.sub(p_y_given_x);
+		//Matrix dy = y.sub(p_y_given_x);
+		Matrix dy = labels.minus(p_LabelsGivenInput);
 
-		connectionWeights = connectionWeights.add(x.transpose().mmul(dy).mul(lr));
-		biasTerms = biasTerms.add(dy.columnMeans().mul(lr));
+		//connectionWeights = connectionWeights.add(x.transpose().mmul(dy).mul(lr));
+		
+		Matrix baseConnectionUpdate = input.transpose().times(dy);
+		this.connectionWeights = this.connectionWeights.plus( baseConnectionUpdate.times(lr) );
+		//biasTerms = biasTerms.add(dy.columnMeans().mul(lr));
+		
+		this.biasTerms = this.biasTerms.plus( MatrixUtils.columnMeans(dy).times(lr) );
 
 	}
 
