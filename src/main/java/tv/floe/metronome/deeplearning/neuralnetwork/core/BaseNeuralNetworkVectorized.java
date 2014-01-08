@@ -42,6 +42,10 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	/* L2 Regularization constant */
 	public double l2 = 0.1;
 	
+	// default CTOR
+	public BaseNeuralNetworkVectorized() {
+		
+	}
 	
 	public BaseNeuralNetworkVectorized(int nVisible, int nHidden, Matrix weights, Matrix hBias, Matrix vBias, RandomGenerator rng) {
 		this.numberVisibleNeurons = nVisible;
@@ -110,6 +114,12 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			this.visibleBiasNeurons = vBias;
 		}
 	}	
+	
+	public BaseNeuralNetworkVectorized(Matrix input, int nVisible, int nHidden, Matrix weights, Matrix hBias, Matrix vBias, RandomGenerator rng) {
+
+		this(nVisible, nHidden, weights, hBias, vBias, rng);
+		this.trainingDataset = input;
+	}
 	
 	
 	@Override

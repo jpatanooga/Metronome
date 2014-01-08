@@ -147,10 +147,10 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			int nVisible, int nHidden, Matrix weights, Matrix hbias,
 			Matrix vBias, RandomGenerator rng, int index) {
 		
+		//		return new RBM(input, nVisible, nHidden, W, hBias, vBias, rng);
+
+		return new RestrictedBoltzmannMachine( input, nVisible, nHidden, weights, hbias, vBias, rng );
 		
-		
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	
