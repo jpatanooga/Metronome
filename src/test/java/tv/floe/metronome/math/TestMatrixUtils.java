@@ -176,6 +176,39 @@ public class TestMatrixUtils {
 		
 	}	
 	
+	@Test
+	public void testEnsureValidOutcomeMatrix() {
+		
+		boolean caughtBad = false;
+		
+		Matrix bad = new DenseMatrix(2, 3);
+		bad.assign(0.0);
+		
+		try {
+			MatrixUtils.ensureValidOutcomeMatrix(bad);
+		} catch (Exception e) {
+			caughtBad = true;
+		}
+		
+		assertEquals( true, caughtBad );
+		
+		Matrix good = new DenseMatrix(2, 3);
+		good.assign(0.0);
+		good.set(0, 1, 2.0);
+		
+		boolean caughtGood = false;
+		
+		try {
+			MatrixUtils.ensureValidOutcomeMatrix(good);
+		} catch (Exception e) {
+			caughtGood = true;
+		}
+		
+		assertEquals(false, caughtGood);
+		
+		
+	}
+	
 	
 	
 	@Test

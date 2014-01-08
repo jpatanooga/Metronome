@@ -8,6 +8,7 @@ import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.function.Functions;
 
 
+
 /**
  *  Collection of Matrix opertations
  * 
@@ -27,9 +28,7 @@ public class MatrixUtils {
 	 */	
 	public static Matrix columnSums(Matrix m) {
 
-		//m.aggregateRows(arg0)
 		Matrix ret_col_sums = new DenseMatrix(1, m.numCols());
-		//int row_count = m.numRows();
 
 		ret_col_sums.assign(0.0);
 
@@ -596,6 +595,30 @@ public class MatrixUtils {
 		return ret;
 
 	}
+	
+	public static void ensureValidOutcomeMatrix(Matrix m) {
+
+		boolean found = false;
+		
+		for (int r = 0; r < m.numRows(); r++) {
+			
+			for ( int c = 0; c < m.numCols(); c++ ) {
+
+				 if ( m.get(r,  c) > 0 ) {
+					 found = true;
+					 break;
+				 }
+
+			}
+		}
+		
+		if (!found) {
+			throw new IllegalStateException("Found a matrix without an outcome");
+		}
+		
+	}
+	
+	
 
 	public static void debug_print(Matrix m) {
 

@@ -89,17 +89,17 @@ public class OutputLayer {
 	 * @param y the labels to train on
 	 * @param lr the learning rate
 	 */
-	public void train(Matrix x, Matrix y, double lr) {
+	public void train(Matrix input, Matrix y, double lr) {
 		
-		//ensureValidOutcomeMatrix(y);
+		ensureValidOutcomeMatrix(y);
 
-		this.inputTrainingData = x;
-		this.labels = y;
+		this.inputTrainingData = input;
+		this.outputTrainingLabels = y;
 
 		if(x.rows != y.rows)
 			throw new IllegalArgumentException("Can't train on the 2 given inputs and labels");
 
-		Matrix p_y_given_x = softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
+		Matrix p_y_given_x = softmax(input.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
 		
 		Matrix dy = y.sub(p_y_given_x);
 
