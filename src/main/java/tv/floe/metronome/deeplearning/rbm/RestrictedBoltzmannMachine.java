@@ -432,6 +432,45 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	}
 
 	
+	@Override
+	public void trainTillConvergence(Matrix input, double learningRate, Object[] params) {
+		int k = (int) params[0];
+		trainTillConvergence(learningRate, k, input);
+	}
+	
+	/**
+	 * Trains till global minimum is found.
+	 * 
+	 * @param learningRate
+	 * @param k
+	 * @param input
+	 */
+	public void trainTillConvergence(double learningRate, int k, Matrix input) {
+		if (input != null) {
+			this.trainingDataset = input;
+		}
+		
+		//optimizer = new RBMOptimizer(this, learningRate, new Object[]{k});
+		//optimizer.train(input);
+	}
+	
+
+	@Override
+	public double lossFunction(Object[] params) {
+		return getReConstructionCrossEntropy();
+	}
+
+	@Override
+	public void train(Matrix input,double lr, Object[] params) {
+		//int k = (int) params[0];
+		contrastiveDivergence(lr, k, input);
+	}
+
+	@Override
+	public Matrix reconstruct(Matrix x) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	

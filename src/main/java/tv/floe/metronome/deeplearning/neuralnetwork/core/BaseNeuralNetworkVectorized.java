@@ -247,4 +247,35 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		// TODO Auto-generated method stub
 		
 	}	
+	
+	/**
+	 * All neural networks are based on this idea of 
+	 * minimizing reconstruction error.
+	 * Both RBMs and Denoising AutoEncoders
+	 * have a component for reconstructing, ala different implementations.
+	 *  
+	 * @param x the input to reconstruct
+	 * @return the reconstructed input
+	 */
+	public abstract Matrix reconstruct(Matrix x);
+	
+	/**
+	 * The loss function (cross entropy, reconstruction error,...)
+	 * @return the loss function
+	 */
+	public abstract double lossFunction(Object[] params);
+
+	public double lossFunction() {
+		return lossFunction(null);
+	}
+	
+	/**
+	 * Train one iteration of the network
+	 * @param input the input to train on
+	 * @param lr the learning rate to train at
+	 * @param params the extra params (k, corruption level,...)
+	 */
+	public abstract void train(Matrix input, double learningRate, Object[] params);
+		
+	
 }
