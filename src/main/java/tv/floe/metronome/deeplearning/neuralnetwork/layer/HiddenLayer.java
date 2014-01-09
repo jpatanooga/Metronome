@@ -87,13 +87,6 @@ public class HiddenLayer {
 		return null;
 	}
 	
-	public Vector getConnectionsForNeuron( int neuronIndex ) {
-		
-		Vector connections = new DenseVector();
-		
-		return null;
-		
-	}
 	
 	/**
 	 * Trigger an activation with the last specified input
@@ -101,19 +94,10 @@ public class HiddenLayer {
 	 */
 	public Matrix computeActivationOutput() {
 		
-		//Matrix mult = this.input.mmul(W); // matrix-matrix multiplication
 		Matrix mult = this.input.times(connectionWeights);
-		//mult = mult.addRowVector(b);
-		
-		//MatrixUtils.debug_print_matrix_stats(mult, "mult");
-		//MatrixUtils.debug_print_matrix_stats(this.biasTerms, "bias");
-		
-		
 		Matrix multPlusBias = MatrixUtils.addRowVector(mult, this.biasTerms.viewRow(0));
-		//return activationFunction.apply(mult);
-		
-		
 		return MatrixUtils.sigmoid(multPlusBias);
+
 	}
 	
 	
