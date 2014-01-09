@@ -1,19 +1,14 @@
 package tv.floe.metronome.deeplearning.dbn;
 
-import java.util.ArrayList;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.mahout.math.Matrix;
-import org.apache.mahout.math.Vector;
-import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
-import tv.floe.metronome.math.MatrixUtils;
-import tv.floe.metronome.types.Pair;
 
 /**
  * Base draft of a Deep Belief Network based on RBMs
@@ -68,9 +63,6 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 * This is where we work through each RBM layer, learning an unsupervised 
 	 * representation of the data
 	 * 
-	 * TODO: make sure layers match and the input layer isnt messing up counts
-	 * 
-	 * TODO: 
 	 * 
 	 */
 	public void preTrain(Matrix trainingRecords,int k,double learningRate,int epochs) {
@@ -109,7 +101,6 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	@Override
 	public void trainNetwork(Matrix input, Matrix labels, Object[] otherParams) {
 
-
 		int k = (Integer) otherParams[0];
 		double learningRate = (Double) otherParams[1];
 		int epochs = (Integer) otherParams[2];
@@ -117,11 +108,15 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		preTrain(input, k, learningRate, epochs);
 		
 		if (otherParams.length < 3) {
-			finetune(labels, lr, epochs);
+			
+			finetune(labels, learningRate, epochs);
+			
 		} else {
-			double finetuneLr = otherParams.length > 3 ? (double) otherParams[3] : lr;
-			int finetuneEpochs = otherParams.length > 4 ? (int) otherParams[4] : epochs;
-			finetune(labels,finetuneLr,finetuneEpochs);
+			
+			double finetuneLr = otherParams.length > 3 ? (Double) otherParams[3] : learningRate;
+			int finetuneEpochs = otherParams.length > 4 ? (Integer) otherParams[4] : epochs;
+			finetune( labels, finetuneLr, finetuneEpochs);
+			
 		}
 
 	}	
