@@ -126,7 +126,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 			}
 
 
-			// construct dA_layer
+			// construct DL appropriate class for pre training layer
 			this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
 		}
 
