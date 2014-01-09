@@ -32,8 +32,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	
 	// the input data ---- how is this going to be handled?
 	// how was it handled with the OOP-MLPN version?
-	Matrix inputTrainingData = null;
-	Matrix outputTrainingLabels = null;
+	public Matrix inputTrainingData = null;
+	public Matrix outputTrainingLabels = null;
 	
 	public double learningRateUpdate = 0.95;
 	

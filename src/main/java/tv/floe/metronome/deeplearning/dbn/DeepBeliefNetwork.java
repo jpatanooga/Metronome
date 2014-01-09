@@ -10,6 +10,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -72,30 +73,57 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 * TODO: 
 	 * 
 	 */
-	public void preTrain(Matrix trainingRecords) {
+	public void preTrain(Matrix trainingRecords,int k,double learningRate,int epochs) {
 		
-		Matrix layerTrainingInput = trainingRecords;
+		if (this.inputTrainingData == null) {
+			this.inputTrainingData = trainingRecords;
+			initializeLayers(trainingRecords);
+		}
 		
+		Matrix layerInput = null;
 		
+		for (int i = 0; i < this.numberLayers; i++) {
+			
+			if (i == 0) {
+				layerInput = this.inputTrainingData;
+			} else { 
+				layerInput = hiddenLayers[ i - 1 ].sampleHiddenGivenVisible_Data(layerInput);
+			}
+			
+			//log.info("Training on layer " + (i + 1));
+			RestrictedBoltzmannMachine rbmPreTrainLayer = (RestrictedBoltzmannMachine) this.preTrainingLayers[i];
+			HiddenLayer h = this.hiddenLayers[i];
+
+			for (int  epoch = 0; epoch < epochs; epoch++) {
+				
+				rbmPreTrainLayer.trainTillConvergence(learningRate, k, layerInput);	
+				h.connectionWeights = rbmPreTrainLayer.connectionWeights;
+				h.biasTerms = rbmPreTrainLayer.hiddenBiasNeurons;
+				
+			}
+
+		}
 		
 	}
 	
 	@Override
 	public void trainNetwork(Matrix input, Matrix labels, Object[] otherParams) {
 
-/*
+
 		int k = (Integer) otherParams[0];
-		double lr = (Double) otherParams[1];
+		double learningRate = (Double) otherParams[1];
 		int epochs = (Integer) otherParams[2];
-		pretrain(input,k,lr,epochs);
-		if(otherParams.length < 3)
+
+		preTrain(input, k, learningRate, epochs);
+		
+		if (otherParams.length < 3) {
 			finetune(labels, lr, epochs);
-		else {
+		} else {
 			double finetuneLr = otherParams.length > 3 ? (double) otherParams[3] : lr;
 			int finetuneEpochs = otherParams.length > 4 ? (int) otherParams[4] : epochs;
 			finetune(labels,finetuneLr,finetuneEpochs);
 		}
-*/		
+
 	}	
 	
 	
