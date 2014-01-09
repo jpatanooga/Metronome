@@ -21,6 +21,12 @@ public class StackedDenoisingAutoEncoder extends BaseMultiLayerNeuralNetworkVect
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public NeuralNetworkVectorized[] createNetworkLayers(int numLayers) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 
 }

@@ -51,11 +51,24 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	
 	private RandomGenerator randomGen = new MersenneTwister(1234);
 	
+	// default CTOR
 	public DeepBeliefNetwork() {
 		
 		
 	}
 	
+	public DeepBeliefNetwork(int n_ins, int[] hidden_layer_sizes, int n_outs, int n_layers,
+			RandomGenerator rng, Matrix input, Matrix labels) {
+		super(n_ins, hidden_layer_sizes, n_outs, n_layers, rng, input,labels);
+	}
+
+
+
+	public DeepBeliefNetwork(int n_ins, int[] hidden_layer_sizes, int n_outs, int n_layers,
+			RandomGenerator rng) {
+		super(n_ins, hidden_layer_sizes, n_outs, n_layers, rng);
+	}
+
 
 	
 	
@@ -130,6 +143,13 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			Matrix vBias, RandomGenerator rng, int index) {
 		
 		return new RestrictedBoltzmannMachine( input, nVisible, nHidden, weights, hbias, vBias, rng );
+		
+	}
+
+	@Override
+	public NeuralNetworkVectorized[] createNetworkLayers(int numLayers) {
+	
+		return new RestrictedBoltzmannMachine[numLayers];	
 		
 	}
 

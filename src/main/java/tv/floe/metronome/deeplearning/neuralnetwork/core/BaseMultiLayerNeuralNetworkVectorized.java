@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
@@ -44,6 +45,44 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	public BaseMultiLayerNeuralNetworkVectorized() {
 		
 	}
+	
+	public BaseMultiLayerNeuralNetworkVectorized(int n_ins, int[] hidden_layer_sizes, int n_outs, int n_layers, RandomGenerator rng) {
+		
+		this(n_ins,hidden_layer_sizes,n_outs,n_layers,rng,null,null);
+		
+	}
+
+
+	public BaseMultiLayerNeuralNetworkVectorized(int n_ins, int[] hidden_layer_sizes, int n_outs, int n_layers, RandomGenerator rng, Matrix input, Matrix labels) {
+		
+		this.inputNeuronCount = n_ins;
+		this.hiddenLayerSizes = hidden_layer_sizes;
+		this.inputTrainingData = input;
+		this.outputTrainingLabels = labels;
+
+		if(hidden_layer_sizes.length != n_layers) {
+			throw new IllegalArgumentException("The number of hidden layer sizes must be equivalent to the nLayers argument which is a value of " + n_layers);
+		}
+
+		this.outputNeuronCount = n_outs;
+		this.numberLayers = n_layers;
+
+		this.hiddenLayers = new HiddenLayer[n_layers];
+		this.preTrainingLayers = createNetworkLayers( this.numberLayers );
+
+		if (rng == null) {   
+			this.randomGenerator = new MersenneTwister(123);
+		} else { 
+			this.randomGenerator = rng;
+		}
+
+
+		if (input != null) { 
+			initializeLayers(input);
+		}
+
+
+	}	
 	
 		
 
@@ -112,7 +151,10 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	}
 
 	/**
-	 * Run SGD based on the given labels
+	 * Run SGD based on the given output vectors
+	 * 
+	 * TODO: Complete
+	 * 
 	 * @param labels the labels to use
 	 * @param lr the learning rate during training
 	 * @param epochs the number of times to iterate
@@ -200,7 +242,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 //	public abstract NeuralNetwork createLayer(Matrix input,int nVisible,int nHidden, Matrix W,Matrix hbias,Matrix vBias,RandomGenerator rng,int index);
 
 
-//	public abstract NeuralNetwork[] createNetworkLayers(int numLayers);
+	public abstract NeuralNetworkVectorized[] createNetworkLayers(int numLayers);
 
 
 	
