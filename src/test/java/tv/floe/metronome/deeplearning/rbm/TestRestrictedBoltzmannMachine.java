@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.Vector;
 
 import org.junit.Test;
 
@@ -152,8 +153,22 @@ public class TestRestrictedBoltzmannMachine {
 		
 		// "get the cross entropy somewhere near 0.3 and we're good"
 		assertEquals(0.4, ce, 0.2 );
-
+/*
+		MatrixUtils.debug_print( rbm.hiddenBiasNeurons );
 		
+		Vector vec = rbm.hiddenBiasNeurons.viewRow(0);
+		
+		for ( int x = 0; x < vec.size(); x++ ) {
+			System.out.println( vec.get(x) );
+		}
+		
+		rbm.trainingDataset.assign(0);
+		
+		Matrix preSigmoid = rbm.trainingDataset.times( rbm.connectionWeights );
+		preSigmoid = MatrixUtils.addRowVector(preSigmoid, rbm.hiddenBiasNeurons.viewRow(0));
+		
+		MatrixUtils.debug_print( preSigmoid );
+	*/	
 		
 	}
 	
