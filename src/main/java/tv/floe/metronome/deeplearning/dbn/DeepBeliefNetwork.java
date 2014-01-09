@@ -80,47 +80,6 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 	}
 	
-	/**
-	 * TODO: look at this more closely
-	 * 
-	 * 
-	 * @return
-	 */
-	public Matrix outputMatrix( Matrix input ) {
-//		Matrix mult = input.mmul(W);
-//		mult = mult.addRowVector(b);
-//		return MatrixUtil.sigmoid(mult);
-		return null;
-	}
-	
-	
-	/**
-	 * This function infers state of visible units given hidden units
-	 * 
-	 *  
-	 * @param input
-	 * @param mlpnLayer
-	 * @return
-	 */
-	public Matrix sampleHiddenGivenVisible(Matrix visible) {
-		
-		
-/*		
-		Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
-
-		Matrix visibleBinomialSample = MatrixUtils.genBinomialDistribution(visibleProb, 1, this.randNumGenerator);
-
-		return new Pair<Matrix, Matrix>(visibleProb, visibleBinomialSample);
-	*/	
-		
-		//reset the seed to ensure consistent generation of data
-		//Matrix ret = MatrixUtils.binomial(outputMatrix(input), 1, this.randomGen);
-		Matrix ret = MatrixUtils.genBinomialDistribution( outputMatrix(visible), 1, this.randomGen);
-		//return ret;
-		return ret;
-	}
-
-
 	@Override
 	public void trainNetwork(Matrix input, Matrix labels, Object[] otherParams) {
 
@@ -137,18 +96,16 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			finetune(labels,finetuneLr,finetuneEpochs);
 		}
 */		
-	}
-
-
-
+	}	
+	
+	
+	
 
 	@Override
 	public NeuralNetworkVectorized createPreTrainingLayer(Matrix input,
 			int nVisible, int nHidden, Matrix weights, Matrix hbias,
 			Matrix vBias, RandomGenerator rng, int index) {
 		
-		//		return new RBM(input, nVisible, nHidden, W, hBias, vBias, rng);
-
 		return new RestrictedBoltzmannMachine( input, nVisible, nHidden, weights, hbias, vBias, rng );
 		
 	}
