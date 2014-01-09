@@ -418,6 +418,8 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * Reconstructs the visible input.
 	 * A reconstruction is a propagation down of the reconstructed hidden input.
 	 * 
+	 * TODO: this is a duplicate method, track down refs and remove
+	 * 
 	 */
 	public Matrix reconstructVisibleInput(Matrix visible) {
 
@@ -432,14 +434,21 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	}
 
 	
+	/**
+	 * TODO: Think about the object[] array as parameter mechanism a bit more
+	 * 
+	 */
 	@Override
 	public void trainTillConvergence(Matrix input, double learningRate, Object[] params) {
-		int k = (int) params[0];
+		// still java 6!
+		int k = (Integer) params[0];
 		trainTillConvergence(learningRate, k, input);
 	}
 	
 	/**
 	 * Trains till global minimum is found.
+	 * 
+	 * TODO: implement the newer style optimizer stuff here!
 	 * 
 	 * @param learningRate
 	 * @param k
@@ -449,6 +458,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		if (input != null) {
 			this.trainingDataset = input;
 		}
+		this.learningRate = learningRate;
 		
 		//optimizer = new RBMOptimizer(this, learningRate, new Object[]{k});
 		//optimizer.train(input);
@@ -461,15 +471,23 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	}
 
 	@Override
-	public void train(Matrix input,double lr, Object[] params) {
-		//int k = (int) params[0];
-		contrastiveDivergence(lr, k, input);
+	public void train(Matrix input, double learningRate, Object[] params) {
+		int k = (Integer) params[0];
+		this.learningRate = learningRate;
+		contrastiveDivergence(k, input);
 	}
 
+	/**
+	 * Reconstructs the visible input.
+	 * A reconstruction is a propdown of the reconstructed hidden input.
+	 * @param v the visible input
+	 * @return the reconstruction of the visible input
+	 */
 	@Override
-	public Matrix reconstruct(Matrix x) {
-		// TODO Auto-generated method stub
-		return null;
+	public Matrix reconstruct(Matrix v) {
+	
+		return propDown(propUp(v));
+		
 	}
 	
 	
