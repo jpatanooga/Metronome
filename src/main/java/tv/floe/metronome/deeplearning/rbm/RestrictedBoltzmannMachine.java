@@ -165,6 +165,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 				
 			}
 			
+			// "free energy of the negative phase"
 			// now create some easier to use aliases
 			negativeVisibleExpectedValues = gibbsSamplingMatrices.getFirst().getFirst();
 			negativeVisibleSamples = gibbsSamplingMatrices.getFirst().getSecond();

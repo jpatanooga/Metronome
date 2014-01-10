@@ -5,7 +5,16 @@ import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.math.MatrixUtils;
 
-
+/**
+ * By assigning a softmax activation function, a generalization of the logistic function, 
+ * on the output layer of the neural network (or a softmax component in a component-based 
+ * neural network) for categorical target variables, the outputs can be interpreted
+ * as posterior probabilities. 
+ * This is very useful in classification as it gives a certainty measure on classifications.
+ * 
+ * @author josh
+ *
+ */
 public class OutputLayer {
 
 
@@ -26,7 +35,6 @@ public class OutputLayer {
 		this.outputTrainingLabels = labels;
 		this.numInputNeurons = nIn;
 		this.numOutputNeurons = nOut;
-		//connectionWeights = Matrix.zeros( nIn, nOut );
 		this.connectionWeights = new DenseMatrix( nIn, nOut );
 		this.connectionWeights.assign(0.0);
 		
@@ -82,11 +90,12 @@ public class OutputLayer {
 
 	/**
 	 * Train on the given inputs and labels.
-	 * This connectionWeightsill assign the passed in values
-	 * as fields to this logistic function for 
+	 * 
+	 * This will assign the passed in values as fields to this logistic function for 
 	 * caching.
-	 * @param x the inputs to train on
-	 * @param y the labels to train on
+	 * 
+	 * @param input the inputs to train on
+	 * @param labels the labels to train on
 	 * @param lr the learning rate
 	 */
 	public void train(Matrix input, Matrix labels, double lr) {
@@ -121,16 +130,15 @@ public class OutputLayer {
 
 
 	/**
-	 * Classify input
-	 * @param x the input (can either be a matrix or vector)
-	 * If it's a matrix, each roconnectionWeights is considered an example
-	 * and associated roconnectionWeightss are classified accordingly.
-	 * Each roconnectionWeights connectionWeightsill be the likelihood of a label given that example
-	 * @return a probability distribution for each roconnectionWeights
+	 * Classify input the input 
+	 * 
+	 * 
+	 * Each row will be the likelihood of a label given that example
+	 * 
+	 * @return a probability distribution for each row
 	 */
 	public Matrix predict(Matrix input) {
 		
-		//return softmax(x.mmul(connectionWeights).addRoconnectionWeightsVector(biasTerms));
 		Matrix prediction = input.times(this.connectionWeights);
 		prediction = MatrixUtils.softmax(MatrixUtils.addRowVector(prediction, this.biasTerms.viewRow(0)));
 		
