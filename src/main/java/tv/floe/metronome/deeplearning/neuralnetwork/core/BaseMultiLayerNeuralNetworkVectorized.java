@@ -153,7 +153,6 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	/**
 	 * Run SGD based on the given output vectors
 	 * 
-	 * TODO: Complete
 	 * 
 	 * @param labels the labels to use
 	 * @param lr the learning rate during training
