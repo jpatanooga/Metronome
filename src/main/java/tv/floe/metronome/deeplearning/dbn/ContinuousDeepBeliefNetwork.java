@@ -10,14 +10,6 @@ import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 
 public class ContinuousDeepBeliefNetwork extends DeepBeliefNetwork {
 
-
-	
-	
-/*	
-	public NeuralNetwork createLayer(Matrix input, int nVisible,
-			int nHidden, Matrix weights, Matrix hBias,
-			Matrix vBias, RandomGenerator rng,int index) {
-	*/
 	@Override
 	public NeuralNetworkVectorized createPreTrainingLayer(Matrix input,
 			int nVisible, int nHidden, Matrix weights, Matrix hBias,
@@ -30,11 +22,6 @@ public class ContinuousDeepBeliefNetwork extends DeepBeliefNetwork {
 		}
 	}
 
-/*	@Override
-	public NeuralNetwork[] createNetworkLayers(int numLayers) {
-		return new RBM[numLayers];
-	}
-	*/
 	@Override
 	public NeuralNetworkVectorized[] createNetworkLayers(int numLayers) {
 	
