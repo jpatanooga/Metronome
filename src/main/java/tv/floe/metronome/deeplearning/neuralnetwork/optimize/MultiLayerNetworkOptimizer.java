@@ -161,20 +161,15 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 	@Override
 	public void setParameters(double[] params) {
-		int idx = 0;
-/*		for(int i = 0; i < network.logLayer.W.length; i++) {
-			network.logLayer.W.put(i,params[idx++]);
-		}
-		for(int i = 0; i < network.logLayer.b.length; i++) {
-			network.logLayer.b.put(i,params[idx++]);
-		}
-	*/
 		
-		for(int i = 0; i < MatrixUtils.length( network.outputLayer.connectionWeights ); i++) {
-//			buffer[idx++] = MatrixUtils.getElement( network.outputLayer.connectionWeights, i );
+		int idx = 0;
+		
+		for (int i = 0; i < MatrixUtils.length( network.outputLayer.connectionWeights ); i++) {
+			MatrixUtils.setElement( network.outputLayer.connectionWeights, i,params[idx++] );
 		}
-		for(int i = 0; i < MatrixUtils.length( network.outputLayer.biasTerms ); i++) {
-//			buffer[idx++] = MatrixUtils.getElement( network.outputLayer.biasTerms, i);
+
+		for (int i = 0; i < MatrixUtils.length( network.outputLayer.biasTerms ); i++) {
+			MatrixUtils.setElement( network.outputLayer.biasTerms, i, params[idx++] );
 		}		
 		
 		
