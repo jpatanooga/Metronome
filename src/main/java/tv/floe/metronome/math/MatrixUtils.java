@@ -618,6 +618,12 @@ public class MatrixUtils {
 		
 	}
 	
+	public static int length(Matrix m) {
+		
+		return m.numRows() * m.numCols();
+		
+	}
+	
 	
 
 	public static void debug_print(Matrix m) {

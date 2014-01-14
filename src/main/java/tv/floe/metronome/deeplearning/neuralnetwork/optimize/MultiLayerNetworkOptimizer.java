@@ -123,13 +123,28 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 	@Override
 	public double getParameter(int arg0) {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
 	@Override
-	public void getParameters(double[] arg0) {
-		// TODO Auto-generated method stub
+	public void getParameters(double[] buffer) {
+
+		int idx = 0;
+/*		for(int i = 0; i < network.logLayer.W.length; i++) {
+			buffer[idx++] = network.logLayer.W.get(i);
+		}
+		for(int i = 0; i < network.logLayer.b.length; i++) {
+			buffer[idx++] = network.logLayer.b.get(i);
+		}
+	*/
+		
+		for(int i = 0; i < network.outputLayer.connectionWeights.length; i++) {
+			buffer[idx++] = network.outputLayer.connectionWeights.get(i);
+		}
+		for(int i = 0; i < network.outputLayer.biasTerms.length; i++) {
+			buffer[idx++] = network.outputLayer.biasTerms.get(i);
+		}		
 		
 	}
 

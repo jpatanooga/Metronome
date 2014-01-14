@@ -15,6 +15,25 @@ import org.junit.Test;
 public class TestMatrixUtils {
 
 	@Test
+	public void testLength() {
+		
+		Matrix m = new DenseMatrix(2, 3);
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+		m.setQuick(0, 2, 3);
+
+		m.setQuick(1, 0, 5);
+		m.setQuick(1, 1, 10);
+		m.setQuick(1, 2, 0);
+
+		int len = MatrixUtils.length(m);
+		
+		assertEquals(6, len);
+		
+		
+	}
+	
+	@Test
 	public void testSumAndMean() {
 		
 		Matrix m = new DenseMatrix(2, 3);
