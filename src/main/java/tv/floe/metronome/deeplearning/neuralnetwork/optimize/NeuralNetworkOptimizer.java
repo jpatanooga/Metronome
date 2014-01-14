@@ -14,6 +14,7 @@ import cc.mallet.optimize.OptimizationException;
 import cc.mallet.optimize.Optimizer;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
+import tv.floe.metronome.math.MatrixUtils;
 
 
 public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientValue,Serializable {
@@ -36,6 +37,9 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 	protected List<Double> errors = new ArrayList<Double>();
 	protected double minLearningRate = 0.001;
 	protected transient Optimizer opt;
+	
+	
+	
 	public void train(Matrix x) {
 		
 		if (opt == null) {
@@ -71,7 +75,8 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 
 	@Override
 	public int getNumParameters() {
-		return network.connectionWeights.length + network.hBias.length + network.vBias.length;
+		//return network.connectionWeights.length + network.hBias.length + network.vBias.length;
+		return MatrixUtils.length(network.connectionWeights ) + MatrixUtils.length( network.hiddenBiasNeurons ) + MatrixUtils.length( network.visibleBiasNeurons );
 	}
 
 
