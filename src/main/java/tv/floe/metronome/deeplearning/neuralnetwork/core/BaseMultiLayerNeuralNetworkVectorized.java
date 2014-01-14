@@ -9,9 +9,11 @@ import java.io.OutputStream;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
+import org.jblas.DoubleMatrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.OutputLayer;
+import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
 
 public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
@@ -37,6 +39,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	public Matrix outputTrainingLabels = null;
 	
 	public double learningRateUpdate = 0.95;
+	
+	public MultiLayerNetworkOptimizer optimizer;
 	
 	/**
 	 * CTOR
@@ -160,11 +164,10 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	 */
 	public void finetune(Matrix outputLabels, double learningRate, int epochs) {
 		
-	//	optimizer = new MultiLayerNetworkOptimizer(this,learningRate);
-	//	optimizer.optimize( outputLabels, learningRate, epochs );
+		optimizer = new MultiLayerNetworkOptimizer(this,learningRate);
+		optimizer.optimize( outputLabels, learningRate, epochs );
 		
 	}
-
 
 
 	/**
