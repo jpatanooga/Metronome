@@ -114,8 +114,11 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	
 	@Override
 	public int getNumParameters() {
-		// TODO Auto-generated method stub
-		return 0;
+		// 		return network.logLayer.W.length + network.logLayer.b.length;
+
+		int connectionSize = network.outputLayer.connectionWeights.numRows() * network.outputLayer.connectionWeights.numCols(); 
+		int biasSize = network.outputLayer.biasTerms.numRows() * network.outputLayer.biasTerms.numCols();
+		return connectionSize + biasSize;
 	}
 
 	@Override
