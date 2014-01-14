@@ -18,6 +18,11 @@ import tv.floe.metronome.math.MatrixUtils;
 
 public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7607015610273177997L;
+
 	protected BaseMultiLayerNeuralNetworkVectorized network;
 
 	private static Logger log = LoggerFactory.getLogger(MultiLayerNetworkOptimizer.class);
@@ -187,8 +192,9 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 	@Override
 	public double getValue() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		return network.negativeLogLikelihood();
+		
 	}
 
 	@Override
