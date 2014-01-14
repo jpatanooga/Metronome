@@ -18,9 +18,6 @@ import tv.floe.metronome.math.MatrixUtils;
 
 public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7607015610273177997L;
 
 	protected BaseMultiLayerNeuralNetworkVectorized network;
@@ -197,9 +194,75 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		
 	}
 
+	/**
+	 * TODO: Explain what is going on here and how this works!
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
 	@Override
-	public void getValueGradient(double[] arg0) {
-		// TODO Auto-generated method stub
+	public void getValueGradient(double[] buffer) {
+/*		
+		
+
+		
+		DoubleMatrix weightGradient = network.logLayer.input.transpose().mmul(dy).mul(lr);
+		DoubleMatrix biasGradient =  dy.columnMeans().mul(lr);
+		for(int i = 0; i < weightGradient.length; i++)
+			buffer[idx++] = weightGradient.get(i);
+		for(int i = 0; i < biasGradient.length; i++)
+			buffer[idx++] = biasGradient.get(i);
+			*/
+		
+		// calc p_y_given_x
+//				DoubleMatrix p_y_given_x = softmax(network.logLayer.input.mmul(network.logLayer.W).addRowVector(network.logLayer.b));
+
+		Matrix p_y_given_x = MatrixUtils.softmax( MatrixUtils.addRowVector( network.outputLayer.inputTrainingData.times(network.outputLayer.connectionWeights ), network.outputLayer.biasTerms.viewRow(0) ) );
+		
+		// calc dy
+		
+		// DoubleMatrix dy = network.logLayer.labels.sub(p_y_given_x);
+		
+		Matrix dy = network.outputLayer.outputTrainingLabels.minus(p_y_given_x);
+
+		// calc weight gradient
+		
+		int idx = 0;
+		
+		Matrix weightGradient = network.outputLayer.inputTrainingData.transpose().times(dy).times(learningRate);
+		
+		
+	
+		// calc bias gradient
+		
+		Matrix biasGradient = MatrixUtils.columnMeans(dy).times(learningRate);
+		
+/*
+ * 
+		for(int i = 0; i < weightGradient.length; i++)
+			buffer[idx++] = weightGradient.get(i);
+		for(int i = 0; i < biasGradient.length; i++)
+			buffer[idx++] = biasGradient.get(i);
+
+ * 				
+ */
+		
+		for ( int i = 0; i < MatrixUtils.length( weightGradient ); i++ ) {
+			
+			buffer[ idx++ ] = MatrixUtils.getElement( weightGradient, i );
+			
+		}
+		
+		for ( int i = 0; i < MatrixUtils.length( biasGradient ); i++ ) {
+			
+			buffer[ idx++ ] = MatrixUtils.getElement( biasGradient, i );
+			
+		}
+		
 		
 	}
 
