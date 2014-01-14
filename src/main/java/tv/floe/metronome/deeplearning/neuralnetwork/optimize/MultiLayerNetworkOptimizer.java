@@ -154,8 +154,18 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	}
 
 	@Override
-	public void setParameter(int arg0, double arg1) {
-		// TODO Auto-generated method stub
+	public void setParameter(int index, double value) {
+		
+		if (index >= MatrixUtils.length( network.outputLayer.connectionWeights ) ) {
+			
+			int i = index - MatrixUtils.length( network.outputLayer.biasTerms );
+			MatrixUtils.setElement( network.outputLayer.biasTerms, i, value );
+			
+		} else {
+			
+			MatrixUtils.setElement( network.outputLayer.connectionWeights, index, value );
+			
+		}
 		
 	}
 
