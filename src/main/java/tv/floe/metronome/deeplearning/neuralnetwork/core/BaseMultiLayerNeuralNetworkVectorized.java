@@ -26,6 +26,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	
 	//the hidden layers
 	public HiddenLayer[] hiddenLayers;	
+	
+	// TODO: do we rename this to LogisticRegressionOutputLayer ?
 	public OutputLayer outputLayer;
 	
 	// DA / RBM Layers
