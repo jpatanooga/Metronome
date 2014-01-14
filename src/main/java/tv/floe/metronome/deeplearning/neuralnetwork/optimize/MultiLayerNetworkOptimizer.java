@@ -31,7 +31,7 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		
 	}
 	
-	public void optimize(Matrix labels, double lr, int epochs) {
+	public void optimize(Matrix labels, double learningRate, int epochs) {
 		
 		MatrixUtils.ensureValidOutcomeMatrix(labels);
 		//sample from the final layer in the network and train on the result
@@ -49,30 +49,44 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 		for(int i = 0; i < epochs; i++) {
 
-			network.outputLayer.train(layerInput, labels, lr);
-			lr *= network.learningRateUpdate;
-			if(currLoss == null)
+			network.outputLayer.train( layerInput, labels, learningRate );
+			learningRate *= network.learningRateUpdate;
+			
+			if (currLoss == null) {
+				
 				currLoss = network.negativeLogLikelihood();
-
-			else {
+				
+			} else {
+				
 				Double loss = network.negativeLogLikelihood();
-				if(loss > currLoss) {
-					if(numTimesOver == null)
+				
+				if (loss > currLoss) {
+					
+					if (numTimesOver == null) {
+						
 						numTimesOver = 1;
-					else 
+						
+					} else {
+						
 						numTimesOver++;
-					if(numTimesOver >= 5) {
+						
+					}
+					
+					if (numTimesOver >= 5) {
+						
 						log.info("Reverting weights and exiting...");
 						network.outputLayer.connectionWeights = w.clone();
 						network.outputLayer.biasTerms = b.clone();
 						break;
+						
 					}
-				}
-
-				else if(loss < currLoss) {
+					
+				} else if (loss < currLoss) {
+					
 					w = network.outputLayer.connectionWeights.clone();
 					b = network.outputLayer.biasTerms.clone();
 					currLoss = loss;
+					
 				}
 
 
@@ -83,7 +97,9 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		}
 		
 		double curr = network.negativeLogLikelihood();
-		if(curr > currLoss) {
+		
+		if (curr > currLoss) {
+			
 			network.outputLayer.connectionWeights = w.clone();
 			network.outputLayer.biasTerms = b.clone();
 			log.info("Reverting to last known good state; converged after global minimum");
