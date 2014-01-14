@@ -44,6 +44,9 @@ public class TestRestrictedBoltzmannMachine {
 		
 		Matrix input = buildTestInputDataset();
 		
+		Matrix c = input.clone();
+		MatrixUtils.debug_print(c);
+		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
 		
 		Pair<Matrix, Matrix> hiddenProbsAndSample = rbm.sampleHiddenGivenVisible( input );
@@ -51,7 +54,7 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix hidden_sample_init = hiddenProbsAndSample.getSecond();
 		
 		//System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
-		MatrixUtils.debug_print(hidden_sample_init);
+		//MatrixUtils.debug_print(hidden_sample_init);
 		
 		Matrix out = input.transpose().times(hidden_sample_init);
 		

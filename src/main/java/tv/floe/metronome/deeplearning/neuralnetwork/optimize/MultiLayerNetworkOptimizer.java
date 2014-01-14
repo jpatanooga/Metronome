@@ -40,8 +40,10 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		network.outputLayer.inputTrainingData = layerInput;
 		network.outputLayer.outputTrainingLabels = labels;
 
-		Matrix w = network.outputLayer.connectionWeights.dup();
-		Matrix b = network.outputLayer.biasTerms.dup();
+		
+		Matrix w = network.outputLayer.connectionWeights.clone();
+		Matrix b = network.outputLayer.biasTerms.clone();
+		
 		Double currLoss = null;
 		Integer numTimesOver = null;
 
@@ -61,15 +63,15 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 						numTimesOver++;
 					if(numTimesOver >= 5) {
 						log.info("Reverting weights and exiting...");
-						network.outputLayer.connectionWeights = w.dup();
-						network.outputLayer.biasTerms = b.dup();
+						network.outputLayer.connectionWeights = w.clone();
+						network.outputLayer.biasTerms = b.clone();
 						break;
 					}
 				}
 
 				else if(loss < currLoss) {
-					w = network.outputLayer.connectionWeights.dup();
-					b = network.outputLayer.biasTerms.dup();
+					w = network.outputLayer.connectionWeights.clone();
+					b = network.outputLayer.biasTerms.clone();
 					currLoss = loss;
 				}
 
@@ -82,8 +84,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		
 		double curr = network.negativeLogLikelihood();
 		if(curr > currLoss) {
-			network.outputLayer.connectionWeights = w.dup();
-			network.outputLayer.biasTerms = b.dup();
+			network.outputLayer.connectionWeights = w.clone();
+			network.outputLayer.biasTerms = b.clone();
 			log.info("Reverting to last known good state; converged after global minimum");
 			
 		}
