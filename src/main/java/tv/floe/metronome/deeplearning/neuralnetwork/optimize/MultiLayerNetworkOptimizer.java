@@ -122,9 +122,21 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	}
 
 	@Override
-	public double getParameter(int arg0) {
+	public double getParameter(int index) {
 		
-		return 0;
+
+		if (index > MatrixUtils.length( network.outputLayer.connectionWeights ) ) {
+			
+			int i = index - MatrixUtils.length( network.outputLayer.biasTerms );
+			return MatrixUtils.getElement( network.outputLayer.biasTerms, i );
+			
+		} else {
+			
+			return MatrixUtils.getElement( network.outputLayer.connectionWeights, index );
+			
+		}
+		
+		
 	}
 
 	@Override
