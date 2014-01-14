@@ -131,21 +131,12 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	public void getParameters(double[] buffer) {
 
 		int idx = 0;
-/*		for(int i = 0; i < network.logLayer.W.length; i++) {
-			buffer[idx++] = network.logLayer.W.get(i);
-		}
-		for(int i = 0; i < network.logLayer.b.length; i++) {
-			buffer[idx++] = network.logLayer.b.get(i);
-		}
-	*/
 		
-		//network.outputLayer.connectionWeights.
-		
-		for(int i = 0; i < network.outputLayer.connectionWeights.length; i++) {
-			buffer[idx++] = network.outputLayer.connectionWeights.get(i);
+		for(int i = 0; i < MatrixUtils.length( network.outputLayer.connectionWeights ); i++) {
+			buffer[idx++] = MatrixUtils.getElement( network.outputLayer.connectionWeights, i );
 		}
-		for(int i = 0; i < network.outputLayer.biasTerms.length; i++) {
-			buffer[idx++] = network.outputLayer.biasTerms.get(i);
+		for(int i = 0; i < MatrixUtils.length( network.outputLayer.biasTerms ); i++) {
+			buffer[idx++] = MatrixUtils.getElement( network.outputLayer.biasTerms, i);
 		}		
 		
 	}
