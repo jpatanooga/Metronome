@@ -139,6 +139,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		}
 	*/
 		
+		//network.outputLayer.connectionWeights.
+		
 		for(int i = 0; i < network.outputLayer.connectionWeights.length; i++) {
 			buffer[idx++] = network.outputLayer.connectionWeights.get(i);
 		}

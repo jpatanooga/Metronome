@@ -34,6 +34,29 @@ public class TestMatrixUtils {
 	}
 	
 	@Test
+	public void testGetElement() {
+		
+		Matrix m = new DenseMatrix(2, 3);
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+		m.setQuick(0, 2, 3);
+
+		m.setQuick(1, 0, 5);
+		m.setQuick(1, 1, 10);
+		m.setQuick(1, 2, 0);
+
+		double el = MatrixUtils.getElement(m, 4);
+		double el1 = MatrixUtils.getElement(m, 0);
+		double el2 = MatrixUtils.getElement(m, 2);
+		
+		assertEquals(10, el, 0.0);
+		assertEquals(6, el1, 0.0);
+		assertEquals(3, el2, 0.0);
+		
+		
+	}
+	
+	@Test
 	public void testSumAndMean() {
 		
 		Matrix m = new DenseMatrix(2, 3);

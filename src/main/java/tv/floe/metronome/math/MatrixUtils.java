@@ -618,9 +618,30 @@ public class MatrixUtils {
 		
 	}
 	
+	/**
+	 * Returns total number of elements in matrix
+	 * 
+	 * @param m
+	 * @return
+	 */
 	public static int length(Matrix m) {
 		
 		return m.numRows() * m.numCols();
+		
+	}
+	
+	/**
+	 * Returns the element as if the matrix was 'unrolled' linearly
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public static double getElement(Matrix m, int index) {
+		
+		int rowIndex = index / m.numCols();
+		int colIndex = index % m.numCols();
+		
+		return m.getQuick(rowIndex, colIndex);
 		
 	}
 	
