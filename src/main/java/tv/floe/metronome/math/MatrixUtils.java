@@ -645,7 +645,16 @@ public class MatrixUtils {
 		
 	}
 	
-	
+
+	public static void setElement(Matrix m, int index, double value) {
+		
+		int rowIndex = index / m.numCols();
+		int colIndex = index % m.numCols();
+		
+		m.setQuick(rowIndex, colIndex, value);
+		
+	}
+
 
 	public static void debug_print(Matrix m) {
 
