@@ -114,17 +114,26 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 
 	@Override
 	public double getParameter(int index) {
-		//beyond weight matrix
-		if(index >= network.W.length) {
-			//beyond visible bias
-			if(index >= network.vBias.length) {
-				return network.hBias.get(index);
+		
+		// beyond weight matrix
+		if (index >= MatrixUtils.length( network.connectionWeights ) ) {
+			
+			
+			// beyond visible bias
+			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) ) {
+				
+				return MatrixUtils.getElement( network.hiddenBiasNeurons, index );
+				
+			} else {
+				
+				return MatrixUtils.getElement( network.visibleBiasNeurons, index );
+				
 			}
-			else
-				return network.vBias.get(index);
-
+			
+			
 		}
-		return network.W.get(index);
+		
+		return MatrixUtils.getElement( network.connectionWeights, index );
 
 	}
 
