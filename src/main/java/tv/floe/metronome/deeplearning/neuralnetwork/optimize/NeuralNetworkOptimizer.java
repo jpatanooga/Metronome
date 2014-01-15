@@ -89,12 +89,26 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		 */
 
 		int idx = 0;
-		for(int i = 0; i < network.connectionWeights.length; i++)
-			buffer[idx++] = network.connectionWeights.get(i);
-		for(int i = 0; i < network.vBias.length; i++)
-			buffer[idx++] = network.vBias.get(i);
-		for(int i =0; i < network.hBias.length; i++)
-			buffer[idx++] = network.hBias.get(i);
+		
+		for (int i = 0; i < MatrixUtils.length( network.connectionWeights ); i++) {
+		
+			buffer[ idx++ ] = MatrixUtils.getElement( network.connectionWeights, i );
+			
+		}
+		
+		for (int i = 0; i < MatrixUtils.length( network.visibleBiasNeurons ); i++) {
+			
+			buffer[ idx++ ] = MatrixUtils.getElement( network.visibleBiasNeurons, i );
+			
+		}
+				
+		for (int i = 0; i < MatrixUtils.length( network.hiddenBiasNeurons ); i++) {
+			
+			buffer[ idx++ ] = MatrixUtils.getElement( network.hiddenBiasNeurons, i );
+			
+		}
+		
+		
 	}
 
 
