@@ -11,6 +11,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
+import tv.floe.metronome.deeplearning.neuralnetwork.layer.LogisticRegressionLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.OutputLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
 
@@ -27,7 +28,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	public HiddenLayer[] hiddenLayers;	
 	
 	// TODO: do we rename this to LogisticRegressionOutputLayer ?
-	public OutputLayer outputLayer;
+	public LogisticRegressionLayer outputLogisticLayer;
 	
 	// DA / RBM Layers
 	public NeuralNetworkVectorized[] preTrainingLayers;
@@ -135,7 +136,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 			this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
 		}
 
-		this.outputLayer = new OutputLayer(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
+		this.outputLogisticLayer = new LogisticRegressionLayer(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
 	}
 	
@@ -191,7 +192,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 			input = layer.computeOutputActivation(input);
 		}
 		
-		return this.outputLayer.predict(input);
+		return this.outputLogisticLayer.predict(input);
 	}
 
 
@@ -215,7 +216,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	 * @return the negative log likelihood of the model
 	 */
 	public double negativeLogLikelihood() {
-		return this.outputLayer.negativeLogLikelihood();
+		return this.outputLogisticLayer.negativeLogLikelihood();
 	}
 	
 	/**

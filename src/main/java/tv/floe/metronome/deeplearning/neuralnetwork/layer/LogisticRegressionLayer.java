@@ -140,7 +140,7 @@ public class LogisticRegressionLayer {
 
 	/**
 	 * Classify input
-	 * @param x the input (can either be a matrix or vector)
+	 * @param input (can either be a matrix or vector)
 	 * If it's a matrix, each row is considered an example
 	 * and associated rows are classified accordingly.
 	 * Each row will be the likelihood of a label given that example
