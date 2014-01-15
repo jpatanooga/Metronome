@@ -39,19 +39,19 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		//sample from the final layer in the network and train on the result
 		Matrix layerInput = network.hiddenLayers[network.hiddenLayers.length - 1].sampleHiddenGivenLastVisible();
 		
-		network.outputLayer.inputTrainingData = layerInput;
-		network.outputLayer.outputTrainingLabels = labels;
+		network.outputLogisticLayer.inputTrainingData = layerInput;
+		network.outputLogisticLayer.outputTrainingLabels = labels;
 
 		
-		Matrix w = network.outputLayer.connectionWeights.clone();
-		Matrix b = network.outputLayer.biasTerms.clone();
+		Matrix w = network.outputLogisticLayer.connectionWeights.clone();
+		Matrix b = network.outputLogisticLayer.biasTerms.clone();
 		
 		Double currLoss = null;
 		Integer numTimesOver = null;
 
 		for(int i = 0; i < epochs; i++) {
 
-			network.outputLayer.train( layerInput, labels, learningRate );
+			network.outputLogisticLayer.train( layerInput, labels, learningRate );
 			learningRate *= network.learningRateUpdate;
 			
 			if (currLoss == null) {
@@ -77,16 +77,16 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 					if (numTimesOver >= 5) {
 						
 						log.info("Reverting weights and exiting...");
-						network.outputLayer.connectionWeights = w.clone();
-						network.outputLayer.biasTerms = b.clone();
+						network.outputLogisticLayer.connectionWeights = w.clone();
+						network.outputLogisticLayer.biasTerms = b.clone();
 						break;
 						
 					}
 					
 				} else if (loss < currLoss) {
 					
-					w = network.outputLayer.connectionWeights.clone();
-					b = network.outputLayer.biasTerms.clone();
+					w = network.outputLogisticLayer.connectionWeights.clone();
+					b = network.outputLogisticLayer.biasTerms.clone();
 					currLoss = loss;
 					
 				}
@@ -102,8 +102,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		
 		if (curr > currLoss) {
 			
-			network.outputLayer.connectionWeights = w.clone();
-			network.outputLayer.biasTerms = b.clone();
+			network.outputLogisticLayer.connectionWeights = w.clone();
+			network.outputLogisticLayer.biasTerms = b.clone();
 			log.info("Reverting to last known good state; converged after global minimum");
 			
 		}
@@ -118,8 +118,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	public int getNumParameters() {
 		// 		return network.logLayer.W.length + network.logLayer.b.length;
 
-		int connectionSize = network.outputLayer.connectionWeights.numRows() * network.outputLayer.connectionWeights.numCols(); 
-		int biasSize = network.outputLayer.biasTerms.numRows() * network.outputLayer.biasTerms.numCols();
+		int connectionSize = network.outputLogisticLayer.connectionWeights.numRows() * network.outputLogisticLayer.connectionWeights.numCols(); 
+		int biasSize = network.outputLogisticLayer.biasTerms.numRows() * network.outputLogisticLayer.biasTerms.numCols();
 		return connectionSize + biasSize;
 	}
 
@@ -127,14 +127,14 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	public double getParameter(int index) {
 		
 
-		if (index > MatrixUtils.length( network.outputLayer.connectionWeights ) ) {
+		if (index > MatrixUtils.length( network.outputLogisticLayer.connectionWeights ) ) {
 			
-			int i = index - MatrixUtils.length( network.outputLayer.biasTerms );
-			return MatrixUtils.getElement( network.outputLayer.biasTerms, i );
+			int i = index - MatrixUtils.length( network.outputLogisticLayer.biasTerms );
+			return MatrixUtils.getElement( network.outputLogisticLayer.biasTerms, i );
 			
 		} else {
 			
-			return MatrixUtils.getElement( network.outputLayer.connectionWeights, index );
+			return MatrixUtils.getElement( network.outputLogisticLayer.connectionWeights, index );
 			
 		}
 		
@@ -146,11 +146,11 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 		int idx = 0;
 		
-		for(int i = 0; i < MatrixUtils.length( network.outputLayer.connectionWeights ); i++) {
-			buffer[idx++] = MatrixUtils.getElement( network.outputLayer.connectionWeights, i );
+		for(int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.connectionWeights ); i++) {
+			buffer[idx++] = MatrixUtils.getElement( network.outputLogisticLayer.connectionWeights, i );
 		}
-		for(int i = 0; i < MatrixUtils.length( network.outputLayer.biasTerms ); i++) {
-			buffer[idx++] = MatrixUtils.getElement( network.outputLayer.biasTerms, i);
+		for(int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.biasTerms ); i++) {
+			buffer[idx++] = MatrixUtils.getElement( network.outputLogisticLayer.biasTerms, i);
 		}		
 		
 	}
@@ -158,14 +158,14 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	@Override
 	public void setParameter(int index, double value) {
 		
-		if (index >= MatrixUtils.length( network.outputLayer.connectionWeights ) ) {
+		if (index >= MatrixUtils.length( network.outputLogisticLayer.connectionWeights ) ) {
 			
-			int i = index - MatrixUtils.length( network.outputLayer.biasTerms );
-			MatrixUtils.setElement( network.outputLayer.biasTerms, i, value );
+			int i = index - MatrixUtils.length( network.outputLogisticLayer.biasTerms );
+			MatrixUtils.setElement( network.outputLogisticLayer.biasTerms, i, value );
 			
 		} else {
 			
-			MatrixUtils.setElement( network.outputLayer.connectionWeights, index, value );
+			MatrixUtils.setElement( network.outputLogisticLayer.connectionWeights, index, value );
 			
 		}
 		
@@ -176,12 +176,12 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		
 		int idx = 0;
 		
-		for (int i = 0; i < MatrixUtils.length( network.outputLayer.connectionWeights ); i++) {
-			MatrixUtils.setElement( network.outputLayer.connectionWeights, i,params[idx++] );
+		for (int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.connectionWeights ); i++) {
+			MatrixUtils.setElement( network.outputLogisticLayer.connectionWeights, i,params[idx++] );
 		}
 
-		for (int i = 0; i < MatrixUtils.length( network.outputLayer.biasTerms ); i++) {
-			MatrixUtils.setElement( network.outputLayer.biasTerms, i, params[idx++] );
+		for (int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.biasTerms ); i++) {
+			MatrixUtils.setElement( network.outputLogisticLayer.biasTerms, i, params[idx++] );
 		}		
 		
 		
@@ -221,19 +221,19 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		// calc p_y_given_x
 //				DoubleMatrix p_y_given_x = softmax(network.logLayer.input.mmul(network.logLayer.W).addRowVector(network.logLayer.b));
 
-		Matrix p_y_given_x = MatrixUtils.softmax( MatrixUtils.addRowVector( network.outputLayer.inputTrainingData.times(network.outputLayer.connectionWeights ), network.outputLayer.biasTerms.viewRow(0) ) );
+		Matrix p_y_given_x = MatrixUtils.softmax( MatrixUtils.addRowVector( network.outputLogisticLayer.inputTrainingData.times(network.outputLogisticLayer.connectionWeights ), network.outputLogisticLayer.biasTerms.viewRow(0) ) );
 		
 		// calc dy
 		
 		// DoubleMatrix dy = network.logLayer.labels.sub(p_y_given_x);
 		
-		Matrix dy = network.outputLayer.outputTrainingLabels.minus(p_y_given_x);
+		Matrix dy = network.outputLogisticLayer.outputTrainingLabels.minus(p_y_given_x);
 
 		// calc weight gradient
 		
 		int idx = 0;
 		
-		Matrix weightGradient = network.outputLayer.inputTrainingData.transpose().times(dy).times(learningRate);
+		Matrix weightGradient = network.outputLogisticLayer.inputTrainingData.transpose().times(dy).times(learningRate);
 		
 		
 	
