@@ -138,13 +138,14 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 	}
 
 
+	/**
+	 * 
+	 * If we think of the parameters of the model (W,vB,hB)
+	 * as a solid line for the optimizer, we get the following:
+	 * 
+	 */
 	@Override
 	public void setParameters(double[] params) {
-		/*
-		 * If we think of the parameters of the model (W,vB,hB)
-		 * as a solid line for the optimizer, we get the following:
-		 * 
-		 */
 
 		int idx = 0;
 		
@@ -175,7 +176,7 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 
 	@Override
 	public void setParameter(int index, double value) {
-		//beyond weight matrix
+/*		//beyond weight matrix
 		if(index >= network.W.length) {
 			//beyond visible bias
 			if(index >= network.vBias.length) {
@@ -190,6 +191,31 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 
 		}
 		network.W.put(index, value);
+		*/
+		
+		// beyond weight matrix
+		if (index >= MatrixUtils.length( network.connectionWeights ) ) {
+			
+			
+			// beyond visible bias
+			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) ) {
+				
+				int i = index - MatrixUtils.length( network.hiddenBiasNeurons );
+				MatrixUtils.setElement( network.hiddenBiasNeurons, index, value );
+				
+			} else {
+				
+				int i = index - MatrixUtils.length( network.visibleBiasNeurons );
+				MatrixUtils.setElement( network.visibleBiasNeurons, index, value );
+				
+			}
+			
+			
+		}
+		
+		MatrixUtils.setElement( network.connectionWeights, index, value );
+		
+		
 	}
 
 
