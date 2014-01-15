@@ -6,7 +6,9 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
+
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -35,7 +37,8 @@ import tv.floe.metronome.types.Pair;
  */
 public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
-	private double learningRate = 0.1d;
+	//private double learningRate = 0.1d;
+	protected NeuralNetworkOptimizer optimizer;
 
 	public RestrictedBoltzmannMachine(int nVisible, int nHidden, Matrix weights, Matrix hBias, Matrix vBias, RandomGenerator rng) {
 		super(nVisible, nHidden, weights, hBias, vBias, rng);
@@ -121,7 +124,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * 
 	 * @param k
 	 */
-	public void contrastiveDivergence(int k, Matrix input) {
+	public void contrastiveDivergence(double learningRate, int k, Matrix input) {
 
 		/*
 		 * 
@@ -187,7 +190,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( negativeVisibleSamplesTransposeTimesNegHiddenExpValues );
 		
 		// learningRate * delta(data - model)
-		Matrix connectionWeightChanges = dataModelDelta.times( this.learningRate );
+		Matrix connectionWeightChanges = dataModelDelta.times( learningRate );
 		
 		// ---- end of equation (9) section -----------------
 		
@@ -195,21 +198,21 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		this.connectionWeights = this.connectionWeights.plus( connectionWeightChanges );
 
 		Matrix vBiasAdd = MatrixUtils.mean( input.minus( negativeVisibleSamples ) , 0); 
-		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd.times( this.learningRate ) );
+		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd.times( learningRate ) );
 
 		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0); //.times(this.learningRate);
-		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times(this.learningRate) );
+		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times( learningRate ) );
 		
 		
 		
 	}
-	
+/*	
 	public void setLearningRate(double alpha) {
 		
 		this.learningRate = alpha;
 		
 	}
-	
+*/	
 	/**
 	 * Used to calculate how well trained the RBM currently is
 	 * 
@@ -459,10 +462,15 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		if (input != null) {
 			this.trainingDataset = input;
 		}
-		this.learningRate = learningRate;
+		//this.learningRate = learningRate;
 		
 		//optimizer = new RBMOptimizer(this, learningRate, new Object[]{k});
 		//optimizer.train(input);
+		
+		optimizer = new RestrictedBoltzmannMachineOptimizer(this, learningRate, new Object[]{k});
+		optimizer.train(input);
+
+		
 	}
 	
 
@@ -474,8 +482,8 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	@Override
 	public void train(Matrix input, double learningRate, Object[] params) {
 		int k = (Integer) params[0];
-		this.learningRate = learningRate;
-		contrastiveDivergence(k, input);
+		//this.learningRate = learningRate;
+		contrastiveDivergence(learningRate, k, input);
 	}
 
 	/**

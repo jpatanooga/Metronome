@@ -86,7 +86,7 @@ public class TestRestrictedBoltzmannMachine {
 		 */
 		
 		for (int x = 0; x < 5000; x++) {
-			rbm.contrastiveDivergence(1, input);
+			rbm.contrastiveDivergence(0.1, 1, input);
 		}
 
 		Matrix hidden = rbm.propUp(input);
@@ -138,7 +138,7 @@ public class TestRestrictedBoltzmannMachine {
 		double ce = 0;
 		
 		for (int x = 0; x < 1000; x++) {
-			rbm.contrastiveDivergence(1, input);
+			rbm.contrastiveDivergence(0.1, 1, input);
 
 			ce = rbm.getReConstructionCrossEntropy();
 			
