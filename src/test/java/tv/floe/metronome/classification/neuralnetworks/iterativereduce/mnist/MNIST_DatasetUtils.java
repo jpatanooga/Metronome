@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.mahout.math.DenseMatrix;
+import org.apache.mahout.math.Matrix;
 
 /**
  * Original work: 
@@ -28,7 +30,8 @@ import org.apache.commons.io.FileUtils;
  */
 public class MNIST_DatasetUtils {
 
-
+	public Matrix imageData = null;
+	public Matrix labelData = null;
 
 
     private String labelFileName;
@@ -107,18 +110,22 @@ public class MNIST_DatasetUtils {
         File tarFile = new File(baseDir, trainingFilesFilename);
         
         if(!tarFile.isFile()) {
+        	System.out.println("Downloading training image data....");
           FileUtils.copyURLToFile(new URL(trainingFilesURL), tarFile);      
         }
         
+        System.out.println("Unzipping training image data....");
         gunzipFile(baseDir, tarFile);
         
         // get training records labels - trainingFileLabelsURL
         File tarLabelsFile = new File(baseDir, trainingFileLabelsFilename);
         
         if(!tarLabelsFile.isFile()) {
+        	System.out.println("Downloading training label data....");
           FileUtils.copyURLToFile(new URL(trainingFileLabelsURL), tarLabelsFile);      
         }
 
+        System.out.println("Unzipping training label data....");
         gunzipFile(baseDir, tarLabelsFile);
         
         
@@ -170,6 +177,9 @@ public class MNIST_DatasetUtils {
         this.labelFileName = labelFileName;
         this.imageFileName = imageFileName;
     }
+    
+
+    
     
     
     /**
@@ -315,6 +325,136 @@ public class MNIST_DatasetUtils {
        // return images;
     }
     
+    public void scanIDXFilesAndGenerateInputAndLabels() throws IOException {
+//      List<DigitImage> images = new ArrayList<DigitImage>();
+  	
+  	int max = 0;
+  	
+  	System.out.println("> Scanning MNIST Files....");
+  	System.out.println("> Labels: " + labelFileName);
+  	System.out.println("> Images: " + imageFileName);
+  	
+
+      ByteArrayOutputStream labelBuffer = new ByteArrayOutputStream();
+      ByteArrayOutputStream imageBuffer = new ByteArrayOutputStream();
+
+      InputStream labelInputStream = new FileInputStream(labelFileName); //this.getClass().getResourceAsStream(labelFileName);
+      InputStream imageInputStream = new FileInputStream(imageFileName); //this.getClass().getResourceAsStream(imageFileName);
+
+      int read;
+      byte[] buffer = new byte[16384];
+
+      while((read = labelInputStream.read(buffer, 0, buffer.length)) != -1) {
+         labelBuffer.write(buffer, 0, read);
+      }
+
+      labelBuffer.flush();
+
+      while((read = imageInputStream.read(buffer, 0, buffer.length)) != -1) {
+          imageBuffer.write(buffer, 0, read);
+      }
+
+      imageBuffer.flush();
+
+      byte[] labelBytes = labelBuffer.toByteArray();
+      byte[] imageBytes = imageBuffer.toByteArray();
+
+      byte[] labelMagic = Arrays.copyOfRange(labelBytes, 0, OFFSET_SIZE);
+      byte[] imageMagic = Arrays.copyOfRange(imageBytes, 0, OFFSET_SIZE);
+
+      if(ByteBuffer.wrap(labelMagic).getInt() != LABEL_MAGIC)  {
+          throw new IOException("Bad magic number in label file!");
+      }
+
+      if(ByteBuffer.wrap(imageMagic).getInt() != IMAGE_MAGIC) {
+          throw new IOException("Bad magic number in image file!");
+      }
+
+      int numberOfLabels = ByteBuffer.wrap(Arrays.copyOfRange(labelBytes, NUMBER_ITEMS_OFFSET, NUMBER_ITEMS_OFFSET + ITEMS_SIZE)).getInt();
+      int numberOfImages = ByteBuffer.wrap(Arrays.copyOfRange(imageBytes, NUMBER_ITEMS_OFFSET, NUMBER_ITEMS_OFFSET + ITEMS_SIZE)).getInt();
+
+      if(numberOfImages != numberOfLabels) {
+          throw new IOException("The number of labels and images do not match!");
+      }
+
+      int numRows = ByteBuffer.wrap(Arrays.copyOfRange(imageBytes, NUMBER_OF_ROWS_OFFSET, NUMBER_OF_ROWS_OFFSET + ROWS_SIZE)).getInt();
+      int numCols = ByteBuffer.wrap(Arrays.copyOfRange(imageBytes, NUMBER_OF_COLUMNS_OFFSET, NUMBER_OF_COLUMNS_OFFSET + COLUMNS_SIZE)).getInt();
+
+      if(numRows != ROWS && numRows != COLUMNS) {
+          throw new IOException("Bad image. Rows and columns do not equal " + ROWS + "x" + COLUMNS);
+      }
+      
+//		BufferedWriter bw = new BufferedWriter(new FileWriter(metronomeFormattedMNISTFile));
+      
+      this.imageData = new DenseMatrix( numberOfImages, 784 );
+      
+      this.labelData = new DenseMatrix( numberOfImages, 10 );
+
+      for(int i = 0; i < numberOfLabels; i++) {
+
+    	  int label = labelBytes[OFFSET_SIZE + ITEMS_SIZE + i];
+          byte[] imageDataAsBytes = Arrays.copyOfRange(imageBytes, (i * IMAGE_SIZE) + IMAGE_OFFSET, (i * IMAGE_SIZE) + IMAGE_OFFSET + IMAGE_SIZE);
+
+          //System.out.print(".");
+//			String formatted_line = formatMNISTHandwritingColumnToMetronomeRecord(imageData, label, 255);
+//			bw.write(formatted_line);
+          
+  		if (imageDataAsBytes.length != 784) {
+			System.out.println("Invalid image data!!!!!");
+		}
+  		
+  		// TODO: convert byte to double and normalize to {0,1}
+
+  		double[] binary_image = binaryNormalizeInputArray(imageDataAsBytes);
+
+  		this.imageData.viewRow(i).assign(binary_image);
+  		this.labelData.viewRow(i).setQuick(label, 1.0);
+          
+          
+      //    images.add(new DigitImage(label, imageData));
+          //System.out.println("label: " + label);
+      }
+      
+//      bw.close();
+
+     // return images;
+  }  
+    
+    public double[] binaryNormalizeInputArray( byte[] image ) {
+    	
+    	double[] out = new double[ image.length ];
+    	
+    	if ( out.length > image.length ) {
+    		
+    		System.out.println("ERR > image data bigger than buffer! - " + image.length );
+    		
+    	}
+    	
+		//DoubleMatrix in = MatrixUtil.toMatrix(ArrayUtil.flatten(man.readImage()));
+		for (int d = 0; d < out.length; d++) {
+			
+			int tmp = image[d] & 0xFF;
+			
+			if(tmp > 30) {
+				
+				//in.put(d,1);
+				out[d] = 1;
+				
+			} else {
+				
+				//in.put(d,0);
+				out[d] = 0;
+				
+			}
+			
+		}
+    	
+		return out;
+    	
+    }
+    
+    
+    
     /*
 	public static void convertIrisNormalizedToMetronome(String filename, String file_out) throws IOException {
 		
@@ -360,5 +500,29 @@ public class MNIST_DatasetUtils {
 		
 		
 	}
+	
+	
+	public static Matrix getImageDataAsMatrix() throws IOException {
+		
+		// 
 
+		downloadAndUntar();
+		
+		MNIST_DatasetUtils util = new MNIST_DatasetUtils( "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFileLabelsFilename_unzipped, "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFilesFilename_unzipped );
+		util.scanIDXFilesAndGenerateInputAndLabels();
+		
+		return util.imageData;
+	}
+
+	public static Matrix getLabelsAsMatrix() throws IOException {
+		
+		downloadAndUntar();
+		
+		MNIST_DatasetUtils util = new MNIST_DatasetUtils( "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFileLabelsFilename_unzipped, "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFilesFilename_unzipped );
+		util.scanIDXFilesAndGenerateInputAndLabels();
+		
+		return util.labelData;
+	}
+	
+	
 }
