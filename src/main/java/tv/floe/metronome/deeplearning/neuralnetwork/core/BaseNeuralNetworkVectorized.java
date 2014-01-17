@@ -97,8 +97,8 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		if (hBias == null) { 
 			// TODO: recheck if this column vector is correctly oriented
 			this.hiddenBiasNeurons = new DenseMatrix(1, nHidden); //Matrix.zeros(nHidden);
-		} else if(hBias.numRows() != nHidden) {
-			throw new IllegalArgumentException("Hidden bias must have a length of " + nHidden + " length was " + hBias.numRows());
+		//} else if(hBias.numRows() != nHidden) {
+			//throw new IllegalArgumentException("Hidden bias must have a length of " + nHidden + " length was " + hBias.numRows());
 		} else {
 			this.hiddenBiasNeurons = hBias;
 		}

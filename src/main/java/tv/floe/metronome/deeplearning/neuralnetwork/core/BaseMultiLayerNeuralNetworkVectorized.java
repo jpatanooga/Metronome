@@ -106,6 +106,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 		Matrix layer_input = input;
 		int input_size;
 
+		System.out.println("initializeLayers --------");
+		
 		// construct multi-layer
 		for (int i = 0; i < this.numberLayers; i++) {
 			
@@ -130,6 +132,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				this.hiddenLayers[ i ].setInput( layer_input );
 				
 			}
+			
+			System.out.println("Created Hidden Layer: ConnWeight Matrix - rows: " + this.hiddenLayers[i].connectionWeights.numRows() + ", cols " + this.hiddenLayers[i].connectionWeights.numCols() );
 
 
 			// construct DL appropriate class for pre training layer
@@ -138,6 +142,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 		this.outputLogisticLayer = new LogisticRegressionLayer(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
+		System.out.println( "Finished layer init ------  " );
+		
 	}
 	
 	/**

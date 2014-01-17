@@ -100,7 +100,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		//this.visibleBiasNeurons = new DenseMatrix( this.numberVisibleNeurons, 1 );
 		this.visibleBiasNeurons.assign(0.0);
 
-		
+		System.out.println("Creating RBM: visible: " + this.numberVisibleNeurons + ", hidden: " + this.numberHiddenNeurons );
 		
 		
 	}

@@ -325,7 +325,7 @@ public class MNIST_DatasetUtils {
        // return images;
     }
     
-    public void scanIDXFilesAndGenerateInputAndLabels() throws IOException {
+    public void scanIDXFilesAndGenerateInputAndLabels(int rowCountLimit) throws IOException {
 //      List<DigitImage> images = new ArrayList<DigitImage>();
   	
   	int max = 0;
@@ -386,11 +386,16 @@ public class MNIST_DatasetUtils {
       
 //		BufferedWriter bw = new BufferedWriter(new FileWriter(metronomeFormattedMNISTFile));
       
-      this.imageData = new DenseMatrix( numberOfImages, 784 );
+      int matrixRowCount = numberOfImages;
+      if (numberOfImages > rowCountLimit) {
+    	  matrixRowCount = rowCountLimit;
+      }
       
-      this.labelData = new DenseMatrix( numberOfImages, 10 );
+      this.imageData = new DenseMatrix( matrixRowCount, 784 );
+      
+      this.labelData = new DenseMatrix( matrixRowCount, 10 );
 
-      for(int i = 0; i < numberOfLabels; i++) {
+      for(int i = 0; i < matrixRowCount; i++) {
 
     	  int label = labelBytes[OFFSET_SIZE + ITEMS_SIZE + i];
           byte[] imageDataAsBytes = Arrays.copyOfRange(imageBytes, (i * IMAGE_SIZE) + IMAGE_OFFSET, (i * IMAGE_SIZE) + IMAGE_OFFSET + IMAGE_SIZE);
@@ -502,24 +507,24 @@ public class MNIST_DatasetUtils {
 	}
 	
 	
-	public static Matrix getImageDataAsMatrix() throws IOException {
+	public static Matrix getImageDataAsMatrix(int rowLimit) throws IOException {
 		
 		// 
 
 		downloadAndUntar();
 		
 		MNIST_DatasetUtils util = new MNIST_DatasetUtils( "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFileLabelsFilename_unzipped, "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFilesFilename_unzipped );
-		util.scanIDXFilesAndGenerateInputAndLabels();
+		util.scanIDXFilesAndGenerateInputAndLabels(rowLimit);
 		
 		return util.imageData;
 	}
 
-	public static Matrix getLabelsAsMatrix() throws IOException {
+	public static Matrix getLabelsAsMatrix(int rowLimit) throws IOException {
 		
 		downloadAndUntar();
 		
 		MNIST_DatasetUtils util = new MNIST_DatasetUtils( "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFileLabelsFilename_unzipped, "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFilesFilename_unzipped );
-		util.scanIDXFilesAndGenerateInputAndLabels();
+		util.scanIDXFilesAndGenerateInputAndLabels(rowLimit);
 		
 		return util.labelData;
 	}

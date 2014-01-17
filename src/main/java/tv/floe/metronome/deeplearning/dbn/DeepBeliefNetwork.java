@@ -89,6 +89,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 		for (int i = 0; i < this.numberLayers; i++) {
 			
+			System.out.println("PreTrain > Layer " + i );
+			
 			if (i == 0) {
 				layerInput = this.inputTrainingData;
 			} else { 
@@ -100,6 +102,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			HiddenLayer h = this.hiddenLayers[i];
 
 			for (int  epoch = 0; epoch < epochs; epoch++) {
+				
+				System.out.println("PreTrain > Layer " + i + ", Epoch " + epoch );
 				
 				rbmPreTrainLayer.trainTillConvergence(learningRate, k, layerInput);	
 				h.connectionWeights = rbmPreTrainLayer.connectionWeights;
@@ -117,6 +121,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		int k = (Integer) otherParams[0];
 		double learningRate = (Double) otherParams[1];
 		int epochs = (Integer) otherParams[2];
+		
+		System.out.println( "Training Network... " );
 
 		preTrain(input, k, learningRate, epochs);
 		

@@ -94,6 +94,10 @@ public class HiddenLayer {
 	 */
 	public Matrix computeActivationOutput() {
 		
+		System.out.println("computeActivationOutput()");
+		System.out.println("input: rows: " + this.input.numRows() + ", cols: " + this.input.numCols() );
+		System.out.println("connectionWeights: rows: " + this.connectionWeights.numRows() + ", cols: " + this.connectionWeights.numCols() );
+		
 		Matrix mult = this.input.times(connectionWeights);
 		Matrix multPlusBias = MatrixUtils.addRowVector(mult, this.biasTerms.viewRow(0));
 		return MatrixUtils.sigmoid(multPlusBias);
