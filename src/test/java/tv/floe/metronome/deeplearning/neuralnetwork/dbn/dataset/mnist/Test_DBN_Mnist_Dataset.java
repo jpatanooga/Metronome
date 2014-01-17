@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist.MNIST_DatasetUtils;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.math.MatrixUtils;
 
 public class Test_DBN_Mnist_Dataset {
 	
@@ -53,8 +54,17 @@ public class Test_DBN_Mnist_Dataset {
 		
 		System.out.println( "input records: " + inputDataset.numRows() );
 		System.out.println( "input labels: " + outputLabels.numRows() );
-		
 
+		assertEquals( 60000, inputDataset.numRows() );
+		assertEquals( 784, inputDataset.numCols() );
+
+		assertEquals( 60000, outputLabels.numRows() );
+		assertEquals( 10, outputLabels.numCols() );
+		
+		MatrixUtils.debug_print_row(inputDataset, 0);
+		MatrixUtils.debug_print_row(inputDataset, 10);
+		
+		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork();
 		
 //		dbn.preTrain( inputDataset, 1, learningRate, preTrainEpochs );

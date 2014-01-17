@@ -680,6 +680,25 @@ public class MatrixUtils {
 		System.out.println("Print Matrix Stats ------- ");
 
 	}
+	
+	public static void debug_print_row(Matrix m, int index) {
+
+
+		//Vector v = m.viewRow(index);
+		
+		System.out.println("Print Matrix Row ------- ");
+		//for (int r = 0; r < m.numRows(); r++) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+
+				//ret.set(r, c, numerator.get(r, c) / denominator.get(r, c)  );
+				System.out.print(" " + m.get(index, c));
+			}
+			System.out.println(" ");
+		//}
+		System.out.println("Print Matrix Row ------- ");
+
+
+	}		
 
 
 
