@@ -175,6 +175,13 @@ public class TestRestrictedBoltzmannMachine {
 		
 	}
 	
+	@Test
+	public void testTrainTilConvergenceOptimizer() {
+		
+		//trainTillConvergence
+		
+	}
+	
 	
 	
 	

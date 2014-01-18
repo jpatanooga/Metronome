@@ -5,16 +5,14 @@ import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.math.MatrixUtils;
 
-
+/**
+ * TODO: make sure this thing works right, some issues with values coming out
+ * 
+ * @author josh
+ *
+ */
 public class LogisticRegressionLayer {
-/*
-	private static final long serialVersionUID = -7065564817460914364L;
-	public int nIn;
-	public int nOut;
-	public Matrix input,labels;
-	public Matrix W;
-	public Matrix b;
-*/
+
 	private static final long serialVersionUID = -7065564817460914364L;
 	public int numInputNeurons;
 	public int numOutputNeurons;
@@ -35,7 +33,7 @@ public class LogisticRegressionLayer {
 		this.connectionWeights = new DenseMatrix( nIn, nOut );
 		this.connectionWeights.assign(0.0);
 		
-		this.biasTerms = new DenseMatrix(nOut, 1); //Matrix.zeros(nOut);
+		this.biasTerms = new DenseMatrix(1, nOut); //Matrix.zeros(nOut);
 		this.biasTerms.assign(0.0);
 	}
 
