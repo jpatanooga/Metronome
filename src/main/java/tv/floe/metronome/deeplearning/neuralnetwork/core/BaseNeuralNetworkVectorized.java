@@ -197,12 +197,13 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	@Override
 	public Matrix getInput() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.trainingDataset;
 	}
 
 	@Override
 	public void setInput(Matrix input) {
-		// TODO Auto-generated method stub
+
+		this.trainingDataset = input;
 		
 	}
 

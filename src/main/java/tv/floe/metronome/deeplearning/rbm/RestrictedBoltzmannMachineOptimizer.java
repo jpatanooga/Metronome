@@ -99,6 +99,8 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 			nhMeans = matrices.getSecond().getFirst();
 			nhSamples = matrices.getSecond().getSecond();
 		}
+		
+		// TODO: check this against the stock CD implementation
 
 		/*
 		 * Update gradient parameters
@@ -114,7 +116,7 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 		Matrix hBiasAdd = MatrixUtils.mean(probHidden.getSecond().minus(nhMeans), 0).times(lr);
 		
 		int idx = 0;
-		/*
+		
 		
 		for (int i = 0; i < MatrixUtils.length(wAdd); i++) { 
 		
@@ -134,13 +136,13 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 			buffer[ idx++ ] = MatrixUtils.getElement( hBiasAdd, i );
 			
 		}
-		*/
+		
 		
 		int wAddLen = MatrixUtils.length(wAdd);
 		int vBiasLen = MatrixUtils.length(vBiasAdd);
 		int hBiasLen = MatrixUtils.length(hBiasAdd);
 		
-		System.out.println("> Total buff len: " + (wAddLen + vBiasLen + hBiasLen ) );
+		//System.out.println("> Total buff len: " + (wAddLen + vBiasLen + hBiasLen ) );
 	
 	}
 	

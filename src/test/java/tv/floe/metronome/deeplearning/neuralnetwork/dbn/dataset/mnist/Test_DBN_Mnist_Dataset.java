@@ -72,7 +72,7 @@ public class Test_DBN_Mnist_Dataset {
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork(n_ins, hiddenLayerSizes, n_outs, n_layers, rng ); //, Matrix input, Matrix labels);
 		
 		dbn.preTrain( inputDataset, 1, learningRate, preTrainEpochs );
-		dbn.finetune( outputLabels, learningRate, fineTuneEpochs );
+//		dbn.finetune( outputLabels, learningRate, fineTuneEpochs );
 		
 		
 		
