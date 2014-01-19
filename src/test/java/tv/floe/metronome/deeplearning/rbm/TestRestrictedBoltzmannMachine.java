@@ -127,7 +127,10 @@ public class TestRestrictedBoltzmannMachine {
 	}
 	
 
-	
+	/**
+	 * Tests to see if the Cross Entropy drops below a certain level after 1000 epochs
+	 * 
+	 */
 	@Test
 	public void testCrossEntropyReconstruction() {
 		
@@ -175,10 +178,23 @@ public class TestRestrictedBoltzmannMachine {
 		
 	}
 	
+	/**
+	 * Tests to see if the optimizer based RBM-contrastive divergence is working 
+	 * 
+	 */
 	@Test
 	public void testTrainTilConvergenceOptimizer() {
 		
 		//trainTillConvergence
+		
+		Matrix input = buildTestInputDataset();
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
+		
+		double ce = 0;
+		
+
+		rbm.trainTillConvergence(0.1, 1, input);
 		
 	}
 	

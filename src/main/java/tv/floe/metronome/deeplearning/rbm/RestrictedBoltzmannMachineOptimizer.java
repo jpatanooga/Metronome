@@ -29,6 +29,9 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 	public void getValueGradient(double[] buffer) {
 		int k = (Integer) extraParams[0];
 		numTimesIterated++;
+		
+		//System.out.println("k: " + k);
+		
 		//adaptive k based on the number of iterations.
 		//typically over time, you want to increase k.
 		if(this.k <= 0)
@@ -111,7 +114,7 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 		Matrix hBiasAdd = MatrixUtils.mean(probHidden.getSecond().minus(nhMeans), 0).times(lr);
 		
 		int idx = 0;
-		
+		/*
 		
 		for (int i = 0; i < MatrixUtils.length(wAdd); i++) { 
 		
@@ -131,7 +134,13 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 			buffer[ idx++ ] = MatrixUtils.getElement( hBiasAdd, i );
 			
 		}
+		*/
 		
+		int wAddLen = MatrixUtils.length(wAdd);
+		int vBiasLen = MatrixUtils.length(vBiasAdd);
+		int hBiasLen = MatrixUtils.length(hBiasAdd);
+		
+		System.out.println("> Total buff len: " + (wAddLen + vBiasLen + hBiasLen ) );
 	
 	}
 	

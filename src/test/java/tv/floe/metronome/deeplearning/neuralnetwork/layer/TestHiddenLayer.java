@@ -54,5 +54,45 @@ public class TestHiddenLayer {
 		assertEquals( 2, layer.computeActivationOutput().numCols() );
 		
 	}
+	
+	/**
+	 * TODO: complete
+	 * 
+	 */
+	@Test
+	public void testComputeActivationOutput() {
+		
+		Matrix input = new DenseMatrix(new double[][] 
+		{
+				{1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0}
+				,{1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0}
+				,{1,1,0,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0}
+				,{1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0}
+				,{0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0}
+				,{0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1}
+				,{0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,1}
+				,{0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1,1,0,1}
+				,{0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,1,1}
+				,{0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0}
+        }
+		);
+
+		RandomGenerator r = new MersenneTwister(1234);
+		
+		HiddenLayer layer = new HiddenLayer(20, 2, r);
+		layer.setInput(input);	
+		
+		Matrix output = layer.computeActivationOutput();
+		
+	}
+
+	/**
+	 * TODO: complete
+	 * 
+	 */	
+	@Test 
+	public void testSampleHiddenGivenLastVisible() {
+		
+	}
 
 }

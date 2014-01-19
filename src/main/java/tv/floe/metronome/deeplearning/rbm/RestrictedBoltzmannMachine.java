@@ -206,17 +206,9 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 		
 	}
-/*	
-	public void setLearningRate(double alpha) {
-		
-		this.learningRate = alpha;
-		
-	}
-*/	
+
 	/**
 	 * Used to calculate how well trained the RBM currently is
-	 * 
-	 * [ TODO: Currently giving weird numbers ]
 	 * 
 	 * - the input training set matrix is arranged such that there is a training example per row
 	 * 
@@ -339,15 +331,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
 	
 	/**
-	 * "Compute Activations"
-	 * 
-	 * Generate probabilities for each visible unit being set to 1 given hidden states
-	 * Equation (8) in Hinton
-	 * 
-	 * This function propagates the hidden units activation downwards to 
-	 * the visible units
-	 * 
-	 * Aka "Propagate Down"
+
 	 * 
 	 * TODO: can this also mean "reconstruction" ?
 	 * 
@@ -462,10 +446,8 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		if (input != null) {
 			this.trainingDataset = input;
 		}
-		//this.learningRate = learningRate;
-		
-		//optimizer = new RBMOptimizer(this, learningRate, new Object[]{k});
-		//optimizer.train(input);
+
+		System.out.println("using Mallet's optimization");
 		
 		optimizer = new RestrictedBoltzmannMachineOptimizer(this, learningRate, new Object[]{k});
 		optimizer.train(input);

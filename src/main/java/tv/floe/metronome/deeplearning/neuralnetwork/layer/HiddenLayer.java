@@ -92,11 +92,6 @@ public class HiddenLayer {
 	}
 	
 	
-	public Matrix getVectorizedOutputMatrix() {
-		
-		return null;
-	}
-	
 	
 	/**
 	 * Trigger an activation with the last specified input
