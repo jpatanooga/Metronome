@@ -7,7 +7,18 @@ import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimi
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
-
+/**
+ * A Mallet-based optimizer for SGD in RBM
+ * 
+ * Current Status: currently there are some integration issues, this class is not functional
+ * 
+ * TODO: finish debugging
+ * 
+ * For now, use the stock SGD + CDk built into RBMs
+ * 
+ * @author josh
+ *
+ */
 public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer {
 
 	
