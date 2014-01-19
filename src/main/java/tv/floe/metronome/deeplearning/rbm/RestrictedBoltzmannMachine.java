@@ -39,6 +39,8 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
 	//private double learningRate = 0.1d;
 	protected NeuralNetworkOptimizer optimizer;
+	public double[] debugWeightAddsBuffer = null; // only set when we want to check things
+	
 
 	public RestrictedBoltzmannMachine(int nVisible, int nHidden, Matrix weights, Matrix hBias, Matrix vBias, RandomGenerator rng) {
 		super(nVisible, nHidden, weights, hBias, vBias, rng);
@@ -103,6 +105,10 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		System.out.println("Creating RBM: visible: " + this.numberVisibleNeurons + ", hidden: " + this.numberHiddenNeurons );
 		
 		
+	}
+	
+	public void setupCDkDebugBuffer(double[] buffer) {
+		this.debugWeightAddsBuffer = buffer;
 	}
 	
 	/**
@@ -197,13 +203,46 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		// update the connection weights and bias terms for visible/hidden units
 		this.connectionWeights = this.connectionWeights.plus( connectionWeightChanges );
 
-		Matrix vBiasAdd = MatrixUtils.mean( input.minus( negativeVisibleSamples ) , 0); 
-		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd.times( learningRate ) );
+		Matrix vBiasAdd = MatrixUtils.mean( input.minus( negativeVisibleSamples ) , 0).times( learningRate ); 
+		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd );
 
-		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0); //.times(this.learningRate);
-		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd.times( learningRate ) );
+		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0).times( learningRate ); //.times(this.learningRate);
+		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd );
 		
+//		System.out.println("Debug: CDk (stock impl)");
+//		MatrixUtils.debug_print( connectionWeightChanges );
+//		MatrixUtils.debug_print( vBiasAdd.times( learningRate ) );
+//		MatrixUtils.debug_print( hBiasAdd.times( learningRate ) );
 		
+		if ( null != this.debugWeightAddsBuffer ) {
+			
+			// this is rarely used
+			// flag is set, lets collect some debug stats
+			
+			int idx = 0;
+			
+			
+			for (int i = 0; i < MatrixUtils.length( connectionWeightChanges ); i++) { 
+			
+				this.debugWeightAddsBuffer[ idx++ ] = MatrixUtils.getElement(connectionWeightChanges, i);
+				
+			}
+			
+			
+			for (int i = 0; i < MatrixUtils.length( vBiasAdd ); i++) {
+				
+				this.debugWeightAddsBuffer[ idx++ ] = MatrixUtils.getElement( vBiasAdd, i );
+				
+			}
+			
+			for (int i = 0; i < MatrixUtils.length( hBiasAdd ); i++) {
+			
+				this.debugWeightAddsBuffer[ idx++ ] = MatrixUtils.getElement( hBiasAdd, i );
+				
+			}			
+			
+			
+		}
 		
 	}
 

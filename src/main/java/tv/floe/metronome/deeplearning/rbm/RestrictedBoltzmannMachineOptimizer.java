@@ -106,7 +106,8 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 		 * Update gradient parameters
 		 */
 		//Matrix wAdd = r.input.transpose().mmul(probHidden.getSecond()).sub(nvSamples.transpose().mmul(nhMeans)).mul(lr).mul(0.1);
-		Matrix wAdd = r.trainingDataset.transpose().times(probHidden.getSecond()).minus(nvSamples.transpose().times(nhMeans)).times(lr).times(0.1);
+		// TODO: Figure out: so the extra multiple on the weight adds was different than the stock CDk impl --- 
+		Matrix wAdd = r.trainingDataset.transpose().times(probHidden.getSecond()).minus(nvSamples.transpose().times(nhMeans)).times(lr); //.times(0.1);
 
 		//Matrix  vBiasAdd = mean(r.trainingDataset.minus(nvSamples), 0).mul(lr);
 		Matrix  vBiasAdd = MatrixUtils.mean(r.trainingDataset.minus(nvSamples), 0).times(lr);
@@ -141,6 +142,12 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 		int wAddLen = MatrixUtils.length(wAdd);
 		int vBiasLen = MatrixUtils.length(vBiasAdd);
 		int hBiasLen = MatrixUtils.length(hBiasAdd);
+		
+//		System.out.println("Debug: CDk (optimizer impl)");
+//		MatrixUtils.debug_print( wAdd );
+//		MatrixUtils.debug_print( vBiasAdd );
+//		MatrixUtils.debug_print( hBiasAdd );
+		
 		
 		//System.out.println("> Total buff len: " + (wAddLen + vBiasLen + hBiasLen ) );
 	
