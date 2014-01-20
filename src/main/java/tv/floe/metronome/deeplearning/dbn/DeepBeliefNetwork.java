@@ -76,6 +76,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 * This is where we work through each RBM layer, learning an unsupervised 
 	 * representation of the data
 	 * 
+	 * TODO: look into applying SGD around the CDk runs
+	 * 
 	 * 
 	 */
 	public void preTrain(Matrix trainingRecords,int k,double learningRate,int epochs) {
