@@ -11,6 +11,9 @@ import org.apache.mahout.math.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ccc.deeplearning.optimize.LogisticRegressionOptimizer;
+import com.ccc.deeplearning.util.MyConjugateGradient;
+
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
 import tv.floe.metronome.math.MatrixUtils;
@@ -32,7 +35,7 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		this.learningRate = lr;
 		
 	}
-	
+/*	
 	public void optimize(Matrix labels, double learningRate, int epochs) {
 		
 		MatrixUtils.ensureValidOutcomeMatrix(labels);
@@ -112,6 +115,29 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 		
 	}	
+	*/
+	
+	public void optimize(Matrix labels, double learningRate, int epochs) {
+		
+		MatrixUtils.ensureValidOutcomeMatrix(labels);
+		//sample from the final layer in the network and train on the result
+		Matrix layerInput = network.hiddenLayers[network.hiddenLayers.length - 1].sampleHiddenGivenLastVisible();
+		
+		network.outputLogisticLayer.inputTrainingData = layerInput;
+		network.outputLogisticLayer.outputTrainingLabels = labels;
+
+		
+		Matrix w = network.outputLogisticLayer.connectionWeights.clone();
+		Matrix b = network.outputLogisticLayer.biasTerms.clone();
+		
+		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.outputLogisticLayer, learningRate );
+		MyConjugateGradient g = new MyConjugateGradient(opt);
+		g.optimize();
+		
+		network.backProp(lr, epochs);
+		
+
+	}
 	
 	
 	@Override
