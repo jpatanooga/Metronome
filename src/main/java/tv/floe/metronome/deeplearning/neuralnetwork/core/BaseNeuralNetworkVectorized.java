@@ -1,5 +1,6 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -76,7 +77,7 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			 * values do not allow typical visible vectors to drive the hidden unit probabilities very close to 1 or 0
 			 * as this significantly slows the learning.
 			 */
-			UniformRealDistribution u = new UniformRealDistribution(rng,-a,a);
+			NormalDistribution u = new NormalDistribution(rng,0,.01,NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
 
 			//this.connectionWeights = Matrix.zeros(nVisible,nHidden);
 			this.connectionWeights = new DenseMatrix( nVisible, nHidden );

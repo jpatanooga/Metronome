@@ -1,5 +1,6 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.layer;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
@@ -46,9 +47,8 @@ public class HiddenLayer {
 		this.neuronCountPreviousLayer = neuronCountPrevLayer;
 		this.rndNumGenerator = rndGen;
 		
-		double a = 1.0 / (double) neuronCountPrevLayer;
 
-		UniformRealDistribution realDistributionGenerator = new UniformRealDistribution( this.rndNumGenerator, -a, a );
+		NormalDistribution u = new NormalDistribution(rndGen,0,.01,NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
 
 		
 		// init the connection weights
@@ -59,7 +59,7 @@ public class HiddenLayer {
 			
 			for(int c = 0; c < this.connectionWeights.numCols(); c++) { 
 			
-				this.connectionWeights.setQuick( r, c, realDistributionGenerator.sample() );
+				this.connectionWeights.setQuick( r, c, u.sample() );
 			
 			}
 

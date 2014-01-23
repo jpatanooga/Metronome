@@ -1,5 +1,6 @@
 package tv.floe.metronome.deeplearning.rbm;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -75,7 +76,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 		double a = 1.0 / (double) this.numberVisibleNeurons;
 		
-		UniformRealDistribution realDistributionGenerator = new UniformRealDistribution(this.randNumGenerator,-a,a);
+		NormalDistribution u = new NormalDistribution(rnd,0,.01,NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
 
 		this.connectionWeights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons );
 		this.connectionWeights.assign(0.0);
@@ -84,7 +85,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			
 			for(int c = 0; c < this.connectionWeights.numCols(); c++) { 
 			
-				this.connectionWeights.setQuick( r, c, realDistributionGenerator.sample() );
+				this.connectionWeights.setQuick( r, c, u.sample() );
 			
 			}
 
