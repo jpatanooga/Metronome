@@ -2,9 +2,12 @@ package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
 import java.io.Serializable;
 
+import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import tv.floe.metronome.math.MatrixUtils;
 
 
 public class LogisticRegression  implements Serializable {
@@ -13,43 +16,59 @@ public class LogisticRegression  implements Serializable {
 	public int nIn;
 	public int nOut;
 	public Matrix input,labels;
-	public Matrix W;
-	public Matrix b;
+	public Matrix connectionWeights;
+	public Matrix biasTerms;
 	public double l2 = 0.01;
 	public boolean useRegularization = true;
 	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 
 
 	public LogisticRegression(Matrix input,Matrix labels, int nIn, int nOut) {
+		
 		this.input = input;
 		this.labels = labels;
 		this.nIn = nIn;
 		this.nOut = nOut;
-		W = Matrix.zeros(nIn,nOut);
-		b = Matrix.zeros(nOut);
+		//this.connectionWeights = Matrix.zeros(nIn,nOut);
+		this.connectionWeights = new DenseMatrix(nIn, nOut);
+		this.connectionWeights.assign(0.0);
+		this.biasTerms = new DenseMatrix(1, nOut); //Matrix.zeros(nOut);
+		this.biasTerms.assign(0.0);
+		
 	}
 
 	public LogisticRegression(Matrix input, int nIn, int nOut) {
+		
 		this(input,null,nIn,nOut);
+		
 	}
 
 	public LogisticRegression(int nIn, int nOut) {
+		
 		this(null,null,nIn,nOut);
+		
 	}
 
 	public void train(double lr) {
+		
 		train(input,labels,lr);
+		
 	}
 
 
 	public void train(Matrix x,double lr) {
+		
 		train(x,labels,lr);
 
 	}
 
 	public void merge(LogisticRegression l,int batchSize) {
-		W.addi(l.W.subi(W).div(batchSize));
-		b.addi(l.b.subi(b).div(batchSize));
+		
+		//W.addi(l.W.subi(W).div(batchSize));
+		this.connectionWeights.plus(l.connectionWeights.minus(this.connectionWeights).divide(batchSize));
+		
+		//b.addi(l.b.subi(b).div(batchSize));
+		this.biasTerms.plus(l.biasTerms.minus(this.biasTerms).divide(batchSize));
 	}
 
 	/**
@@ -57,15 +76,22 @@ public class LogisticRegression  implements Serializable {
 	 * @return the negative log likelihood of the model
 	 */
 	public double negativeLogLikelihood() {
-		Matrix sigAct = softmax(input.mmul(W).addRowVector(b));
-		if(useRegularization) {
-			double reg = (2 / l2) * MatrixFunctions.pow(this.W,2).sum();
+		
+		//Matrix sigAct = softmax(input.mmul(W).addRowVector(b));
+		Matrix sigActivation = MatrixUtils.softmax( MatrixUtils.addRowVector( input.times(this.connectionWeights), this.biasTerms.viewRow(0) ) );
+		
+		if (this.useRegularization) {
+			
+			//double reg = (2 / l2) * MatrixFunctions.pow(this.W,2).sum();
+			double regularization = ( 2 / l2 ) * 
 			return - labels.mul(log(sigAct)).add(
 					oneMinus(labels).mul(
 							log(oneMinus(sigAct))
 							))
 							.columnSums().mean() + reg;
+			
 		}
+		
 		return - labels.mul(log(sigAct)).add(
 				oneMinus(labels).mul(
 						log(oneMinus(sigAct))
@@ -83,20 +109,24 @@ public class LogisticRegression  implements Serializable {
 	 * @param y the labels to train on
 	 * @param lr the learning rate
 	 */
-	public void train(Matrix x,Matrix y, double lr) {
-		ensureValidOutcomeMatrix(y);
-		if(x.rows != y.rows) {
+	public void train(Matrix x, Matrix y, double lr) {
+		//ensureValidOutcomeMatrix(y);
+		MatrixUtils.ensureValidOutcomeMatrix(y);
+		
+		if (x.numRows() != y.numRows()) {
 			throw new IllegalArgumentException("How does this happen?");
 		}
 
 		this.input = x;
 		this.labels = y;
 
-		//Matrix regularized = W.transpose().mul(l2);
 		LogisticRegressionGradient gradient = getGradient(lr);
 
-		W.addi(gradient.getwGradient());
-		b.addi(gradient.getbGradient());
+		//W.addi(gradient.getwGradient());
+		this.connectionWeights.plus(gradient.getwGradient());
+		
+		//b.addi(gradient.getbGradient());
+		this.biasTerms.plus(gradient.getbGradient());
 
 	}
 
@@ -128,7 +158,7 @@ public class LogisticRegression  implements Serializable {
 	}	
 
 
-
+/*
 	public static class Builder {
 		private Matrix W;
 		private LogisticRegression ret;
@@ -166,5 +196,6 @@ public class LogisticRegression  implements Serializable {
 		}
 
 	}
+	*/
 	
 }
