@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import tv.floe.metronome.math.MatrixUtils;
 
 
-public class LogisticRegression  implements Serializable {
+public class LogisticRegression implements Serializable {
 
 	private static final long serialVersionUID = -7065564817460914364L;
 	public int nIn;
@@ -83,21 +83,31 @@ public class LogisticRegression  implements Serializable {
 		if (this.useRegularization) {
 			
 			//double reg = (2 / l2) * MatrixFunctions.pow(this.W,2).sum();
-			double regularization = ( 2 / l2 ) * 
-			return - labels.mul(log(sigAct)).add(
+			// TODO: fix this
+			//double regularization = ( 2 / l2 ) * 
+					
+					
+/*			return - labels.mul(log(sigAct)).add(
 					oneMinus(labels).mul(
 							log(oneMinus(sigAct))
 							))
 							.columnSums().mean() + reg;
-			
+*/
+			return - MatrixUtils.mean( MatrixUtils.columnSums( labels.times(MatrixUtils.log(sigActivation).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) ) + regularization;
+					
+					
 		}
-		
+		/*
 		return - labels.mul(log(sigAct)).add(
 				oneMinus(labels).mul(
 						log(oneMinus(sigAct))
 						))
 						.columnSums().mean();
-
+*/
+		
+		return - MatrixUtils.mean( MatrixUtils.columnSums( labels.times(MatrixUtils.log(sigActivation).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) );
+		
+		
 	}
 
 	/**
@@ -132,13 +142,22 @@ public class LogisticRegression  implements Serializable {
 
 
 	public LogisticRegressionGradient getGradient(double lr) {
-		Matrix p_y_given_x = sigmoid(input.mmul(W).addRowVector(b));
-		Matrix dy = labels.sub(p_y_given_x);
-		if(useRegularization)
-			dy.divi(input.rows);
-		Matrix wGradient = input.transpose().mmul(dy).mul(lr);
+		
+		//Matrix p_y_given_x = sigmoid(input.mmul(W).addRowVector(b));
+		Matrix p_y_given_x = MatrixUtils.sigmoid( MatrixUtils.addRowVector( input.times( this.connectionWeights ), this.biasTerms.viewRow(0) ) );
+		
+		//Matrix dy = labels.sub(p_y_given_x);
+		Matrix dy = labels.minus(p_y_given_x);
+		
+		if (useRegularization) {
+			dy.divide( this.input.numRows() );
+		}
+		
+		//Matrix wGradient = input.transpose().mmul(dy).mul(lr);
+		Matrix wGradient = input.transpose().times( dy ).times( lr );
+		
 		Matrix bGradient = dy;
-		return new LogisticRegressionGradient(wGradient,bGradient);
+		return new LogisticRegressionGradient( wGradient, bGradient );
 		
 		
 	}
@@ -154,7 +173,10 @@ public class LogisticRegression  implements Serializable {
 	 * @return a probability distribution for each row
 	 */
 	public Matrix predict(Matrix x) {
-		return softmax(x.mmul(W).addRowVector(b));
+		
+		//return softmax(x.mmul(W).addRowVector(b));
+		return MatrixUtils.softmax( MatrixUtils.addRowVector( x.times( this.connectionWeights ), this.biasTerms.viewRow(0) ) );
+		
 	}	
 
 
