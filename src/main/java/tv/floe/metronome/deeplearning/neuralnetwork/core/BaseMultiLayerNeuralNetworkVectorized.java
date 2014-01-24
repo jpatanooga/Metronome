@@ -11,15 +11,12 @@ import java.util.List;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
-import org.jblas.DoubleMatrix;
-
-import com.ccc.deeplearning.nn.activation.ActivationFunction;
-import com.ccc.deeplearning.util.MatrixUtil;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.LogisticRegressionLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.OutputLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
+import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
 public abstract class BaseMultiLayerNeuralNetworkVectorized {
@@ -178,72 +175,106 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 		return activations;
 	}
 
-	private void computeDeltas(List<DoubleMatrix> activations,List<Pair<DoubleMatrix,DoubleMatrix>> deltaRet) {
-		DoubleMatrix[] gradients = new DoubleMatrix[nLayers + 2];
-		DoubleMatrix[] deltas = new DoubleMatrix[nLayers + 2];
-		ActivationFunction derivative = sigmoidLayers[0].activationFunction;
+	/**
+	 * TODO: make sure our concept of an activation function can deliver functionality
+	 * 
+	 * @param activations
+	 * @param deltaRet
+	 */
+	private void computeDeltas(List<Matrix> activations,List<Pair<Matrix,Matrix>> deltaRet) {
+		
+		Matrix[] gradients = new Matrix[ this.numberLayers + 2 ];
+		Matrix[] deltas = new Matrix[ this.numberLayers + 2 ];
+		ActivationFunction derivative = this.hiddenLayers[ 0 ].activationFunction;
+		
 		//- y - h
-		DoubleMatrix delta = null;
+		Matrix delta = null;
 
 
 		/*
 		 * Precompute activations and z's (pre activation network outputs)
 		 */
-		List<DoubleMatrix> weights = new ArrayList<>();
-		for(int j = 0; j < layers.length; j++)
+		List<Matrix> weights = new ArrayList<Matrix>();
+/*		
+		for (int j = 0; j < layers.length; j++) {
 			weights.add(layers[j].getW());
-		weights.add(logLayer.W);
-
-		List<DoubleMatrix> zs = new ArrayList<>();
-		zs.add(input);
-		for(int i = 0; i < layers.length; i++) {
-			if(layers[i].getInput() == null && i == 0) {
-				layers[i].setInput(input);
-			}
-			else if(layers[i].getInput() == null){
-				this.feedForward();
-			}
-
-			zs.add(MatrixUtil.sigmoid(layers[i].getInput().mmul(weights.get(i)).addRowVector(layers[i].gethBias())));
 		}
-		zs.add(logLayer.input.mmul(logLayer.W).addRowVector(logLayer.b));
+*/
+		for (int j = 0; j < this.preTrainingLayers.length; j++) {
+			
+			weights.add( this.preTrainingLayers[j].getConnectionWeights() );
+			
+		}
+		
+		weights.add( this.logisticRegressionLayer.connectionWeights );
+
+		List<Matrix> zs = new ArrayList<Matrix>();
+		
+		zs.add( this.inputTrainingData );
+		
+		for (int i = 0; i < this.preTrainingLayers.length; i++) {
+			
+			if (this.preTrainingLayers[i].getInput() == null && i == 0) {
+				
+				this.preTrainingLayers[i].setInput( this.inputTrainingData );
+				
+			} else if (this.preTrainingLayers[i].getInput() == null) {
+				
+				this.feedForward();
+				
+			}
+
+			//zs.add(MatrixUtil.sigmoid(layers[i].getInput().mmul(weights.get(i)).addRowVector(layers[i].gethBias())));
+			//zs.add(MatrixUtils.sigmoid( this.preTrainingLayers[ i ].getInput().times( weights.get( i ) ).addRowVector( this.preTrainingLayers[i].getHiddenBias() )));
+			zs.add(MatrixUtils.sigmoid( MatrixUtils.addRowVector( this.preTrainingLayers[ i ].getInput().times( weights.get( i ) ),  this.preTrainingLayers[i].getHiddenBias().viewRow(0) )));
+			
+		}
+		
+		//zs.add(logLayer.input.mmul(logLayer.W).addRowVector(logLayer.b));
+		//zs.add( this.logisticRegressionLayer.input.times( this.logisticRegressionLayer.connectionWeights ).addRowVector( this.logisticRegressionLayer.biasTerms ));
+		zs.add( MatrixUtils.addRowVector( this.logisticRegressionLayer.input.times( this.logisticRegressionLayer.connectionWeights ), this.logisticRegressionLayer.biasTerms.viewRow(0) ) );
 
 		//errors
-		for(int i = nLayers + 1; i >= 0; i--) {
-			if(i >= nLayers + 1) {
-				DoubleMatrix z = zs.get(i);
+		for (int i = this.numberLayers + 1; i >= 0; i--) {
+			
+			if (i >= this.numberLayers + 1) {
+				
+				Matrix z = zs.get(i);
 				//- y - h
-				delta = labels.sub(activations.get(i)).neg();
+				//delta = labels.sub(activations.get(i)).neg();
+				delta = MatrixUtils.neg( this.outputTrainingLabels.minus( activations.get( i ) ) );
 
 				//(- y - h) .* f'(z^l) where l is the output layer
-				DoubleMatrix initialDelta = delta.mul(derivative.applyDerivative(z));
-				deltas[i] = initialDelta;
+				Matrix initialDelta = delta.mul( derivative.applyDerivative( z ) );
+				deltas[ i ] = initialDelta;
 
-			}
-			else {
-				delta = deltas[i + 1];
-				DoubleMatrix w = weights.get(i).transpose();
-				DoubleMatrix z = zs.get(i);
-				DoubleMatrix a = activations.get(i + 1);
+			} else {
+				
+				delta = deltas[ i + 1 ];
+				Matrix w = weights.get( i ).transpose();
+				Matrix z = zs.get( i );
+				Matrix a = activations.get( i + 1 );
 				//W^t * error^l + 1
 
-				DoubleMatrix error = delta.mmul(w);
-				deltas[i] = error;
+				Matrix error = delta.times( w );
+				deltas[ i ] = error;
 
 				error = error.mul(derivative.applyDerivative(z));
 
-				deltas[i] = error;
-				gradients[i] = a.transpose().mmul(error).transpose().div(input.rows);
+				deltas[ i ] = error;
+//				gradients[ i ] = a.transpose().times(error).transpose().div( this.inputTrainingData.numRows() );
+				gradients[ i ] = a.transpose().times(error).transpose().divide( this.inputTrainingData.numRows() );
 			}
 
 		}
 
 
-
-
-		for(int i = 0; i < gradients.length; i++) {
-			deltaRet.add(new Pair<>(gradients[i],deltas[i]));
+		for (int i = 0; i < gradients.length; i++) {
+			
+			deltaRet.add(new Pair<Matrix, Matrix>(gradients[i],deltas[i]));
+			
 		}
+		
 	}
 	
 	
@@ -278,7 +309,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 				layers[l].setW(layers[l].getW().sub(add.mul(lr)));
 				sigmoidLayers[l].W = layers[l].getW();
-				DoubleMatrix deltaColumnSums = deltas.get(l + 1).getSecond().columnSums();
+				Matrix deltaColumnSums = deltas.get(l + 1).getSecond().columnSums();
 				deltaColumnSums.divi(input.rows);
 
 				layers[l].gethBias().subi(deltaColumnSums.mul(lr));
