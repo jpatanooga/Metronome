@@ -121,18 +121,18 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		//sample from the final layer in the network and train on the result
 		Matrix layerInput = network.hiddenLayers[network.hiddenLayers.length - 1].sampleHiddenGivenLastVisible();
 		
-		network.outputLogisticLayer.inputTrainingData = layerInput;
-		network.outputLogisticLayer.outputTrainingLabels = labels;
+		network.logisticRegressionLayer.input = layerInput;
+		network.logisticRegressionLayer.labels = labels;
 
 		
-		Matrix w = network.outputLogisticLayer.connectionWeights.clone();
-		Matrix b = network.outputLogisticLayer.biasTerms.clone();
+		Matrix w = network.logisticRegressionLayer.connectionWeights.clone();
+		Matrix b = network.logisticRegressionLayer.biasTerms.clone();
 		
-		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.outputLogisticLayer, learningRate );
+		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.logisticRegressionLayer, learningRate );
 		CustomConjugateGradient g = new CustomConjugateGradient(opt);
 		g.optimize();
 		
-		network.backProp(lr, epochs);
+		network.backProp(learningRate, epochs);
 		
 
 	}
@@ -142,8 +142,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	public int getNumParameters() {
 		// 		return network.logLayer.W.length + network.logLayer.b.length;
 
-		int connectionSize = network.outputLogisticLayer.connectionWeights.numRows() * network.outputLogisticLayer.connectionWeights.numCols(); 
-		int biasSize = network.outputLogisticLayer.biasTerms.numRows() * network.outputLogisticLayer.biasTerms.numCols();
+		int connectionSize = network.logisticRegressionLayer.connectionWeights.numRows() * network.logisticRegressionLayer.connectionWeights.numCols(); 
+		int biasSize = network.logisticRegressionLayer.biasTerms.numRows() * network.logisticRegressionLayer.biasTerms.numCols();
 		return connectionSize + biasSize;
 	}
 
@@ -151,14 +151,14 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	public double getParameter(int index) {
 		
 
-		if (index > MatrixUtils.length( network.outputLogisticLayer.connectionWeights ) ) {
+		if (index > MatrixUtils.length( network.logisticRegressionLayer.connectionWeights ) ) {
 			
-			int i = index - MatrixUtils.length( network.outputLogisticLayer.biasTerms );
-			return MatrixUtils.getElement( network.outputLogisticLayer.biasTerms, i );
+			int i = index - MatrixUtils.length( network.logisticRegressionLayer.biasTerms );
+			return MatrixUtils.getElement( network.logisticRegressionLayer.biasTerms, i );
 			
 		} else {
 			
-			return MatrixUtils.getElement( network.outputLogisticLayer.connectionWeights, index );
+			return MatrixUtils.getElement( network.logisticRegressionLayer.connectionWeights, index );
 			
 		}
 		
@@ -170,11 +170,11 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 		int idx = 0;
 		
-		for(int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.connectionWeights ); i++) {
-			buffer[idx++] = MatrixUtils.getElement( network.outputLogisticLayer.connectionWeights, i );
+		for(int i = 0; i < MatrixUtils.length( network.logisticRegressionLayer.connectionWeights ); i++) {
+			buffer[idx++] = MatrixUtils.getElement( network.logisticRegressionLayer.connectionWeights, i );
 		}
-		for(int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.biasTerms ); i++) {
-			buffer[idx++] = MatrixUtils.getElement( network.outputLogisticLayer.biasTerms, i);
+		for(int i = 0; i < MatrixUtils.length( network.logisticRegressionLayer.biasTerms ); i++) {
+			buffer[idx++] = MatrixUtils.getElement( network.logisticRegressionLayer.biasTerms, i);
 		}		
 		
 	}
@@ -182,14 +182,14 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	@Override
 	public void setParameter(int index, double value) {
 		
-		if (index >= MatrixUtils.length( network.outputLogisticLayer.connectionWeights ) ) {
+		if (index >= MatrixUtils.length( network.logisticRegressionLayer.connectionWeights ) ) {
 			
-			int i = index - MatrixUtils.length( network.outputLogisticLayer.biasTerms );
-			MatrixUtils.setElement( network.outputLogisticLayer.biasTerms, i, value );
+			int i = index - MatrixUtils.length( network.logisticRegressionLayer.biasTerms );
+			MatrixUtils.setElement( network.logisticRegressionLayer.biasTerms, i, value );
 			
 		} else {
 			
-			MatrixUtils.setElement( network.outputLogisticLayer.connectionWeights, index, value );
+			MatrixUtils.setElement( network.logisticRegressionLayer.connectionWeights, index, value );
 			
 		}
 		
@@ -200,12 +200,12 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		
 		int idx = 0;
 		
-		for (int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.connectionWeights ); i++) {
-			MatrixUtils.setElement( network.outputLogisticLayer.connectionWeights, i,params[idx++] );
+		for (int i = 0; i < MatrixUtils.length( network.logisticRegressionLayer.connectionWeights ); i++) {
+			MatrixUtils.setElement( network.logisticRegressionLayer.connectionWeights, i,params[idx++] );
 		}
 
-		for (int i = 0; i < MatrixUtils.length( network.outputLogisticLayer.biasTerms ); i++) {
-			MatrixUtils.setElement( network.outputLogisticLayer.biasTerms, i, params[idx++] );
+		for (int i = 0; i < MatrixUtils.length( network.logisticRegressionLayer.biasTerms ); i++) {
+			MatrixUtils.setElement( network.logisticRegressionLayer.biasTerms, i, params[idx++] );
 		}		
 		
 		
@@ -245,19 +245,19 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		// calc p_y_given_x
 //				DoubleMatrix p_y_given_x = softmax(network.logLayer.input.mmul(network.logLayer.W).addRowVector(network.logLayer.b));
 
-		Matrix p_y_given_x = MatrixUtils.softmax( MatrixUtils.addRowVector( network.outputLogisticLayer.inputTrainingData.times(network.outputLogisticLayer.connectionWeights ), network.outputLogisticLayer.biasTerms.viewRow(0) ) );
+		Matrix p_y_given_x = MatrixUtils.softmax( MatrixUtils.addRowVector( network.logisticRegressionLayer.input.times(network.logisticRegressionLayer.connectionWeights ), network.logisticRegressionLayer.biasTerms.viewRow(0) ) );
 		
 		// calc dy
 		
 		// DoubleMatrix dy = network.logLayer.labels.sub(p_y_given_x);
 		
-		Matrix dy = network.outputLogisticLayer.outputTrainingLabels.minus(p_y_given_x);
+		Matrix dy = network.logisticRegressionLayer.labels.minus(p_y_given_x);
 
 		// calc weight gradient
 		
 		int idx = 0;
 		
-		Matrix weightGradient = network.outputLogisticLayer.inputTrainingData.transpose().times(dy).times(learningRate);
+		Matrix weightGradient = network.logisticRegressionLayer.input.transpose().times(dy).times(learningRate);
 		
 		
 	
