@@ -28,7 +28,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	public HiddenLayer[] hiddenLayers;	
 	
 	// TODO: do we rename this to LogisticRegressionOutputLayer ?
-	public LogisticRegression logisticRegression;
+	public LogisticRegression logisticRegressionLayer;
 	
 	// DA / RBM Layers
 	public NeuralNetworkVectorized[] preTrainingLayers;
@@ -140,7 +140,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 			this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
 		}
 
-		this.logisticRegression = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
+		this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
 		System.out.println( "Finished layer init ------  " );
 		
@@ -198,7 +198,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 			input = layer.computeOutputActivation(input);
 		}
 		
-		return this.logisticRegression.predict(input);
+		return this.logisticRegressionLayer.predict(input);
 	}
 
 
@@ -222,7 +222,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	 * @return the negative log likelihood of the model
 	 */
 	public double negativeLogLikelihood() {
-		return this.logisticRegression.negativeLogLikelihood();
+		return this.logisticRegressionLayer.negativeLogLikelihood();
 	}
 	
 	/**
