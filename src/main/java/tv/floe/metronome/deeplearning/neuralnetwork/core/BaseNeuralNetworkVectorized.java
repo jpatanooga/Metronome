@@ -7,7 +7,6 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
-import org.jblas.MatrixFunctions;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.math.MatrixUtils;
@@ -132,73 +131,84 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	
 	@Override
 	public int getnVisible() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		return this.numberVisibleNeurons;
+		
 	}
 
 	@Override
 	public void setnVisible(int nVisible) {
-		// TODO Auto-generated method stub
+
+		this.numberVisibleNeurons = nVisible;
 		
 	}
 
 	@Override
 	public int getnHidden() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return this.numberHiddenNeurons;
 	}
 
 	@Override
 	public void setnHidden(int nHidden) {
-		// TODO Auto-generated method stub
+
+		this.numberHiddenNeurons = nHidden;
 		
 	}
 
 	@Override
 	public Matrix getConnectionWeights() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.connectionWeights;
+		
 	}
 
 	@Override
 	public void setConnectionWeights(Matrix weights) {
-		// TODO Auto-generated method stub
+
+		this.connectionWeights = weights;
 		
 	}
 
 	@Override
 	public Matrix getHiddenBias() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.hiddenBiasNeurons;
+		
 	}
 
 	@Override
 	public void sethBias(Matrix hiddenBias) {
-		// TODO Auto-generated method stub
+		
+		this.hiddenBiasNeurons = hiddenBias;
 		
 	}
 
 	@Override
 	public Matrix getVisibleBias() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.visibleBiasNeurons;
+		
 	}
 
 	@Override
 	public void setVisibleBias(Matrix visibleBias) {
-		// TODO Auto-generated method stub
+
+		this.visibleBiasNeurons = visibleBias;
 		
 	}
 
 	@Override
 	public RandomGenerator getRng() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.randNumGenerator;
+		
 	}
 
 	@Override
 	public void setRng(RandomGenerator rng) {
-		// TODO Auto-generated method stub
+
+		this.randNumGenerator = rng;
 		
 	}
 
@@ -214,48 +224,90 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		this.trainingDataset = input;
 		
 	}
+	
+	@Override
+	public NeuralNetworkVectorized transpose() {
+		try {
+			NeuralNetworkVectorized ret = getClass().newInstance();
+			ret.sethBias( this.hiddenBiasNeurons.clone() );
+			ret.setVisibleBias( this.visibleBiasNeurons.clone() );
+			ret.setnHidden(getnVisible());
+			ret.setnVisible(getnHidden());
+			ret.setConnectionWeights( this.connectionWeights.transpose() );
+			ret.setRng(getRng());
+
+			return ret;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} 
+
+
+	}
+
+	@Override
+	public NeuralNetworkVectorized clone() {
+		try {
+			NeuralNetworkVectorized ret = getClass().newInstance();
+			ret.sethBias( this.hiddenBiasNeurons.clone() );
+			ret.setVisibleBias( this.visibleBiasNeurons.clone() );
+			ret.setnHidden(getnHidden());
+			ret.setnVisible(getnVisible());
+			//ret.setW(W.dup());
+			ret.setConnectionWeights( this.connectionWeights.transpose() );
+			ret.setRng(getRng());
+
+			return ret;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} 
+
+
+	}
+	
 
 	@Override
 	public double getSparsity() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.sparsity;
 	}
 
 	@Override
 	public void setSparsity(double sparsity) {
-		// TODO Auto-generated method stub
-		
+
+		this.sparsity = sparsity;
 	}
 
 	@Override
 	public double getL2() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.l2;
 	}
 
 	@Override
 	public void setL2(double l2) {
-		// TODO Auto-generated method stub
+
+		this.l2 = l2;
 		
 	}
 
 	@Override
 	public double getMomentum() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return this.momentum;
+		
 	}
 
 	@Override
 	public void setMomentum(double momentum) {
-		// TODO Auto-generated method stub
+
+		this.momentum = momentum;
 		
 	}
 
-	@Override
+/*	@Override
 	public void trainTillConvergence(Matrix input, double lr, Object[] params) {
 		// TODO Auto-generated method stub
 		
 	}	
+	*/
 	
 	/**
 	 * All neural networks are based on this idea of 
@@ -278,6 +330,22 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		return lossFunction(null);
 	}
 	
+	@Override
+	public double squaredLoss() {
+		Matrix reconstructed = reconstruct( this.trainingDataset );
+		
+		//double loss = MatrixFunctions.powi(reconstructed.sub(input), 2).sum() / input.rows;
+		double loss = MatrixUtils.sum( MatrixUtils.pow( reconstructed.minus( this.trainingDataset ), 2 ) ) / this.trainingDataset.numRows();
+		
+		if(this.useRegularization) {
+			//loss += 0.5 * l2 * MatrixFunctions.pow(W,2).sum();
+			loss += 0.5 * l2 * MatrixUtils.sum( MatrixUtils.pow( this.connectionWeights, 2 ) );
+		}
+		
+		return -loss;
+	}
+	
+	
 	/**
 	 * Train one iteration of the network
 	 * @param input the input to train on
@@ -286,6 +354,9 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	 */
 	public abstract void train(Matrix input, double learningRate, Object[] params);
 		
+	
+	
+	
 	/**
 	 * Reconstruction error.
 	 * @return reconstruction error
@@ -307,10 +378,10 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		
 		if (this.useRegularization) {
 			double normalized = l + l2RegularizedCoefficient();
-			return - inner.rowSums().mean() / normalized;
+			return - MatrixUtils.mean( MatrixUtils.rowSums( inner ) ) / normalized;
 		}
 		
-		return - inner.rowSums().mean();
+		return - MatrixUtils.mean( MatrixUtils.rowSums( inner ) );
 	}	
 	
 	@Override

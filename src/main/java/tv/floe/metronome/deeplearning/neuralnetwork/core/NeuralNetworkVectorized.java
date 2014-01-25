@@ -65,6 +65,8 @@ public interface NeuralNetworkVectorized {
 	public double fanIn();
 	public void setFanIn(double fanIn);
 	
+	public double squaredLoss();
+	
 	
 	public double l2RegularizedCoefficient();
 	
