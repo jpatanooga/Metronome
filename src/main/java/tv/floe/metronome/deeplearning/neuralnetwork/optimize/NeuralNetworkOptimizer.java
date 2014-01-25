@@ -54,6 +54,18 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		
 
 	}
+	
+	// used in NeuralNetworkEpochListener
+	/*
+	@Override
+	public void epochDone(int epoch) {
+		int plotEpochs = network.getRenderEpochs();
+		if(epoch % plotEpochs == 0 || epoch == 0) {
+			NeuralNetPlotter plotter = new NeuralNetPlotter();
+			plotter.plotNetworkGradient(network,network.getGradient(extraParams));
+		}
+	}
+	*/
 
 
 	public List<Double> getErrors() {
@@ -205,6 +217,25 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		
 		
 	}
+	
+	private int getAdjustedIndex(int index) {
+		//int wLength = network.W.length;
+		int wLength = MatrixUtils.length( network.connectionWeights );
+		
+		//int vBiasLength = network.vBias.length;
+		int vBiasLength = MatrixUtils.length( network.visibleBiasNeurons );
+		
+		if(index < wLength)
+			return index;
+		else if(index >= wLength + vBiasLength) {
+			int hIndex = index - wLength - vBiasLength;
+			return hIndex;
+		}
+		else {
+			int vIndex = index - wLength;
+			return vIndex;
+		}
+	}	
 
 
 	@Override

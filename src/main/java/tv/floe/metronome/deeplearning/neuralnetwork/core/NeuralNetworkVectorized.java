@@ -5,6 +5,7 @@ import org.apache.mahout.math.Matrix;
 
 
 
+
 /**
  * Neural Network implementation (vectorization)
  * - designed to do work on all of the input samples at the same time via matrix ops
@@ -55,6 +56,19 @@ public interface NeuralNetworkVectorized {
 	public double getMomentum();
 	public void setMomentum(double momentum);
 	
+	public void setRenderEpochs(int renderEpochs);
+	public int getRenderEpochs();
+
+	public NeuralNetworkVectorized transpose();
+	public  NeuralNetworkVectorized clone();
+
+	public double fanIn();
+	public void setFanIn(double fanIn);
+	
+	
+	public double l2RegularizedCoefficient();
+	
+	public double getReConstructionCrossEntropy();	
 	public void trainTillConvergence(Matrix input, double lr, Object[] params);
 	/**
 	 * Performs a network merge in the form of

@@ -1,13 +1,16 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.jblas.MatrixFunctions;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
+import tv.floe.metronome.math.MatrixUtils;
 
 /**
  * Based on the NN design by Adam Gibson
@@ -42,6 +45,10 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	public double momentum = 0.1;
 	/* L2 Regularization constant */
 	public double l2 = 0.1;
+	
+	public double fanIn = -1;
+	public boolean useRegularization = true;
+	
 	
 	// default CTOR
 	public BaseNeuralNetworkVectorized() {
@@ -279,5 +286,40 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	 */
 	public abstract void train(Matrix input, double learningRate, Object[] params);
 		
+	/**
+	 * Reconstruction error.
+	 * @return reconstruction error
+	 */
+	public double getReConstructionCrossEntropy() {
+		//Matrix preSigH = input.mmul(W).addRowVector(hBias);
+		Matrix preSigH = MatrixUtils.addRowVector( this.trainingDataset.times(this.connectionWeights), this.hiddenBiasNeurons.viewRow(0) );
+		Matrix sigH = MatrixUtils.sigmoid(preSigH);
+
+		Matrix preSigV = MatrixUtils.addRowVector( sigH.times(this.connectionWeights.transpose()), this.visibleBiasNeurons.viewRow(0) );
+		Matrix sigV = MatrixUtils.sigmoid(preSigV);
+		Matrix inner = 
+				this.trainingDataset.times(MatrixUtils.log(sigV))
+				.plus(MatrixUtils.oneMinus( this.trainingDataset )
+						.times(MatrixUtils.log(MatrixUtils.oneMinus(sigV))));
+		
+		//double l = inner.length;
+		double l = MatrixUtils.length(inner);
+		
+		if (this.useRegularization) {
+			double normalized = l + l2RegularizedCoefficient();
+			return - inner.rowSums().mean() / normalized;
+		}
+		
+		return - inner.rowSums().mean();
+	}	
+	
+	@Override
+	public double l2RegularizedCoefficient() {
+		//return (MatrixFunctions.pow(getW(),2).sum()/ 2.0)  * l2;
+		
+		return ( MatrixUtils.sum( MatrixUtils.pow( this.getConnectionWeights(), 2 ) ) / 2.0 ) * l2;
+		
+	}
+	
 	
 }
