@@ -45,6 +45,9 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	public Matrix outputTrainingLabels = null;
 	
 	public double learningRateUpdate = 0.95;
+	public boolean useRegularization = true;
+	public double l2 = 0.01;
+	
 	
 	public MultiLayerNetworkOptimizer optimizer;
 	
@@ -290,30 +293,34 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 			List<Matrix> activations = feedForward();
 
 			//precompute deltas
-			List<Pair<Matrix,Matrix>> deltas = new ArrayList<>();
+			List<Pair<Matrix,Matrix>> deltas = new ArrayList<Pair<Matrix, Matrix>>();
 			computeDeltas(activations, deltas);
 
 
 			for (int l = 0; l < this.numberLayers; l++) {
 				
-				Matrix add = deltas.get(l).getFirst().div(input.rows).mul(lr);
+				Matrix add = deltas.get( l ).getFirst().divide( this.inputTrainingData.numRows() ).times( lr );
 				
-				add.divi(input.rows);
+				add.divide( this.inputTrainingData.numRows() );
 				
 				if(useRegularization) {
 					
-					add.muli(layers[l].getW().mul(l2));
+					add.times( this.preTrainingLayers[ l ].getConnectionWeights().times( l2 ) );
 					
 				}
 
 
-				layers[l].setW(layers[l].getW().sub(add.mul(lr)));
-				sigmoidLayers[l].W = layers[l].getW();
-				Matrix deltaColumnSums = deltas.get(l + 1).getSecond().columnSums();
-				deltaColumnSums.divi(input.rows);
+				this.preTrainingLayers[ l ].setConnectionWeights( this.preTrainingLayers[ l ].getConnectionWeights().minus( add.times( lr ) ) );
+				
+				this.hiddenLayers[ l ].connectionWeights = this.preTrainingLayers[l].getConnectionWeights();
+				Matrix deltaColumnSums = MatrixUtils.columnSums( deltas.get( l + 1 ).getSecond() );
+				
+				// TODO: check this, needs to happen in place?
+				deltaColumnSums.divide( this.inputTrainingData.numRows() );
 
-				layers[l].gethBias().subi(deltaColumnSums.mul(lr));
-				sigmoidLayers[l].b = layers[l].gethBias();
+				// TODO: check this, needs to happen in place?
+				this.preTrainingLayers[ l ].getHiddenBias().subi( deltaColumnSums.times( lr ) );
+				this.hiddenLayers[ l ].biasTerms = this.preTrainingLayers[l].getHiddenBias();
 			}
 
 
