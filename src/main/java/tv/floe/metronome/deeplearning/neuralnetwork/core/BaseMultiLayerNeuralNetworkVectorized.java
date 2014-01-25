@@ -1,8 +1,6 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -14,8 +12,6 @@ import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
-import tv.floe.metronome.deeplearning.neuralnetwork.layer.LogisticRegressionLayer;
-import tv.floe.metronome.deeplearning.neuralnetwork.layer.OutputLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -249,7 +245,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				delta = MatrixUtils.neg( this.outputTrainingLabels.minus( activations.get( i ) ) );
 
 				//(- y - h) .* f'(z^l) where l is the output layer
-				Matrix initialDelta = delta.mul( derivative.applyDerivative( z ) );
+				Matrix initialDelta = delta.times( derivative.applyDerivative( z ) );
 				deltas[ i ] = initialDelta;
 
 			} else {
@@ -263,7 +259,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				Matrix error = delta.times( w );
 				deltas[ i ] = error;
 
-				error = error.mul(derivative.applyDerivative(z));
+				error = error.times(derivative.applyDerivative(z));
 
 				deltas[ i ] = error;
 //				gradients[ i ] = a.transpose().times(error).transpose().div( this.inputTrainingData.numRows() );
@@ -302,11 +298,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				
 				Matrix add = deltas.get( l ).getFirst().divide( this.inputTrainingData.numRows() ).times( lr );
 				
-				add.divide( this.inputTrainingData.numRows() );
+				add = add.divide( this.inputTrainingData.numRows() );
 				
-				if(useRegularization) {
+				if (useRegularization) {
 					
-					add.times( this.preTrainingLayers[ l ].getConnectionWeights().times( l2 ) );
+					add = add.times( this.preTrainingLayers[ l ].getConnectionWeights().times( l2 ) );
 					
 				}
 
@@ -317,15 +313,18 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				Matrix deltaColumnSums = MatrixUtils.columnSums( deltas.get( l + 1 ).getSecond() );
 				
 				// TODO: check this, needs to happen in place?
-				deltaColumnSums.divide( this.inputTrainingData.numRows() );
+				deltaColumnSums = deltaColumnSums.divide( this.inputTrainingData.numRows() );
 
 				// TODO: check this, needs to happen in place?
-				this.preTrainingLayers[ l ].getHiddenBias().subi( deltaColumnSums.times( lr ) );
+				//this.preTrainingLayers[ l ].getHiddenBias().subi( deltaColumnSums.times( lr ) );
+				Matrix hbiasMinus = this.preTrainingLayers[ l ].getHiddenBias().minus( deltaColumnSums.times( lr ) );
+				this.preTrainingLayers[ l ].sethBias(hbiasMinus);
+				
 				this.hiddenLayers[ l ].biasTerms = this.preTrainingLayers[l].getHiddenBias();
 			}
 
 
-			this.logisticRegressionLayer.connectionWeights.addi(deltas.get( this.numberLayers ).getFirst());
+			this.logisticRegressionLayer.connectionWeights = this.logisticRegressionLayer.connectionWeights.plus(deltas.get( this.numberLayers ).getFirst());
 
 
 		}
