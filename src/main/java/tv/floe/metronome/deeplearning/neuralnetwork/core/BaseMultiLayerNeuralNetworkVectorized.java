@@ -12,6 +12,7 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.LogisticRegressionLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.OutputLayer;
@@ -324,7 +325,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 			}
 
 
-			logLayer.W.addi(deltas.get(nLayers).getFirst());
+			this.logisticRegressionLayer.connectionWeights.addi(deltas.get( this.numberLayers ).getFirst());
 
 
 		}

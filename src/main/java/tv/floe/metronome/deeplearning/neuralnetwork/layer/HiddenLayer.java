@@ -8,6 +8,9 @@ import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 
+
+import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
+import tv.floe.metronome.deeplearning.neuralnetwork.activation.Sigmoid;
 import tv.floe.metronome.math.MatrixUtils;
 
 /**
@@ -30,7 +33,7 @@ public class HiddenLayer {
 	public Matrix biasTerms;
 	public RandomGenerator rndNumGenerator;
 	public Matrix input;
-	//private ActivationFunction sigmoidFunction = new Sigmoid();
+	public ActivationFunction activationFunction = new Sigmoid();
 	
 	/**
 	 * LayerVectorized Ctor
