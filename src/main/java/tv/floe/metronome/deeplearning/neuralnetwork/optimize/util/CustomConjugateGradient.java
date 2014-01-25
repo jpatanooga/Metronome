@@ -210,4 +210,14 @@ public class CustomConjugateGradient  implements Optimizer {
 	public void reset() {
 		xi = null;
 	}
+	
+	public int getMaxIterations() {
+		return maxIterations;
+	}
+
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
+	}
+	
+	
 }
