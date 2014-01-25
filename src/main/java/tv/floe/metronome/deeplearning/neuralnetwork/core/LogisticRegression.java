@@ -84,7 +84,7 @@ public class LogisticRegression implements Serializable {
 			
 			//double reg = (2 / l2) * MatrixFunctions.pow(this.W,2).sum();
 			// TODO: fix this
-			//double regularization = ( 2 / l2 ) * 
+			double regularization = ( 2 / l2 ) * MatrixUtils.sum( MatrixUtils.pow(this.connectionWeights, 2) );
 					
 					
 /*			return - labels.mul(log(sigAct)).add(
