@@ -98,7 +98,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			} else { 
 				layerInput = hiddenLayers[ i - 1 ].sampleHiddenGivenVisible_Data(layerInput);
 			}
-			
+			/*
 			//log.info("Training on layer " + (i + 1));
 			RestrictedBoltzmannMachine rbmPreTrainLayer = (RestrictedBoltzmannMachine) this.preTrainingLayers[i];
 			HiddenLayer h = this.hiddenLayers[i];
@@ -112,6 +112,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 				h.biasTerms = rbmPreTrainLayer.hiddenBiasNeurons;
 				
 			}
+			*/
+			this.preTrainingLayers[i].trainTillConvergence(layerInput, learningRate, new Object[]{k});
 
 		}
 		

@@ -76,7 +76,9 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 		double a = 1.0 / (double) this.numberVisibleNeurons;
 		
-		NormalDistribution u = new NormalDistribution(rnd,0,.01,NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
+		
+		
+		NormalDistribution u = new NormalDistribution(this.randNumGenerator,0,.01,NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
 
 		this.connectionWeights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons );
 		this.connectionWeights.assign(0.0);

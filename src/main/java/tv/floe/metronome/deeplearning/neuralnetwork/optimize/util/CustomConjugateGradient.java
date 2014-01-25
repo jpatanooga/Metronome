@@ -14,6 +14,7 @@ package tv.floe.metronome.deeplearning.neuralnetwork.optimize.util;
 import java.util.logging.*;
 
 
+
 import cc.mallet.optimize.BackTrackLineSearch;
 import cc.mallet.optimize.GradientBracketLineOptimizer;
 import cc.mallet.optimize.LineOptimizer;
@@ -48,11 +49,18 @@ public class CustomConjugateGradient  implements Optimizer {
 	double gradientTolerance = 0.001;
 	int maxIterations = 1000;
 	private String myName = "";
+	//private NeuralNetEpochListener listener;
 
 	// "eps" is a small number to recitify the special case of converging
 	// to exactly zero function value
 	final double eps = 1.0e-10;
 	private OptimizerEvaluator.ByGradient eval;
+	
+	// The state of a conjugate gradient search
+	double fp, gg, gam, dgg, step, fret;
+	double[] xi, g, h;
+	int j, iterations;
+	
 
 	public CustomConjugateGradient(Optimizable.ByGradientValue function, double initialStepSize) {
 		this.initialStepSize = initialStepSize;
@@ -97,10 +105,6 @@ public class CustomConjugateGradient  implements Optimizer {
 		return step;
 	}
 
-	// The state of a conjugate gradient search
-	double fp, gg, gam, dgg, step, fret;
-	double[] xi, g, h;
-	int j, iterations;
 
 	public boolean optimize() {
 		return optimize(maxIterations);

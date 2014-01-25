@@ -131,6 +131,7 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.logisticRegressionLayer, learningRate );
 		CustomConjugateGradient g = new CustomConjugateGradient(opt);
 		g.optimize();
+		System.out.println("using LogisticRegressionOptimizer and CustomConjugateGradient !!!");
 		
 		network.backProp(learningRate, epochs);
 		

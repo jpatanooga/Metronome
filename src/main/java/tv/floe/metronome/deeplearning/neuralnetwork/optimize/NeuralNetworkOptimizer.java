@@ -14,6 +14,7 @@ import cc.mallet.optimize.OptimizationException;
 import cc.mallet.optimize.Optimizer;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
 import tv.floe.metronome.math.MatrixUtils;
 
 
@@ -36,35 +37,22 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 	protected static Logger log = LoggerFactory.getLogger(NeuralNetworkOptimizer.class);
 	protected List<Double> errors = new ArrayList<Double>();
 	protected double minLearningRate = 0.001;
-	protected transient Optimizer opt;
+	protected transient CustomConjugateGradient opt;
 	
 	
 	
 	public void train(Matrix x) {
 		
 		if (opt == null) {
-			opt = new cc.mallet.optimize.LimitedMemoryBFGS(this);
+			//opt = new cc.mallet.optimize.LimitedMemoryBFGS(this);
+			opt = new CustomConjugateGradient(this);
 		}
-
-		boolean done = false;
-		network.train(x, lr, extraParams);
 		
-		while (!done) {
-			
-			try {
-				done = opt.optimize();
-			}
-			catch(InvalidOptimizableException e) {
-				done = true;
-				log.info("Error on step; finishing");
-			}
-			catch(OptimizationException e2) {
-				done = true;
-				log.info("Error on step; finishing");
+		opt.setTolerance(tolerance);
+		opt.setMaxIterations(10000);
+		opt.optimize(500);
+		
 
-			}
-
-		}
 	}
 
 
