@@ -630,6 +630,29 @@ public class MatrixUtils {
 		
 	}
 	
+	
+	/**
+	 * Returns a new matrix with Math.pow() applied to each element in the src matrix
+	 * 
+	 * @param m
+	 * @param d
+	 * @return
+	 */
+	public static Matrix pow(Matrix m, double d) {
+		
+		Matrix ret = m.like();
+		
+		for (int r = 0; r < m.numRows(); r++) {
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				ret.set(r, c, (double)Math.pow(m.get(r, c), d) );
+			}
+		}
+		
+		return ret;
+		
+     }
+		     
+	
 	/**
 	 * Returns the element as if the matrix was 'unrolled' linearly
 	 * 

@@ -536,6 +536,32 @@ public class TestMatrixUtils {
 	}	
 	
 	@Test
+	public void testMatrixPow() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(1, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, 3);
+		m0.setQuick(0, 2, 5);
+		
+		Matrix sig = MatrixUtils.pow(m0, 3);
+		
+
+		double val_0_answer = Math.pow(2, 3);
+		double val_1_answer = Math.pow(3, 3);
+		double val_2_answer = Math.pow(5, 3);
+		
+		
+		assertEquals( val_0_answer, sig.get(0,0), 0.0 );
+		assertEquals( val_1_answer, sig.get(0,1), 0.0 );
+		assertEquals( val_2_answer, sig.get(0,2), 0.0 );
+
+		
+	}		
+	
+	
+	@Test
 	public void testMatrixLog() {
 
 		
