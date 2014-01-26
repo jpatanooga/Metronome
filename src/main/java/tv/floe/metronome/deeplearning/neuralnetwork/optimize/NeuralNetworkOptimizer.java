@@ -8,10 +8,7 @@ import org.apache.mahout.math.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.mallet.optimize.InvalidOptimizableException;
 import cc.mallet.optimize.Optimizable;
-import cc.mallet.optimize.OptimizationException;
-import cc.mallet.optimize.Optimizer;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
@@ -201,12 +198,12 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) ) {
 				
 				int i = index - MatrixUtils.length( network.hiddenBiasNeurons );
-				MatrixUtils.setElement( network.hiddenBiasNeurons, index, value );
+				MatrixUtils.setElement( network.hiddenBiasNeurons, i, value );
 				
 			} else {
 				
 				int i = index - MatrixUtils.length( network.visibleBiasNeurons );
-				MatrixUtils.setElement( network.visibleBiasNeurons, index, value );
+				MatrixUtils.setElement( network.visibleBiasNeurons, i, value );
 				
 			}
 			
@@ -244,7 +241,8 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 
 	@Override
 	public double getValue() {
-		return network.lossFunction(extraParams);
+		//return network.lossFunction(extraParams);
+		return -network.getReConstructionCrossEntropy();
 	}
 
 

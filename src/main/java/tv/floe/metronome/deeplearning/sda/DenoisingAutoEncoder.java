@@ -23,6 +23,12 @@ public class DenoisingAutoEncoder extends BaseNeuralNetworkVectorized {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void trainTillConvergence(Matrix input, double lr, Object[] params) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	
