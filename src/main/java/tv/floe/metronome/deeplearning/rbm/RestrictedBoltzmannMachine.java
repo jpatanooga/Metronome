@@ -8,7 +8,9 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
 
+
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -131,6 +133,11 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * - why keep the probabilites around?
 	 * - why call the matrix "means" instead of "probabilities" ?
 	 * 
+	 * 
+	 * 
+	 * 
+	 * TODO: rebuild this method to use the gradient method
+	 * 
 	 * @param k
 	 */
 	public void contrastiveDivergence(double learningRate, int k, Matrix input) {
@@ -246,6 +253,86 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			
 			
 		}
+		
+	}
+	
+	/**
+	 * TODO: Works with conjugate gradient --- current WIP
+	 * 
+	 */
+	@Override
+	public NeuralNetworkGradient getGradient(Object[] params) {
+		int k = (Integer) params[0];
+		double learningRate = (Double) params[1];
+		
+		// init CDk
+		
+		// do gibbs sampling given V to get the Hidden states based on the training input
+		// compute positive phase
+		Pair<Matrix, Matrix> hiddenProbsAndSamplesStart = this.sampleHiddenGivenVisible( this.trainingDataset );
+				
+		Pair<Pair<Matrix, Matrix>,Pair<Matrix, Matrix>> gibbsSamplingMatrices = null;
+		
+		// now run k full steps of alternating Gibbs sampling
+		
+		//negative visble "means" or "expected values"
+		Matrix negativeVisibleExpectedValues = null;
+		//negative value samples
+		Matrix negativeVisibleSamples = null;
+		//negative hidden means or expected values
+		Matrix negativeHiddenExpectedValues = null;
+		//negative hidden samples
+		Matrix negativeHiddenSamples = null;
+		
+		for ( int x = 0; x < k; x++ ) {
+			
+			if (0 == x) {
+				
+				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenProbsAndSamplesStart.getSecond() );
+								
+			} else {
+				
+				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( negativeHiddenSamples );
+				
+			}
+			
+			// "free energy of the negative phase"
+			// now create some easier to use aliases
+			negativeVisibleExpectedValues = gibbsSamplingMatrices.getFirst().getFirst();
+			negativeVisibleSamples = gibbsSamplingMatrices.getFirst().getSecond();
+			negativeHiddenExpectedValues = gibbsSamplingMatrices.getSecond().getFirst();
+			negativeHiddenSamples = gibbsSamplingMatrices.getSecond().getSecond();
+			
+			
+		}
+				
+		// ----- now calculate equation (9) to get the weight changes ------
+		
+		// now compute the <vi hj>data		
+		Matrix trainingDataTimesInitialHiddenStates = this.trainingDataset.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
+
+		// now compute the <vi hj>model (this may be vi * phj --- double check)
+		Matrix negativeVisibleSamplesTransposeTimesNegHiddenExpValues = negativeVisibleSamples.transpose().times( negativeHiddenExpectedValues );
+				
+		// calc the delta between: data - model
+		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( negativeVisibleSamplesTransposeTimesNegHiddenExpValues );
+		
+		// learningRate * delta(data - model)
+		Matrix wGradient = dataModelDelta.times( learningRate );
+		
+		// ---- end of equation (9) section -----------------
+		
+		// update the connection weights and bias terms for visible/hidden units
+		//this.connectionWeights = this.connectionWeights.plus( connectionWeightChanges );
+
+		Matrix vBiasGradient = MatrixUtils.mean( this.trainingDataset.minus( negativeVisibleSamples ) , 0).times( learningRate ); 
+		//this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd );
+
+		Matrix hBiasGradient = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0).times( learningRate ); //.times(this.learningRate);
+		//this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd );		
+
+		return new NeuralNetworkGradient(wGradient, vBiasGradient, hBiasGradient);
+		
 		
 	}
 
@@ -485,11 +572,12 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * @param input
 	 */
 	public void trainTillConvergence(double learningRate, int k, Matrix input) {
+		
 		if (input != null) {
 			this.trainingDataset = input;
 		}
 
-		System.out.println("using Mallet's optimization");
+		//System.out.println("using Mallet's optimization");
 		
 		optimizer = new RestrictedBoltzmannMachineOptimizer(this, learningRate, new Object[]{k});
 		optimizer.train(input);

@@ -3,6 +3,7 @@ package tv.floe.metronome.deeplearning.sda;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 
 public class DenoisingAutoEncoder extends BaseNeuralNetworkVectorized {
 
@@ -28,6 +29,12 @@ public class DenoisingAutoEncoder extends BaseNeuralNetworkVectorized {
 	public void trainTillConvergence(Matrix input, double lr, Object[] params) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public NeuralNetworkGradient getGradient(Object[] params) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
