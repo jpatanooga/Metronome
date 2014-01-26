@@ -522,6 +522,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		return propDown(propUp(v));
 		
 	}
+
 	
 	
 	

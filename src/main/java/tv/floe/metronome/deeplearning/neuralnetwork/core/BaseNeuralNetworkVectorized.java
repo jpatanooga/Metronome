@@ -44,6 +44,8 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	public double momentum = 0.1;
 	/* L2 Regularization constant */
 	public double l2 = 0.1;
+
+	public int renderWeightsEveryNumEpochs = -1;
 	
 	public double fanIn = -1;
 	public boolean useRegularization = true;
@@ -391,6 +393,156 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		return ( MatrixUtils.sum( MatrixUtils.pow( this.getConnectionWeights(), 2 ) ) / 2.0 ) * l2;
 		
 	}
+	
+	protected void initWeights()  {
+		
+		if (this.numberVisibleNeurons < 1) {
+			throw new IllegalStateException("Number of visible can not be less than 1");
+		}
+		
+		if (this.numberHiddenNeurons < 1) {
+			throw new IllegalStateException("Number of hidden can not be less than 1");
+		}
+		
+		
+		/*
+		 * Initialize based on the number of visible units..
+		 * The lower bound is called the fan in
+		 * The outer bound is called the fan out.
+		 * 
+		 * Below's advice works for Denoising AutoEncoders and other 
+		 * neural networks you will use due to the same baseline guiding principles for
+		 * both RBMs and Denoising Autoencoders.
+		 * 
+		 * Hinton's Guide to practical RBMs:
+		 * The weights are typically initialized to small random values chosen from a zero-mean Gaussian with
+		 * a standard deviation of about 0.01. Using larger random values can speed the initial learning, but
+		 * it may lead to a slightly worse final model. Care should be taken to ensure that the initial weight
+		 * values do not allow typical visible vectors to drive the hidden unit probabilities very close to 1 or 0
+		 * as this significantly slows the learning.
+		 */
+		
+		if (this.connectionWeights == null) {
+			
+			NormalDistribution u = new NormalDistribution( this.randNumGenerator, 0, .01, NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY );
+
+			this.connectionWeights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons );// Matrix.zeros(nVisible,nHidden);
+			this.connectionWeights.assign(0.0);
+
+		//	for(int i = 0; i < this.W.rows; i++) 
+		//		this.W.putRow(i,new Matrix(u.sample(this.W.columns)));
+			
+			for ( int i = 0; i < this.connectionWeights.numRows(); i++ ) {
+				
+				// u.sample( "number of cols in weights" )
+				
+				double[] rowSamples = u.sample( this.connectionWeights.numCols() );
+				
+				this.connectionWeights.viewRow(i).assign(rowSamples);
+				
+				
+			}
+
+		}
+
+		//if(this.hBias == null) {
+		if ( this.hiddenBiasNeurons == null) {
+			
+			//this.hBias = Matrix.zeros(nHidden);
+			this.hiddenBiasNeurons = new DenseMatrix(1, this.numberHiddenNeurons);// Matrix.zeros(nHidden);
+			this.hiddenBiasNeurons.assign(0.0);
+			
+			/*
+			 * Encourage sparsity.
+			 * See Hinton's Practical guide to RBMs
+			 */
+			//this.hBias.subi(4);
+		}
+
+		if (this.visibleBiasNeurons == null) {
+			
+			if (this.trainingDataset != null) {
+		
+				this.visibleBiasNeurons = new DenseMatrix(1, this.numberVisibleNeurons); // Matrix.zeros(nVisible);
+				this.visibleBiasNeurons.assign(0.0);
+
+
+			} else {
+//				this.vBias = Matrix.zeros(nVisible);
+				this.visibleBiasNeurons = new DenseMatrix(1, this.numberVisibleNeurons); // Matrix.zeros(nVisible);
+				this.visibleBiasNeurons.assign(0.0);
+				
+			}
+		}
+
+
+
+	}
+
+
+	@Override
+	public void setRenderEpochs(int renderEpochs) {
+		this.renderWeightsEveryNumEpochs = renderEpochs;
+
+	}
+	@Override
+	public int getRenderEpochs() {
+		return renderWeightsEveryNumEpochs;
+	}
+
+	@Override
+	public double fanIn() {
+		return fanIn < 0 ? 1 / this.numberVisibleNeurons : fanIn;
+	}
+
+	@Override
+	public void setFanIn(double fanIn) {
+		this.fanIn = fanIn;
+	}
+
+	public void regularize() {
+	
+		//this.W.addi(W.mul(0.01));
+		//this.W.divi(this.momentum);
+		
+		this.connectionWeights = this.connectionWeights.plus( this.connectionWeights.times(0.01) );
+		this.connectionWeights = this.connectionWeights.divide( this.momentum );
+
+	}
+
+	public void jostleWeighMatrix() {
+		/*
+		 * Initialize based on the number of visible units..
+		 * The lower bound is called the fan in
+		 * The outer bound is called the fan out.
+		 * 
+		 * Below's advice works for Denoising AutoEncoders and other 
+		 * neural networks you will use due to the same baseline guiding principles for
+		 * both RBMs and Denoising Autoencoders.
+		 * 
+		 * Hinton's Guide to practical RBMs:
+		 * The weights are typically initialized to small random values chosen from a zero-mean Gaussian with
+		 * a standard deviation of about 0.01. Using larger random values can speed the initial learning, but
+		 * it may lead to a slightly worse final model. Care should be taken to ensure that the initial weight
+		 * values do not allow typical visible vectors to drive the hidden unit probabilities very close to 1 or 0
+		 * as this significantly slows the learning.
+		 */
+		NormalDistribution u = new NormalDistribution( this.randNumGenerator, 0, .01, fanIn() );
+
+		Matrix weights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons ); //Matrix.zeros(nVisible,nHidden);
+		weights.assign(0.0);
+
+		for (int i = 0; i < this.connectionWeights.numRows(); i++) { 
+		
+			// TODO: figure out whats going on with the weights matrix
+		//	weights.putRow(i,new Matrix(u.sample(this.W.columns)));
+			
+		}
+
+
+
+
+	}	
 	
 	
 }
