@@ -320,6 +320,28 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		// learningRate * delta(data - model)
 		Matrix wGradient = dataModelDelta.times( learningRate );
 		
+		if (useRegularization) { 
+		
+			//wGradient.subi(W.muli(l2));
+			
+			// TODO: figure out if this should stick around like this
+			this.connectionWeights = this.connectionWeights.times(l2);
+			wGradient = wGradient.minus(this.connectionWeights);
+		
+		}
+		
+		if (momentum != 0) {
+		
+			//wGradient.muli( 1 - momentum);
+			
+			wGradient = wGradient.times( 1 - momentum );
+			
+		}
+
+		//wGradient.divi(input.rows);
+		wGradient = wGradient.divide( this.trainingDataset.numRows() );
+		
+		
 		// ---- end of equation (9) section -----------------
 		
 		// update the connection weights and bias terms for visible/hidden units
