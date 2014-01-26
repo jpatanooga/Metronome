@@ -6,6 +6,7 @@ import org.apache.mahout.math.Matrix;
 
 
 
+
 /**
  * Neural Network implementation (vectorization)
  * - designed to do work on all of the input samples at the same time via matrix ops
@@ -49,6 +50,9 @@ public interface NeuralNetworkVectorized {
 	
 	public double getSparsity();
 	public abstract void setSparsity(double sparsity);
+	
+	public NeuralNetworkGradient getGradient(Object[] params);
+	
 	
 	public double getL2();
 	public void setL2(double l2);
