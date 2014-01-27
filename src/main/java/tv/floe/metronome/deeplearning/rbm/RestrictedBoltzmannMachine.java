@@ -142,6 +142,24 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 */
 	public void contrastiveDivergence(double learningRate, int k, Matrix input) {
 
+		if (input != null) {
+			
+			this.trainingDataset = input;
+			
+		}
+		
+		NeuralNetworkGradient gradient = getGradient(new Object[]{k,learningRate});
+		
+		//W.addi(gradient.getwGradient());
+		this.connectionWeights = this.connectionWeights.plus(gradient.getwGradient());
+		
+		//hBias.addi(gradient.gethBiasGradient());
+		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus(gradient.gethBiasGradient());
+		
+		//vBias.addi(gradient.getvBiasGradient());
+		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( gradient.getvBiasGradient() );
+		
+		
 		/*
 		 * 
 		 * we initialize the Gibbs chain with the hidden sample 
@@ -150,7 +168,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		 * we can then compute the sample at the end of the Gibbs chain, 
 		 * sample that we need for getting the gradient
 		 */
-		
+/*		
 		this.trainingDataset = input;
 				
 		// init CDk
@@ -253,11 +271,11 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			
 			
 		}
-		
+		*/
 	}
 	
 	/**
-	 * TODO: Works with conjugate gradient --- current WIP
+	 * reviewed, seems decent
 	 * 
 	 */
 	@Override
