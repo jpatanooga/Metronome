@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
@@ -16,6 +17,29 @@ import tv.floe.metronome.math.MatrixUtils;
 
 public class Test_DBN_Mnist_Dataset {
 	
+	public static Matrix segmentOutSomeTestData(Matrix input, int max_count) {
+		
+		int rows = max_count;
+		
+		if (max_count > input.numRows()) {
+			
+			rows = input.numRows();
+			
+		}
+		
+		Matrix samples = new DenseMatrix( rows, input.numCols() );
+		
+		for (int x = 0; x < rows; x++ ) {
+			
+			samples.assignRow(x, input.viewRow(x) );
+			
+		}
+		
+		
+		return samples;
+		
+		
+	}
 
 	
 	
@@ -49,6 +73,8 @@ public class Test_DBN_Mnist_Dataset {
 		
 		Matrix inputDataset = MNIST_DatasetUtils.getImageDataAsMatrix(rowLimit);
 		
+		Matrix testSamples = segmentOutSomeTestData( inputDataset, 5 );
+		
 		Matrix outputLabels = MNIST_DatasetUtils.getLabelsAsMatrix(rowLimit);
 		
 		int n_ins = inputDataset.numCols(); // number of elements in input vector 
@@ -73,6 +99,20 @@ public class Test_DBN_Mnist_Dataset {
 		
 		dbn.preTrain( inputDataset, 1, learningRate, preTrainEpochs );
 		dbn.finetune( outputLabels, learningRate, fineTuneEpochs );
+		
+		//for ( int x = 0; x < testSamples.numRows(); x++ ) {
+			
+		Matrix testPredictedLabels = dbn.predict(testSamples);
+		
+		System.out.println("\n\n-------------- predictions ------------- ");
+		
+		MatrixUtils.debug_print( testPredictedLabels );
+			
+		System.out.println("\n\n-------------- actual ------------- ");
+		
+		MatrixUtils.debug_print( outputLabels );
+		
+		//}
 		
 		
 		
