@@ -361,6 +361,10 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	 */
 	public void finetune(Matrix outputLabels, double learningRate, int epochs) {
 		
+		if (null != outputLabels) {
+			this.outputTrainingLabels = outputLabels;
+		}
+		
 		optimizer = new MultiLayerNetworkOptimizer(this,learningRate);
 		optimizer.optimize( outputLabels, learningRate, epochs );
 		
