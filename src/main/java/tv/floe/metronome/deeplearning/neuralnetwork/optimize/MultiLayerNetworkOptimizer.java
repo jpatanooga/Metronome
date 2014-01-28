@@ -125,8 +125,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		network.logisticRegressionLayer.labels = labels;
 
 		
-		Matrix w = network.logisticRegressionLayer.connectionWeights.clone();
-		Matrix b = network.logisticRegressionLayer.biasTerms.clone();
+//		Matrix w = network.logisticRegressionLayer.connectionWeights.clone();
+//		Matrix b = network.logisticRegressionLayer.biasTerms.clone();
 		
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.logisticRegressionLayer, learningRate );
 		CustomConjugateGradient g = new CustomConjugateGradient(opt);

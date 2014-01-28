@@ -159,6 +159,9 @@ public class TestRestrictedBoltzmannMachine {
 		
 		// "get the cross entropy somewhere near 0.3 and we're good"
 		assertEquals(0.4, ce, 0.2 );
+		
+		
+		
 /*
 		MatrixUtils.debug_print( rbm.hiddenBiasNeurons );
 		
