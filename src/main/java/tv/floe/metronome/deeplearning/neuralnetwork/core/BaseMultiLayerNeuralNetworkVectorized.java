@@ -306,7 +306,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				
 				if (useRegularization) {
 					
-					add = add.times( this.preTrainingLayers[ l ].getConnectionWeights().times( l2 ) );
+					//add = add.times( this.preTrainingLayers[ l ].getConnectionWeights().times( l2 ) );
+					add = MatrixUtils.elementWiseMultiplication(add, this.preTrainingLayers[ l ].getConnectionWeights().times( l2 ));
 					
 				}
 
