@@ -259,7 +259,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				Matrix error = delta.times( w );
 				deltas[ i ] = error;
 
-				error = error.times(derivative.applyDerivative(z));
+				MatrixUtils.debug_print_matrix_stats(error, "error matrix");
+				MatrixUtils.debug_print_matrix_stats(z, "z matrix");
+				
+				//error = error.times(derivative.applyDerivative(z));
+				error = MatrixUtils.elementWiseMultiplication( error, derivative.applyDerivative(z) );
 
 				deltas[ i ] = error;
 //				gradients[ i ] = a.transpose().times(error).transpose().div( this.inputTrainingData.numRows() );

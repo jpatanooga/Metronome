@@ -15,7 +15,8 @@ public class Sigmoid implements ActivationFunction {
 
 	@Override
 	public Matrix applyDerivative(Matrix input) {
-		return MatrixUtils.sigmoid( input ).times( MatrixUtils.oneMinus( MatrixUtils.sigmoid( input ) ) );
+		//return MatrixUtils.sigmoid( input ).times( MatrixUtils.oneMinus( MatrixUtils.sigmoid( input ) ) );
+		return MatrixUtils.elementWiseMultiplication( MatrixUtils.sigmoid( input ), MatrixUtils.oneMinus( MatrixUtils.sigmoid( input ) ) );
 	}
 
 }
