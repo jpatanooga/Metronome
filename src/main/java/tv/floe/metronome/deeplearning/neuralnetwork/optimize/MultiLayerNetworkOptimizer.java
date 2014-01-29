@@ -118,6 +118,11 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	public void optimize(Matrix labels, double learningRate, int epochs) {
 		
 		MatrixUtils.ensureValidOutcomeMatrix(labels);
+		
+		//ensure network input is synced to the passed in labels
+		network.feedForward();
+		
+		
 		//sample from the final layer in the network and train on the result
 		Matrix layerInput = network.hiddenLayers[network.hiddenLayers.length - 1].sampleHiddenGivenLastVisible();
 		

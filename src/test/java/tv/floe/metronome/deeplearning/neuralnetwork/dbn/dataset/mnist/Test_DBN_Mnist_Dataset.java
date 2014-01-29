@@ -64,7 +64,7 @@ public class Test_DBN_Mnist_Dataset {
 //		int numIns = first.getFirst().columns;
 //		int numLabels = first.getSecond().columns;
 		int[] hiddenLayerSizes = { 600, 600, 600 };
-		double learningRate = 0.001;
+		double learningRate = 0.005;
 		int preTrainEpochs = 200;
 		int fineTuneEpochs = 200;
 		int rowLimit = 100;
