@@ -63,11 +63,11 @@ public class Test_DBN_Mnist_Dataset {
 		
 //		int numIns = first.getFirst().columns;
 //		int numLabels = first.getSecond().columns;
-		int[] hiddenLayerSizes = { 1000, 1000, 2000 };
-		double learningRate = 0.1;
-		int preTrainEpochs = 2;
-		int fineTuneEpochs = 2;
-		int rowLimit = 10;
+		int[] hiddenLayerSizes = { 600, 600, 600 };
+		double learningRate = 0.001;
+		int preTrainEpochs = 200;
+		int fineTuneEpochs = 200;
+		int rowLimit = 100;
 		
 		//MNIST_DatasetUtils dataset_utils = new MNIST_DatasetUtils();
 		
@@ -106,11 +106,18 @@ public class Test_DBN_Mnist_Dataset {
 		
 		System.out.println("\n\n-------------- predictions ------------- ");
 		
-		MatrixUtils.debug_print( testPredictedLabels );
+		//MatrixUtils.debug_print( testPredictedLabels );
+		for (int x = 0; x < testPredictedLabels.numRows(); x++ ) {
+			System.out.println( x + ": " + testPredictedLabels.viewRow(x).maxValueIndex() );
+		}
 			
 		System.out.println("\n\n-------------- actual ------------- ");
 		
-		MatrixUtils.debug_print( outputLabels );
+//		MatrixUtils.debug_print( outputLabels );
+		for (int x = 0; x < outputLabels.numRows(); x++ ) {
+			System.out.println( x + ": " + outputLabels.viewRow(x).maxValueIndex() );
+		}
+
 		
 		//}
 		
