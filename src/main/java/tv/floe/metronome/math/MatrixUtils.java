@@ -749,6 +749,26 @@ public class MatrixUtils {
 		return m.viewPart( rowIndex, 1, 0, m.numCols() );		
 		
 	}
+	
+
+	public static Matrix toOutcomeVector(int index,int numOutcomes) {
+		int[] nums = new int[numOutcomes];
+		nums[ index ] = 1;
+		//return toMatrix(nums);
+		Matrix out = new DenseMatrix(1, numOutcomes);
+		out.set(0, index, 1.0);
+		return out;
+	}
+	
+	/*
+	public static Matrix toMatrix(int[] arr) {
+		Matrix d = new DenseMatrix(arr.length);
+		for(int i = 0; i < arr.length; i++)
+			d.put(i,arr[i]);
+		d.reshape(1, d.length);
+		return d;
+	}	
+	*/
 
 
 
