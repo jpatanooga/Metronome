@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.deeplearning.math.transforms.MatrixTransform;
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
@@ -47,6 +50,9 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	
 	
 	public MultiLayerNetworkOptimizer optimizer;
+	
+	protected Map<Integer,MatrixTransform> weightTransforms = new HashMap<Integer,MatrixTransform>();
+	
 	
 	/**
 	 * CTOR
