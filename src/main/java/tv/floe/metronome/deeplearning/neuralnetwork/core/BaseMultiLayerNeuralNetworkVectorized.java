@@ -245,7 +245,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 				delta = MatrixUtils.neg( this.outputTrainingLabels.minus( activations.get( i ) ) );
 
 				//(- y - h) .* f'(z^l) where l is the output layer
-				Matrix initialDelta = delta.times( derivative.applyDerivative( z ) );
+				//Matrix initialDelta = delta.times( derivative.applyDerivative( z ) );
+				Matrix initialDelta = MatrixUtils.elementWiseMultiplication( delta, derivative.applyDerivative( z ) );
 				deltas[ i ] = initialDelta;
 
 			} else {

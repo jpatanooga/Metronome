@@ -93,7 +93,16 @@ public class LogisticRegression implements Serializable {
 							))
 							.columnSums().mean() + reg;
 */
-			return - MatrixUtils.mean( MatrixUtils.columnSums( labels.times(MatrixUtils.log(sigActivation).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) ) + regularization;
+			//return - MatrixUtils.mean( MatrixUtils.columnSums( labels.times(MatrixUtils.log(sigActivation).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) ) + regularization;
+			
+			Matrix labelsMulLogSig = MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) );
+
+			Matrix oneMinusLabelsMulLogOneMinusSigAct = MatrixUtils.elementWiseMultiplication( MatrixUtils.oneMinus(labels), MatrixUtils.log(MatrixUtils.oneMinus(sigActivation)));
+			
+			Matrix sum = labelsMulLogSig.plus( oneMinusLabelsMulLogOneMinusSigAct );
+					
+			return - MatrixUtils.mean( MatrixUtils.columnSums( sum ) )  + regularization;
+			
 					
 					
 		}
@@ -105,7 +114,15 @@ public class LogisticRegression implements Serializable {
 						.columnSums().mean();
 */
 		
-		return - MatrixUtils.mean( MatrixUtils.columnSums( labels.times(MatrixUtils.log(sigActivation).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) );
+//		return - MatrixUtils.mean( MatrixUtils.columnSums( MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) ).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) );return - MatrixUtils.mean( MatrixUtils.columnSums( MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) ).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) );
+
+		Matrix labelsMulLogSig = MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) );
+
+		Matrix oneMinusLabelsMulLogOneMinusSigAct = MatrixUtils.elementWiseMultiplication( MatrixUtils.oneMinus(labels), MatrixUtils.log(MatrixUtils.oneMinus(sigActivation)));
+		
+		Matrix sum = labelsMulLogSig.plus( oneMinusLabelsMulLogOneMinusSigAct );
+				
+		return - MatrixUtils.mean( MatrixUtils.columnSums( sum ) );
 		
 		
 	}
