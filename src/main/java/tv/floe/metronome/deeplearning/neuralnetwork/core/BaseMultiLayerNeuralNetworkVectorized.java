@@ -474,8 +474,10 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 		for (int i = 0; i < this.preTrainingLayers.length; i++) {
 			
-		//	if(weightTransforms.containsKey(i)) 
+			if (weightTransforms.containsKey(i)) { 
 		//		layers[i].setW(weightTransforms.get(i).apply(layers[i].getW()));
+				this.preTrainingLayers[i].setConnectionWeights( weightTransforms.get(i).apply( this.preTrainingLayers[i].getConnectionWeights() ) );
+			}
 			
 			
 			
