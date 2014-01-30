@@ -645,6 +645,31 @@ public class TestMatrixUtils {
 		
 	}
 	
+	@Test
+	public void testViewRowAsMatrix() {
+	
+		Matrix m0 = new DenseMatrix(3, 3);
+		m0.setQuick(0, 0, 0.5);
+		m0.setQuick(0, 1, 0.5);
+		m0.setQuick(0, 2, 0.1);
+
+		m0.setQuick(1, 0, 1.5);
+		m0.setQuick(1, 1, 1.5);
+		m0.setQuick(1, 2, 1.1);
+
+		m0.setQuick(2, 0, 2.5);
+		m0.setQuick(2, 1, 2.5);
+		m0.setQuick(2, 2, 2.1);
+
+		
+		Matrix out = MatrixUtils.viewRowAsMatrix(m0, 1);
+		
+		assertEquals( m0.get(1, 0), out.get(0, 0), 0.0 );
+		assertEquals( m0.get(1, 1), out.get(0, 1), 0.0 );
+		assertEquals( m0.get(1, 2), out.get(0, 2), 0.0 );
+	
+	}
+	
 	
 	
 }

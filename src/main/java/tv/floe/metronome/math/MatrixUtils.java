@@ -723,6 +723,32 @@ public class MatrixUtils {
 
 	}		
 
+	
+	public static int iamax(Vector vec) {
+		
+		//double max = vec.get(0);
+		int index = 0;
+		
+		for ( int x = 0; x < vec.size(); x++ ) {
+			
+			if ( Math.abs(vec.get(x)) > Math.abs( vec.get(index) ) ) {
+				
+				index = x;
+				
+			}
+			
+			
+		}
+		
+		return index;
+		
+	}
+	
+	public static Matrix viewRowAsMatrix(Matrix m, int rowIndex) {
+		
+		return m.viewPart( rowIndex, 1, 0, m.numCols() );		
+		
+	}
 
 
 

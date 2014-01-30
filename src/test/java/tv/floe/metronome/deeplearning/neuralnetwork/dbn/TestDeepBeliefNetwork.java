@@ -104,7 +104,7 @@ public class TestDeepBeliefNetwork {
 	
 	
 	@Test
-	public void test() {
+	public void testXor() {
 
 		//matrixRand(2, 2);
 	//	xorData( 2 );
