@@ -3,6 +3,10 @@ package tv.floe.metronome.eval;
 import java.util.Set;
 
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.Vector;
+
+import tv.floe.metronome.berkley.Counter;
+import tv.floe.metronome.math.MatrixUtils;
 
 public class Evaluation {
 
@@ -11,6 +15,27 @@ public class Evaluation {
 	private double falseNegatives;
 	private ConfusionMatrix<Integer> confusion = new ConfusionMatrix<Integer>();
 
+	
+	private int iamax(Vector vec) {
+		
+		//double max = vec.get(0);
+		int index = 0;
+		
+		for ( int x = 0; x < vec.size(); x++ ) {
+			
+			if ( Math.abs(vec.get(x)) > Math.abs( vec.get(index) ) ) {
+				
+				index = x;
+				
+			}
+			
+			
+		}
+		
+		return index;
+		
+	}
+	
 	/**
 	 * Collects statistics on the real outcomes vs the 
 	 * guesses. This is for logistic outcome matrices such that the 
@@ -21,22 +46,34 @@ public class Evaluation {
 	 * @param guesses the guesses (usually a probability vector)
 	 */
 	public void eval(Matrix realOutcomes,Matrix guesses) {
-		if(realOutcomes.length != guesses.length)
+		//if(realOutcomes.length != guesses.length)
+		if ( MatrixUtils.length(realOutcomes) != MatrixUtils.length(guesses) ) {
 			throw new IllegalArgumentException("Unable to evaluate. Outcome matrices not same length");
-		for(int i = 0; i < realOutcomes.rows; i++) {
-			Matrix currRow = realOutcomes.getRow(i);
-			Matrix guessRow = guesses.getRow(i);
+		}
+		
+		for (int i = 0; i < realOutcomes.numRows(); i++) {
+			
+			//Matrix currRow = realOutcomes.getRow(i);
+			Vector currRow = realOutcomes.viewRow(i);
+			//Matrix guessRow = guesses.getRow(i);
+			Vector guessRow = guesses.viewRow(i);
 
-			int currMax = SimpleBlas.iamax(currRow);
-			int guessMax = SimpleBlas.iamax(guessRow);
+			//int currMax = SimpleBlas.iamax(currRow);
+			int currMax = iamax(currRow);
+			//int guessMax = SimpleBlas.iamax(guessRow);
+			int guessMax = iamax(guessRow);
 
-			addToConfusion(currMax,guessMax);
+			addToConfusion( currMax, guessMax );
 
-			if(currMax == guessMax)
+			if (currMax == guessMax) {
+				
 				incrementTruePositives();
-			else {
+				
+			} else {
+				
 				incrementFalseNegatives();
 				incrementFalsePositives(guessMax);
+				
 			}
 		}
 	}
