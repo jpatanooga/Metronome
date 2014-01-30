@@ -453,6 +453,29 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
 	public abstract NeuralNetworkVectorized[] createNetworkLayers(int numLayers);
 
+	/**
+	 * Apply transforms to RBMs before we train
+	 * 
+	 * 
+	 * 
+	 */
+	protected void applyTransforms() {
+
+		// do we have RBMs at all
+		if(this.preTrainingLayers == null || this.preTrainingLayers.length < 1) {
+			throw new IllegalStateException("Layers not initialized");
+		}
+
+		for (int i = 0; i < this.preTrainingLayers.length; i++) {
+			
+		//	if(weightTransforms.containsKey(i)) 
+		//		layers[i].setW(weightTransforms.get(i).apply(layers[i].getW()));
+			
+			
+			
+		}
+		
+	}
 
 	
 }

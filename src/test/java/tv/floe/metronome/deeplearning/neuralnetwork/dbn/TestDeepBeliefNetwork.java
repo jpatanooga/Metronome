@@ -11,6 +11,7 @@ import org.junit.Test;
 
 
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -150,11 +151,12 @@ public class TestDeepBeliefNetwork {
 
 		Matrix predict = dbn.predict(x);
 		//log.info(predict.toString());
-/*
+
 		Evaluation eval = new Evaluation();
 		eval.eval(y, predict);
-		log.info(eval.stats());
-*/
+		//log.info(eval.stats());
+		System.out.println( eval.stats() );
+
 		
 	
 	
