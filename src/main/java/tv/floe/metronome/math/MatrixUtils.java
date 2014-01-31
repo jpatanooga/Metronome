@@ -10,7 +10,7 @@ import org.apache.mahout.math.function.Functions;
 
 
 /**
- *  Collection of Matrix opertations
+ *  Collection of Matrix operations
  * 
  * @author josh
  *
@@ -760,15 +760,22 @@ public class MatrixUtils {
 		return out;
 	}
 	
-	/*
+	
 	public static Matrix toMatrix(int[] arr) {
-		Matrix d = new DenseMatrix(arr.length);
-		for(int i = 0; i < arr.length; i++)
-			d.put(i,arr[i]);
-		d.reshape(1, d.length);
+		
+		Matrix d = new DenseMatrix(1, arr.length);
+		
+		for (int i = 0; i < arr.length; i++) {
+		
+			d.set(0, i,arr[i]);
+		
+		}
+		
+		//d.reshape(1, d.length);
 		return d;
+		
 	}	
-	*/
+	
 
 
 

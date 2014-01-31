@@ -5,6 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.mahout.math.Matrix;
+
+import tv.floe.metronome.deeplearning.datasets.MnistManager;
+import tv.floe.metronome.math.ArrayUtils;
+import tv.floe.metronome.math.MatrixUtils;
+import tv.floe.metronome.types.Pair;
+
 
 /**
  * Data fetcher for the MNIST dataset
@@ -13,6 +20,10 @@ import java.util.List;
  */
 public class MnistDataFetcher extends BaseDataFetcher {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private transient MnistManager man;
 	public final static int NUM_EXAMPLES = 60000;
 
@@ -31,7 +42,7 @@ public class MnistDataFetcher extends BaseDataFetcher {
 		} catch (IOException e) {
 			throw new IllegalStateException("Unable to read image");
 		}
-		inputColumns = ArrayUtil.flatten(image).length;
+		inputColumns = ArrayUtils.flatten(image).length;
 
 
 	}
@@ -44,7 +55,7 @@ public class MnistDataFetcher extends BaseDataFetcher {
 
 
 		//we need to ensure that we don't overshoot the number of examples total
-		List<Pair<DoubleMatrix,DoubleMatrix>> toConvert = new ArrayList<>();
+		List<Pair<Matrix,Matrix>> toConvert = new ArrayList<Pair<Matrix,Matrix>>();
 
 		for(int i = 0; i < numExamples; i++,cursor++) {
 			if(!hasMore())
@@ -59,28 +70,38 @@ public class MnistDataFetcher extends BaseDataFetcher {
 			man.setCurrent(cursor);
 			//note data normalization
 			try {
-				DoubleMatrix in = MatrixUtil.toMatrix(ArrayUtil.flatten(man.readImage()));
-				for(int d = 0; d < in.length; d++) {
-					if(in.get(d) > 30) {
-						in.put(d,1);
+				Matrix in = MatrixUtils.toMatrix(ArrayUtils.flatten(man.readImage()));
+				
+				for (int d = 0; d < in.numCols(); d++) {
+					
+					if (in.get(0, d) > 30) {
+						
+						in.set(0, d, 1);
+						
+					} else {
+						
+						in.set(0, d, 0);
+						
 					}
-					else 
-						in.put(d,0);
+					
 				}
 
 
-				DoubleMatrix out = createOutputVector(man.readLabel());
+				Matrix out = createOutputVector(man.readLabel());
 				boolean found = false;
-				for(int col = 0; col < out.length; col++) {
-					if(out.get(col) > 0) {
+				
+				for (int col = 0; col < out.numCols(); col++) {
+					
+					if (out.get(0, col) > 0) {
 						found = true;
 						break;
 					}
+					
 				}
 				if(!found)
 					throw new IllegalStateException("Found a matrix without an outcome");
 
-				toConvert.add(new Pair<>(in,out));
+				toConvert.add(new Pair<Matrix, Matrix>(in,out));
 			} catch (IOException e) {
 				throw new IllegalStateException("Unable to read image");
 
