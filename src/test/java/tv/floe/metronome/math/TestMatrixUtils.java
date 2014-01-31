@@ -447,6 +447,52 @@ public class TestMatrixUtils {
 		
 		
 	}	
+
+	@Test
+	public void testMatrixNormalize() {
+		
+		Matrix m0 = new DenseMatrix(2, 2);
+		m0.setQuick(0, 0, 2); // 1 / 5
+		m0.setQuick(0, 1, 6); // 5 / 5
+
+
+		m0.setQuick(1, 0, 1); // 0 / 5
+		m0.setQuick(1, 1, 4); // 3 / 5
+		
+		MatrixUtils.normalize(m0);
+		
+		//MatrixUtils.debug_print(m0);
+		
+		assertEquals( 0.2, m0.get(0, 0), 0.0 );
+		assertEquals( 1.0, m0.get(0, 1), 0.0 );
+		
+		assertEquals( 0.0, m0.get(1, 0), 0.0 );
+		assertEquals( 0.6, m0.get(1, 1), 0.0 );
+		
+	}
+	
+	@Test
+	public void testMatrixMinMax() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(2, 3);
+		m0.setQuick(0, 0, 2);
+		m0.setQuick(0, 1, -3);
+		m0.setQuick(0, 2, 5);
+
+		m0.setQuick(1, 0, 3);
+		m0.setQuick(1, 1, 4);
+		m0.setQuick(1, 2, -6);
+
+		
+		double min = MatrixUtils.min(m0);
+		double max = MatrixUtils.max(m0);
+		
+		assertEquals( -6.0, min, 0.0 );
+		assertEquals( 5.0, max, 0.0 );
+		
+	}
 	
 	@Test
 	public void testMatrixExp() {

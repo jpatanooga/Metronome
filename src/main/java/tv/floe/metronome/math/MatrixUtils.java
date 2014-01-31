@@ -322,6 +322,27 @@ public class MatrixUtils {
 		
 	}
 	
+	/**
+	 * Finds the max value in the input matrix
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static double min(Matrix m) {
+		
+		double min_tmp = m.viewRow(0).minValue();
+		
+		for ( int r = 0; r < m.rowSize(); r++ ) {
+			
+			if (m.viewRow(r).minValue() < min_tmp ) {
+				min_tmp = m.viewRow(r).minValue();
+			}
+			
+		}
+		
+		return min_tmp;
+		
+	}	
 	
 	
 	/**
@@ -775,6 +796,72 @@ public class MatrixUtils {
 		return d;
 		
 	}	
+	
+	public static Matrix toMatrix(int[][] arr) {
+		
+		Matrix d = new DenseMatrix( arr.length, arr[0].length );
+		
+		for (int i = 0; i < arr.length; i++) {
+			
+			for (int j = 0; j < arr[i].length; j++) {
+				
+				d.set( i, j, arr[ i ][ j ] );
+				
+			}
+			
+		}
+		
+		return d;
+	}
+
+	public static void subi(Matrix m, double val) {
+		
+		for (int r = 0; r < m.numRows(); r++) {
+
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				
+				m.set(r, c, m.get(r, c) - val );
+			
+			}
+			
+		}
+		
+		
+	}
+
+	public static void divi(Matrix m, double val) {
+		
+		for (int r = 0; r < m.numRows(); r++) {
+
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				
+				m.set(r, c, m.get(r, c) / val );
+			
+			}
+			
+		}
+		
+		
+	}
+	
+	
+	public static Matrix normalize( Matrix input) {
+		
+		//double min = input.min();
+		double min = MatrixUtils.min( input );
+		
+		//double max = input.max();
+		double max = MatrixUtils.max( input );
+		
+		//return input.subi(min).divi(max - min);
+		subi( input, min );
+		divi( input, max - min );
+				
+		return input;
+	}
+
+	
+	
 	
 
 
