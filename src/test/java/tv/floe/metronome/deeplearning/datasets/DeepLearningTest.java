@@ -107,7 +107,8 @@ public abstract class DeepLearningTest {
 		MnistManager man = new MnistManager("/tmp/MNIST/" + MnistFetcher.trainingFilesFilename_unzipped,"/tmp/MNIST/" + MnistFetcher.trainingFileLabelsFilename_unzipped);
 		man.setCurrent(example);
 		int[] imageExample = ArrayUtils.flatten(man.readImage());
-		return new Pair<Matrix,Matrix>(MatrixUtils.toMatrix(imageExample).transpose(),MatrixUtils.toOutcomeVector(man.readLabel(),10));
+		//return new Pair<Matrix,Matrix>(MatrixUtils.toMatrix(imageExample).transpose(),MatrixUtils.toOutcomeVector(man.readLabel(),10));
+		return new Pair<Matrix,Matrix>(MatrixUtils.toMatrix(imageExample),MatrixUtils.toOutcomeVector(man.readLabel(),10));
 	}
 
 

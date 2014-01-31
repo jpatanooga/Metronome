@@ -19,6 +19,7 @@ public class MnistFetcherTest extends BaseDataFetcherTest {
 	public void testMnistFetcher() throws IOException {
 		Pair<Matrix, Matrix> pair = DeepLearningTest.getMnistExample(1);
 		int inputColumns = pair.getFirst().numCols();
+		
 		int outputColumns = 10;
 		testFetcher(fetcher, inputColumns, outputColumns);
 		testFetchBatchSize(10);
