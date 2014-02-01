@@ -74,8 +74,9 @@ public class Test_DBN_Mnist_Dataset {
 		
 		//MNIST_DatasetUtils dataset_utils = new MNIST_DatasetUtils();
 		
+		int batchSize = 50;
 		// mini-batches through dataset
-		MnistDataSetIterator fetcher = new MnistDataSetIterator(50,2000);
+		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, 200 );
 		DataSet first = fetcher.next();
 		int numIns = first.getFirst().numCols();
 		int numLabels = first.getSecond().numCols();
@@ -111,8 +112,13 @@ public class Test_DBN_Mnist_Dataset {
 //		dbn.preTrain( inputDataset, 1, learningRate, preTrainEpochs );
 //		dbn.finetune( outputLabels, learningRate, fineTuneEpochs );
 		
+		int recordsProcessed = 0;
+		
 		do  {
 			
+			recordsProcessed += batchSize;
+			
+			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed );
 			dbn.preTrain( first.getFirst(), 1, learningRate, 300);
 
 			if (fetcher.hasNext()) {
@@ -124,7 +130,14 @@ public class Test_DBN_Mnist_Dataset {
 		fetcher.reset();
 		first = fetcher.next();
 		
+		recordsProcessed = 0;
+		
 		do {
+			
+			recordsProcessed += batchSize;
+			
+			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed );
+			
 			
 			dbn.finetune( first.getSecond(), learningRate, 300);
 			

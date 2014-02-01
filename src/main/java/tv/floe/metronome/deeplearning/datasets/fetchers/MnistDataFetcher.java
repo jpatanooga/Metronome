@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.datasets.MnistManager;
+import tv.floe.metronome.deeplearning.datasets.iterator.DataSetFetcher;
 import tv.floe.metronome.math.ArrayUtils;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -18,7 +19,7 @@ import tv.floe.metronome.types.Pair;
  * @author Adam Gibson
  *
  */
-public class MnistDataFetcher extends BaseDataFetcher {
+public class MnistDataFetcher extends BaseDataFetcher implements DataSetFetcher {
 
 	/**
 	 * 
