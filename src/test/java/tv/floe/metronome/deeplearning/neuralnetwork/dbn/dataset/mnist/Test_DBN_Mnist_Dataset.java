@@ -9,6 +9,10 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 
 
@@ -16,9 +20,13 @@ import tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist.MNI
 import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
 
 public class Test_DBN_Mnist_Dataset {
+	
+	private static Logger log = LoggerFactory.getLogger(Test_DBN_Mnist_Dataset.class);
+	
 	
 	public static Matrix segmentOutSomeTestData(Matrix input, int max_count) {
 		
@@ -147,9 +155,63 @@ public class Test_DBN_Mnist_Dataset {
 			
 		} while (fetcher.hasNext());
 		
+		System.out.println("----------- Training Complete! -----------");
+		
+		// save model
+		
 		// now do evaluation of results ....
+			
 		
 		
+	}
+	
+	/**
+	 * This is the general pattern that we'd use to score new 
+	 * 
+	 */
+	@Test
+	public void testTestFromSavedModel() {
+		
+		// create DBN from scratch
+		
+		int[] hiddenLayerSizes = { 600, 600, 600 };
+		double learningRate = 0.005;
+		
+		
+//		DeepBeliefNetwork dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
+		
+		
+		
+		// load model from disk
+		
+		
+		// run tests on model
+		
+		int batchSize = 50;
+		// mini-batches through dataset
+		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, 200 );
+		DataSet first = fetcher.next();
+
+		fetcher.reset();
+		first = fetcher.next();
+		Evaluation eval = new Evaluation();
+
+		do {
+
+
+			Matrix predicted = dbn.predict(first.getFirst());
+			log.info("Predicting\n " + first.getSecond().toString().replaceAll(";","\n"));
+			log.info("Prediction was " + predicted.toString().replaceAll(";","\n"));
+			eval.eval(first.getSecond(), predicted);
+			
+			if (fetcher.hasNext()) {
+				first = fetcher.next();
+			}
+			
+		} while(fetcher.hasNext());
+		
+
+		log.info(eval.stats());			
 		
 	}
 
