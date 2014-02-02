@@ -35,6 +35,9 @@ public class HiddenLayer {
 	public Matrix input;
 	public ActivationFunction activationFunction = new Sigmoid();
 	
+	private HiddenLayer() {}
+	
+	
 	/**
 	 * LayerVectorized Ctor
 	 * 
@@ -155,6 +158,18 @@ public class HiddenLayer {
 		return ret;
 	}	
 	
+	@Override
+	public HiddenLayer clone() {
+		HiddenLayer layer = new HiddenLayer();
+		layer.biasTerms = biasTerms.clone();
+		layer.connectionWeights = connectionWeights.clone();
+		layer.input = input.clone();
+		layer.activationFunction = activationFunction;
+		layer.neuronCount = neuronCount;
+		layer.neuronCountPreviousLayer = neuronCountPreviousLayer;
+		layer.rndNumGenerator = rndNumGenerator;
+		return layer;
+	}
 	
 	
 	

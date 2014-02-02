@@ -1,6 +1,8 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -8,9 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 import tv.floe.metronome.deeplearning.math.transforms.MatrixTransform;
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
@@ -21,6 +28,9 @@ import tv.floe.metronome.types.Pair;
 
 public abstract class BaseMultiLayerNeuralNetworkVectorized {
 
+	private static Logger log = LoggerFactory.getLogger( BaseMultiLayerNeuralNetworkVectorized.class );
+	
+	
 	public int inputNeuronCount;
 	public int outputNeuronCount;
 	
@@ -38,6 +48,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 	public NeuralNetworkVectorized[] preTrainingLayers;
 	
 	public RandomGenerator randomGenerator;
+	public RealDistribution distribution;
 	
 	// the input data ---- how is this going to be handled?
 	// how was it handled with the OOP-MLPN version?
@@ -421,6 +432,72 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized {
 		}
 
 	}
+
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+			ObjectInputStream ois = new ObjectInputStream(is);
+			BaseMultiLayerNeuralNetworkVectorized loaded = (BaseMultiLayerNeuralNetworkVectorized) ois.readObject();
+			update(loaded);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public static BaseMultiLayerNeuralNetworkVectorized loadFromFile(InputStream is) {
+		try {
+			ObjectInputStream ois = new ObjectInputStream(is);
+			log.info("Loading network model...");
+
+			BaseMultiLayerNeuralNetworkVectorized loaded = (BaseMultiLayerNeuralNetworkVectorized) ois.readObject();
+			return loaded;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+	
+	/**
+	 * Assigns the parameters of this model to the ones specified by this
+	 * network. This is used in loading from input streams, factory methods, etc
+	 * @param network the network to get parameters from
+	 */
+	protected void update(BaseMultiLayerNeuralNetworkVectorized network) {
+		
+		this.preTrainingLayers = new NeuralNetworkVectorized[ network.preTrainingLayers.length ];
+		
+		for (int i = 0; i < preTrainingLayers.length; i++) {
+			
+			this.preTrainingLayers[i] = network.preTrainingLayers[ i ].clone();
+			
+		}
+		
+		this.hiddenLayerSizes = network.hiddenLayerSizes;
+		this.logisticRegressionLayer = network.logisticRegressionLayer.clone();
+		this.inputNeuronCount = network.inputNeuronCount;
+		this.numberLayers = network.numberLayers;
+		this.outputNeuronCount = network.outputNeuronCount;
+		this.randomGenerator = network.randomGenerator;
+		this.distribution = network.distribution;
+		
+		this.hiddenLayers = new HiddenLayer[network.hiddenLayers.length];
+		
+		for (int i = 0; i < hiddenLayers.length; i++) {
+			
+			this.hiddenLayers[ i ] = network.hiddenLayers[ i ].clone();
+			
+		}
+
+
+	}	
 
 
 	/**

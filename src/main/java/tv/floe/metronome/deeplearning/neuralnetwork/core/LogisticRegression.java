@@ -22,6 +22,7 @@ public class LogisticRegression implements Serializable {
 	public boolean useRegularization = true;
 	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 
+	private LogisticRegression() {}
 
 	public LogisticRegression(Matrix input,Matrix labels, int nIn, int nOut) {
 		
@@ -194,6 +195,20 @@ public class LogisticRegression implements Serializable {
 		//return softmax(x.mmul(W).addRowVector(b));
 		return MatrixUtils.softmax( MatrixUtils.addRowVector( x.times( this.connectionWeights ), this.biasTerms.viewRow(0) ) );
 		
+	}	
+	
+	@Override
+	protected LogisticRegression clone()  {
+		LogisticRegression reg = new LogisticRegression();
+		reg.biasTerms = biasTerms.clone();
+		reg.connectionWeights = connectionWeights.clone();
+		reg.l2 = this.l2;
+		reg.labels = this.labels.clone();
+		reg.nIn = this.nIn;
+		reg.nOut = this.nOut;
+		reg.useRegularization = this.useRegularization;
+		reg.input = this.input.clone();
+		return reg;
 	}	
 
 

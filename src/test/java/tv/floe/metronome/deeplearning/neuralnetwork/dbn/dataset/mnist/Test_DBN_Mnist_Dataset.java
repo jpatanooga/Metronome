@@ -51,6 +51,8 @@ public class Test_DBN_Mnist_Dataset {
 		
 		
 	}
+	
+	
 
 	
 	
@@ -167,10 +169,11 @@ public class Test_DBN_Mnist_Dataset {
 	
 	/**
 	 * This is the general pattern that we'd use to score new 
+	 * @throws IOException 
 	 * 
 	 */
 	@Test
-	public void testTestFromSavedModel() {
+	public void testTestFromSavedModel() throws IOException {
 		
 		// create DBN from scratch
 		
@@ -195,7 +198,7 @@ public class Test_DBN_Mnist_Dataset {
 		fetcher.reset();
 		first = fetcher.next();
 		Evaluation eval = new Evaluation();
-
+/*
 		do {
 
 
@@ -209,7 +212,7 @@ public class Test_DBN_Mnist_Dataset {
 			}
 			
 		} while(fetcher.hasNext());
-		
+*/		
 
 		log.info(eval.stats());			
 		
