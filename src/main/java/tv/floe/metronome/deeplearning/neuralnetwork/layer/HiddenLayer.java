@@ -1,5 +1,7 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.layer;
 
+import java.io.Serializable;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -23,9 +25,13 @@ import tv.floe.metronome.math.MatrixUtils;
  * @author josh
  *
  */
-public class HiddenLayer {
+public class HiddenLayer implements Serializable {
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 87885295280050784L;
 	private int neuronCountPreviousLayer = 0;
 	private int neuronCount = 0;
 	

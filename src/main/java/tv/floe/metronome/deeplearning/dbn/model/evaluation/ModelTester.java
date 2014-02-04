@@ -20,6 +20,9 @@ import tv.floe.metronome.eval.Evaluation;
 
 public class ModelTester {
 	
+
+	private static Logger log = LoggerFactory.getLogger(ModelTester.class);
+	
 	
 	public static void evaluateSavedModel( BaseDatasetIterator iterator, String modelLocation, String pathForReport ) throws IOException {
 		
@@ -65,8 +68,6 @@ public class ModelTester {
 	}
 	
 	
-
-	private static Logger log = LoggerFactory.getLogger(ModelTester.class);
 	/**
 	 * @param args
 	 * @throws IOException 

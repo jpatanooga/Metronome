@@ -448,6 +448,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		
 		if (!file.exists()) {
 			
+			try {
+				file.getParentFile().mkdirs();
+			} catch (Exception e) {
+				
+			}
 			file.createNewFile();
 			
 		}

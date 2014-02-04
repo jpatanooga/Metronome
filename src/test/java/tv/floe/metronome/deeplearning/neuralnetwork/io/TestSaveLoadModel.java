@@ -1,4 +1,4 @@
-package tv.floe.metronome.deeplearning.neuralnetwork.dbn.dataset.mnist;
+package tv.floe.metronome.deeplearning.neuralnetwork.io;
 
 import static org.junit.Assert.*;
 
@@ -6,73 +6,18 @@ import java.io.IOException;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.mahout.math.DenseMatrix;
-import org.apache.mahout.math.Matrix;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-
-
-
-
-import tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist.MNIST_DatasetUtils;
 import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
-import tv.floe.metronome.eval.Evaluation;
-import tv.floe.metronome.math.MatrixUtils;
 
-public class Test_DBN_Mnist_Dataset {
-	
-	private static Logger log = LoggerFactory.getLogger(Test_DBN_Mnist_Dataset.class);
-	
-	
-	public static Matrix segmentOutSomeTestData(Matrix input, int max_count) {
-		
-		int rows = max_count;
-		
-		if (max_count > input.numRows()) {
-			
-			rows = input.numRows();
-			
-		}
-		
-		Matrix samples = new DenseMatrix( rows, input.numCols() );
-		
-		for (int x = 0; x < rows; x++ ) {
-			
-			samples.assignRow(x, input.viewRow(x) );
-			
-		}
-		
-		
-		return samples;
-		
-		
-	}
-	
-	
+public class TestSaveLoadModel {
 
-	
-	
-	/**
-	 * For each hidden / RBM layer, the visible units are dictated by the number of incoming
-	 * entries in the input matrix
-	 * 
-	 * The hidden units are manually set by us here 
-	 * 
-	 * TODO: 
-	 * - 1. generate MNIST input data as a matrix
-	 * 
-	 * - 2. train DBN
-	 * 
-	 * - 3. generate number correct
-	 * @throws IOException 
-	 * 
-	 */
 	@Test
-	public void testMnist() throws IOException {
+	public void testLoadSaveModel() throws IOException {
+
+	
 		
 		int[] hiddenLayerSizes = { 600, 600, 600 };
 		double learningRate = 0.005;
@@ -133,13 +78,14 @@ public class Test_DBN_Mnist_Dataset {
 		
 		// save model
 		
+		System.out.println("----------- Saving Model -----------");
 		dbn.write( "/tmp/metronome/dbn/TEST_DBN_MNIST/models/mnist.model" );
 		
 		// now do evaluation of results ....
 			
-		
-		
+			
+	
+	
 	}
-
 
 }
