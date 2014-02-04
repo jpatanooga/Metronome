@@ -74,54 +74,25 @@ public class Test_DBN_Mnist_Dataset {
 	@Test
 	public void testMnist() throws IOException {
 		
-//		int numIns = first.getFirst().columns;
-//		int numLabels = first.getSecond().columns;
 		int[] hiddenLayerSizes = { 600, 600, 600 };
 		double learningRate = 0.005;
 		int preTrainEpochs = 200;
 		int fineTuneEpochs = 200;
 		int rowLimit = 100;
-		
-		//MNIST_DatasetUtils dataset_utils = new MNIST_DatasetUtils();
-		
+				
 		int batchSize = 50;
 		// mini-batches through dataset
 		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, 200 );
 		DataSet first = fetcher.next();
 		int numIns = first.getFirst().numCols();
 		int numLabels = first.getSecond().numCols();
-		
-/*		
-		Matrix inputDataset = MNIST_DatasetUtils.getImageDataAsMatrix(rowLimit);
-		
-		Matrix testSamples = segmentOutSomeTestData( inputDataset, 5 );
-		
-		Matrix outputLabels = MNIST_DatasetUtils.getLabelsAsMatrix(rowLimit);
-		
-		int n_ins = inputDataset.numCols(); // number of elements in input vector 
-		int n_outs = 10; // 0 - 9 == number of classes of labels
-		*/
+
 		int n_layers = hiddenLayerSizes.length;
 		RandomGenerator rng = new MersenneTwister(123);
 		
-		//System.out.println( "input records: " + inputDataset.numRows() );
-		//System.out.println( "input labels: " + outputLabels.numRows() );
-/*
-		assertEquals( rowLimit, inputDataset.numRows() );
-		assertEquals( 784, inputDataset.numCols() );
-
-		assertEquals( rowLimit, outputLabels.numRows() );
-		assertEquals( 10, outputLabels.numCols() );
-*/		
-//		MatrixUtils.debug_print_row(inputDataset, 0);
-//		MatrixUtils.debug_print_row(inputDataset, 10);
-		
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
-		
-//		dbn.preTrain( inputDataset, 1, learningRate, preTrainEpochs );
-//		dbn.finetune( outputLabels, learningRate, fineTuneEpochs );
-		
+				
 		int recordsProcessed = 0;
 		
 		do  {
@@ -129,7 +100,7 @@ public class Test_DBN_Mnist_Dataset {
 			recordsProcessed += batchSize;
 			
 			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed );
-			dbn.preTrain( first.getFirst(), 1, learningRate, 300);
+			dbn.preTrain( first.getFirst(), 1, learningRate, preTrainEpochs);
 
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
@@ -149,7 +120,7 @@ public class Test_DBN_Mnist_Dataset {
 			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed );
 			
 			
-			dbn.finetune( first.getSecond(), learningRate, 300);
+			dbn.finetune( first.getSecond(), learningRate, fineTuneEpochs );
 			
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
@@ -161,61 +132,13 @@ public class Test_DBN_Mnist_Dataset {
 		
 		// save model
 		
+//		dbn.write(os)
+		
 		// now do evaluation of results ....
 			
 		
 		
 	}
-	
-	/**
-	 * This is the general pattern that we'd use to score new 
-	 * @throws IOException 
-	 * 
-	 */
-	@Test
-	public void testTestFromSavedModel() throws IOException {
-		
-		// create DBN from scratch
-		
-		int[] hiddenLayerSizes = { 600, 600, 600 };
-		double learningRate = 0.005;
-		
-		
-//		DeepBeliefNetwork dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
-		
-		
-		
-		// load model from disk
-		
-		
-		// run tests on model
-		
-		int batchSize = 50;
-		// mini-batches through dataset
-		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, 200 );
-		DataSet first = fetcher.next();
 
-		fetcher.reset();
-		first = fetcher.next();
-		Evaluation eval = new Evaluation();
-/*
-		do {
-
-
-			Matrix predicted = dbn.predict(first.getFirst());
-			log.info("Predicting\n " + first.getSecond().toString().replaceAll(";","\n"));
-			log.info("Prediction was " + predicted.toString().replaceAll(";","\n"));
-			eval.eval(first.getSecond(), predicted);
-			
-			if (fetcher.hasNext()) {
-				first = fetcher.next();
-			}
-			
-		} while(fetcher.hasNext());
-*/		
-
-		log.info(eval.stats());			
-		
-	}
 
 }
