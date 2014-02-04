@@ -1,11 +1,13 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.activation;
 
+import java.io.Serializable;
+
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.math.MatrixUtils;
 
 
-public class Sigmoid implements ActivationFunction {
+public class Sigmoid implements ActivationFunction,Serializable {
 
 	private static final long serialVersionUID = -6280602270833101092L;
 
