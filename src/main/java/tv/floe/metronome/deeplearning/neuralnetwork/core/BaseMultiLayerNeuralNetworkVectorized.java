@@ -1,5 +1,12 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -465,6 +472,42 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 			throw new RuntimeException(e);
 		}
 
+	}
+	
+	public static BaseMultiLayerNeuralNetworkVectorized loadFromFile(String filename ) throws Exception {
+
+		BaseMultiLayerNeuralNetworkVectorized nn = null;
+		
+		File file = new File( filename );
+		if(!file.exists()) {
+			//
+			//file.createNewFile();
+			throw new Exception("Model File Path does not exist!");
+		}
+		 
+		//FileOutputStream oFile = new FileOutputStream(filename, false); 
+		
+		
+
+			try { 
+			
+				DataInputStream dis = new DataInputStream(
+                        new FileInputStream( filename ));
+				
+				nn = BaseMultiLayerNeuralNetworkVectorized.loadFromFile( dis );
+				
+
+				//dataOutputStream.flush();
+				dis.close();
+
+			} catch (IOException e) {
+				log.error("Unable to load model",e);
+			}
+			
+			return nn;
+
+					
+		
 	}
 	
 	/**

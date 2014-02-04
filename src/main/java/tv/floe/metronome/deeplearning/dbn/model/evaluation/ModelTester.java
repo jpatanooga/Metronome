@@ -49,7 +49,7 @@ public class ModelTester {
 		
 		// open files somewhere
 		
-		File yourFile = new File("score.txt");
+		File yourFile = new File(fileLocation);
 		if(!yourFile.exists()) {
 		    yourFile.createNewFile();
 		} 
