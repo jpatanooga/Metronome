@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,10 +24,11 @@ import tv.floe.metronome.deeplearning.math.transforms.MatrixTransform;
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
+import tv.floe.metronome.deeplearning.neuralnetwork.serde.Persistable;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
-public abstract class BaseMultiLayerNeuralNetworkVectorized {
+public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializable,Persistable {
 
 	private static Logger log = LoggerFactory.getLogger( BaseMultiLayerNeuralNetworkVectorized.class );
 	
