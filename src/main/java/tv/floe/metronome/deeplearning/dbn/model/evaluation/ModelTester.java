@@ -24,6 +24,34 @@ public class ModelTester {
 	private static Logger log = LoggerFactory.getLogger(ModelTester.class);
 	
 	
+	
+	public static void evaluateModel( BaseDatasetIterator iterator, BaseMultiLayerNeuralNetworkVectorized model ) throws IOException {
+		
+
+		Evaluation eval = new Evaluation();
+		//BaseMultiLayerNeuralNetworkVectorized load = BaseMultiLayerNeuralNetworkVectorized.loadFromFile(new FileInputStream(new File(modelLocation)));
+		
+		while (iterator.hasNext()) {
+			
+			DataSet inputs = iterator.next();
+
+			Matrix in = inputs.getFirst();
+			Matrix outcomes = inputs.getSecond();
+			Matrix predicted = model.predict(in);
+			eval.eval( outcomes, predicted );
+			
+		}
+		
+		
+		
+		
+		log.info( eval.stats() );		
+		
+		//writeReportToDisk( eval, pathForReport );
+		
+	}	
+	
+	
 	public static void evaluateSavedModel( BaseDatasetIterator iterator, String modelLocation, String pathForReport ) throws IOException {
 		
 

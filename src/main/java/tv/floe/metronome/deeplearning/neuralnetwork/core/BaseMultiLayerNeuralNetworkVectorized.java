@@ -1,7 +1,9 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +24,7 @@ import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -433,8 +436,38 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	 */
 	public void write(OutputStream os) {
 		try {
-			ObjectOutputStream oos = new ObjectOutputStream(os);
-			oos.writeObject(this);
+		//	ObjectOutputStream oos = new ObjectOutputStream(os);
+		//	oos.writeObject(this);
+			
+	//		MatrixWritable.writeMatrix(arg0, arg1)this.hiddenLayers[ 0 ].biasTerms
+			
+		//	ByteArrayOutputStream out = new ByteArrayOutputStream();
+		    DataOutput d = new DataOutputStream(os);
+		    
+		    MatrixWritable.writeMatrix(d, inputTrainingData);
+		    // d.writeUTF(src_host);
+/*		    //d.writeInt(this.SrcWorkerPassCount);
+		    d.writeInt(this.GlobalPassCount);
+		    
+		    d.writeInt(this.IterationComplete);
+		    d.writeInt(this.CurrentIteration);
+		    
+		    d.writeInt(this.TrainedRecords);
+		    //d.writeFloat(this.AvgLogLikelihood);
+		    d.writeFloat(this.PercentCorrect);
+		    d.writeDouble(this.RMSE);
+		    */
+		    
+		    
+		    //d.write
+		    
+		    // buf.write
+		    // MatrixWritable.writeMatrix(d, this.worker_gradient.getMatrix());
+		    //MatrixWritable.writeMatrix(d, this.parameter_vector);
+		    // MatrixWritable.
+	//	    ObjectOutputStream oos = new ObjectOutputStream(out);			
+			
+			
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
