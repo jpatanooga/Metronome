@@ -3,6 +3,7 @@ package tv.floe.metronome.deeplearning.dbn.model.evaluation;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.mahout.math.Matrix;
@@ -41,6 +42,23 @@ public class ModelTester {
 		
 		
 		log.info( eval.stats() );		
+		
+	}
+	
+	public void writeReportToDisk( Evaluation eval, String fileLocation ) throws IOException {
+		
+		// open files somewhere
+		
+		File yourFile = new File("score.txt");
+		if(!yourFile.exists()) {
+		    yourFile.createNewFile();
+		} 
+		FileOutputStream oFile = new FileOutputStream(fileLocation, false); 
+		
+		oFile.write(eval.stats().getBytes() );
+		
+		oFile.close();
+		
 		
 	}
 	
