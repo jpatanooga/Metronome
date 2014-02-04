@@ -441,6 +441,24 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		}
 
 	}
+	
+	public void write( String filename ) throws IOException {
+		
+		File file = new File( filename );
+		
+		if (!file.exists()) {
+			
+			file.createNewFile();
+			
+		}
+		 
+		FileOutputStream oFile = new FileOutputStream(filename, false); 
+		this.write(oFile);
+		oFile.close();
+
+		
+		
+	}
 
 	/**
 	 * Load (using {@link ObjectInputStream}
@@ -474,6 +492,13 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 	}
 	
+	/**
+	 * Helper method for loading the model file from disk by path name
+	 * 
+	 * @param filename
+	 * @return
+	 * @throws Exception
+	 */
 	public static BaseMultiLayerNeuralNetworkVectorized loadFromFile(String filename ) throws Exception {
 
 		BaseMultiLayerNeuralNetworkVectorized nn = null;
