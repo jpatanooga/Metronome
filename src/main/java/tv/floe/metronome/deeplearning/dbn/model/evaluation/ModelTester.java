@@ -21,7 +21,7 @@ import tv.floe.metronome.eval.Evaluation;
 public class ModelTester {
 	
 	
-	public static void evaluateSavedModel( BaseDatasetIterator iterator, String modelLocation ) throws FileNotFoundException {
+	public static void evaluateSavedModel( BaseDatasetIterator iterator, String modelLocation, String pathForReport ) throws IOException {
 		
 
 		Evaluation eval = new Evaluation();
@@ -43,9 +43,11 @@ public class ModelTester {
 		
 		log.info( eval.stats() );		
 		
+		writeReportToDisk( eval, pathForReport );
+		
 	}
 	
-	public void writeReportToDisk( Evaluation eval, String fileLocation ) throws IOException {
+	public static void writeReportToDisk( Evaluation eval, String fileLocation ) throws IOException {
 		
 		// open files somewhere
 		
