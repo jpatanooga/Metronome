@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist.MNI
 import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.deeplearning.dbn.model.evaluation.ModelTester;
 import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
 
@@ -74,14 +76,17 @@ public class Test_DBN_Mnist_Dataset {
 	@Test
 	public void testMnist() throws IOException {
 		
+		PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
+		
 		int[] hiddenLayerSizes = { 600, 600, 600 };
 		double learningRate = 0.005;
-		int preTrainEpochs = 5;
-		int fineTuneEpochs = 5;
-		int totalNumExamples = 50;
+		int preTrainEpochs = 10;
+		int fineTuneEpochs = 10;
+		int totalNumExamples = 140;
 		//int rowLimit = 100;
 				
-		int batchSize = 10;
+		int batchSize = 20;
+		
 		// mini-batches through dataset
 		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
 		DataSet first = fetcher.next();
@@ -133,10 +138,12 @@ public class Test_DBN_Mnist_Dataset {
 		
 		// save model
 		
-		dbn.write( "/tmp/metronome/dbn/TEST_DBN_MNIST/models/mnist.model" );
+	//	dbn.write( "/tmp/metronome/dbn/TEST_DBN_MNIST/models/mnist.model" );
 		
 		// now do evaluation of results ....
-			
+		fetcher.reset();
+		
+		ModelTester.evaluateModel(fetcher, dbn);
 		
 		
 	}

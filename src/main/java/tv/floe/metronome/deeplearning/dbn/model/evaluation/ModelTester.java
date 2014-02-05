@@ -44,7 +44,7 @@ public class ModelTester {
 		
 		
 		
-		
+		log.warn( "evaluateModel" );
 		log.info( eval.stats() );		
 		
 		//writeReportToDisk( eval, pathForReport );
@@ -100,7 +100,7 @@ public class ModelTester {
 	 * @param args
 	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws IOException {
+/*	public static void main(String[] args) throws IOException {
 		
 		MnistDataSetIterator iter = new MnistDataSetIterator(10, 60000);
 		
@@ -123,6 +123,6 @@ public class ModelTester {
 		
 		log.info( eval.stats() );
 	}	
-	
+*/	
 
 }

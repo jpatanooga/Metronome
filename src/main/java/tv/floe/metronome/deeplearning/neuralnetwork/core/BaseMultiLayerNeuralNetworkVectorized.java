@@ -120,6 +120,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 			initializeLayers(input);
 		}
 
+		
 
 	}	
 	
