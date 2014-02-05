@@ -76,9 +76,9 @@ public class Test_DBN_Mnist_Dataset {
 	@Test
 	public void testMnist() throws IOException {
 		
-		PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
+		//PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
 		
-		int[] hiddenLayerSizes = { 600, 600, 600 };
+		int[] hiddenLayerSizes = { 500, 500, 500 };
 		double learningRate = 0.005;
 		int preTrainEpochs = 10;
 		int fineTuneEpochs = 10;

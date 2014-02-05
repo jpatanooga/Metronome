@@ -70,6 +70,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	public double learningRateUpdate = 0.95;
 	public boolean useRegularization = true;
 	public double l2 = 0.01;
+	private double momentum = 0.1;
 	
 	
 	public MultiLayerNetworkOptimizer optimizer;
@@ -311,6 +312,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		}
 		
 	}
+	
+	
 	
 	
 	/**
@@ -670,6 +673,15 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		}
 		
 	}
+	
+	public synchronized double getMomentum() {
+		return momentum;
+	}
+
+	public synchronized void setMomentum(double momentum) {
+		this.momentum = momentum;
+	}
+	
 
 	
 }
