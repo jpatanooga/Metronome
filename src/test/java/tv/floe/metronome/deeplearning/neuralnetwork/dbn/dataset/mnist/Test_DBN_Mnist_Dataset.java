@@ -80,12 +80,12 @@ public class Test_DBN_Mnist_Dataset {
 		
 		int[] hiddenLayerSizes = { 500, 500, 500 };
 		double learningRate = 0.005;
-		int preTrainEpochs = 10;
-		int fineTuneEpochs = 10;
-		int totalNumExamples = 140;
+		int preTrainEpochs = 100;
+		int fineTuneEpochs = 100;
+		int totalNumExamples = 200;
 		//int rowLimit = 100;
 				
-		int batchSize = 20;
+		int batchSize = 50;
 		
 		// mini-batches through dataset
 		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
