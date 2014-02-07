@@ -148,7 +148,7 @@ public class CustomConjugateGradient  implements Optimizer {
 
 			// This termination provided by "Numeric Recipes in C".
 			if ((0 < tolerance) && (2.0 * Math.abs(fret - fp) <= tolerance * (Math.abs(fret) + Math.abs(fp) + eps))) {
-				logger.info("ConjugateGradient converged: old value= " + fp + " new value= " + fret + " tolerance="
+				logger.info("\nConjugateGradient converged: old value= " + fp + " new value= " + fret + " tolerance="
 						+ tolerance);
 				converged = true;
 				return true;

@@ -39,9 +39,17 @@ public class TestMNIST_On_RBMs {
 
 		rbm.trainingDataset = first.getFirst();
 
-		rbm.trainTillConvergence( first.getFirst(), 0.01, new Object[]{ 1 } );
+		System.out.println(" ----- Training ------");
+		for(int i = 0; i < 20; i++) {
+			
+			rbm.trainTillConvergence( first.getFirst(), 0.01, new Object[]{ 1 } );
+			
+		}
+		
 		Matrix reconstruct = rbm.reconstruct(first.getFirst());
 
+		System.out.println(" ----- Visualizing Reconstructions ------");
+		
 		for (int j = 0; j < first.numExamples(); j++) {
 			
 			Matrix draw1 = first.get(j).getFirst().times(255);
