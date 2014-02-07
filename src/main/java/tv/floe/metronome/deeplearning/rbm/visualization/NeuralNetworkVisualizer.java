@@ -2,6 +2,7 @@ package tv.floe.metronome.deeplearning.rbm.visualization;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -12,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.Vector;
 
 //import org.springframework.core.io.ClassPathResource;
 
@@ -22,6 +24,7 @@ import com.google.common.io.Resources;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized;
+import tv.floe.metronome.math.MatrixUtils;
 
 
 
@@ -40,7 +43,7 @@ public class NeuralNetworkVisualizer {
 
 
 	//private static 	ClassPathResource r = new ClassPathResource("/scripts/plot.py");
-	URL url = Resources.getResource("/scripts/plot.py");
+	private static URL script_local_url = Resources.getResource("/scripts/plot.py");
 	private static Logger log = LoggerFactory.getLogger(NeuralNetworkVisualizer.class);
 
 
@@ -88,20 +91,22 @@ public class NeuralNetworkVisualizer {
 			log.warn("Cant render good representation of filter witout perfect square, please choose different hidden layer size");*/
 	}
 
-	public void plotMatrices(String[] titles,Matrix[] matrices) {
+	public void plotMatrices(String[] titles, Matrix[] matrices) {
 		
 		String[] path = new String[matrices.length * 2];
 		
 		try {
 			
 			if (titles.length != matrices.length) {
+				
 				throw new IllegalArgumentException("Titles and matrix lengths must be equal");
+				
 			}
 
 
 			for(int i = 0; i < path.length - 1; i+=2) {
 			
-				path[i] = writeMatrix(MatrixUtil.unroll(matrices[i / 2]));
+				path[i] = writeMatrix( MatrixUtils.unroll( matrices[i / 2] ) );
 				path[i + 1] = titles[i / 2];
 				
 			}
@@ -130,7 +135,7 @@ public class NeuralNetworkVisualizer {
 		write.deleteOnExit();
 		
 		for(int i = 0; i < matrix.numRows(); i++) {
-		
+		/*
 			Matrix row = matrix.getRow(i);
 			StringBuffer sb = new StringBuffer();
 			
@@ -142,6 +147,23 @@ public class NeuralNetworkVisualizer {
 				}
 				
 			}
+			*/
+			
+			Vector row = matrix.viewRow(i);
+			StringBuffer sb = new StringBuffer();
+			
+			for (int j = 0; j < row.size(); j++) {
+				
+				sb.append(String.format("%.10f", row.get(j)));
+				
+				if (j < row.size() - 1) {
+					
+					sb.append(",");
+					
+				}
+				
+			}
+			
 			
 			sb.append("\n");
 			String line = sb.toString();
@@ -178,19 +200,20 @@ public class NeuralNetworkVisualizer {
 				throw new IllegalStateException("Unable to plot; missing input");
 			}
 
-				Matrix hbiasMean = network.getInput().mmul( network.getConnectionWeights() ).addRowVector( network.getHiddenBias() );
+				//Matrix hbiasMean = network.getInput().mmul( network.getConnectionWeights() ).addRowVector( network.getHiddenBias() );
+			Matrix hbiasMean = MatrixUtils.addRowVector( network.getInput().times( network.getConnectionWeights() ), network.getHiddenBias().viewRow(0) );
 
 
-				String filePath = writeMatrix(hbiasMean);
+			String filePath = writeMatrix(hbiasMean);
 
-				Process is = Runtime.getRuntime().exec("python /tmp/plot.py hbias " + filePath);
+			Process is = Runtime.getRuntime().exec("python /tmp/plot.py hbias " + filePath);
 
-				Thread.sleep(10000);
-				is.destroy();
+			Thread.sleep(10000);
+			is.destroy();
 
 
-				log.info("Rendering hbias " + filePath);
-				log.error(IOUtils.readLines(is.getErrorStream()).toString());
+			log.info("Rendering hbias " + filePath);
+			log.error(IOUtils.readLines(is.getErrorStream()).toString());
 
 		}catch(Exception e) {
 			log.warn("Image closed");
@@ -203,9 +226,13 @@ public class NeuralNetworkVisualizer {
 
 		File script = new File("/tmp/plot.py");
 
-
+		
+		
+		
 		try {
-			List<String> lines = IOUtils.readLines(r.getInputStream());
+			//List<String> lines = IOUtils.readLines(r.getInputStream());
+			FileInputStream fs = new FileInputStream( script_local_url.getPath() );
+			List<String> lines = IOUtils.readLines( fs );
 			FileUtils.writeLines(script, lines);
 
 		} catch (IOException e) {
