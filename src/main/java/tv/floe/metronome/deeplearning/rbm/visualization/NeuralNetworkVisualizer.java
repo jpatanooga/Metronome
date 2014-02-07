@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,9 +12,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.mahout.math.Matrix;
+
+//import org.springframework.core.io.ClassPathResource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
+
+import com.google.common.io.Resources;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized;
@@ -34,7 +39,8 @@ import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized
 public class NeuralNetworkVisualizer {
 
 
-	private static 	ClassPathResource r = new ClassPathResource("/scripts/plot.py");
+	//private static 	ClassPathResource r = new ClassPathResource("/scripts/plot.py");
+	URL url = Resources.getResource("/scripts/plot.py");
 	private static Logger log = LoggerFactory.getLogger(NeuralNetworkVisualizer.class);
 
 
@@ -83,16 +89,23 @@ public class NeuralNetworkVisualizer {
 	}
 
 	public void plotMatrices(String[] titles,Matrix[] matrices) {
+		
 		String[] path = new String[matrices.length * 2];
+		
 		try {
-			if(titles.length != matrices.length)
+			
+			if (titles.length != matrices.length) {
 				throw new IllegalArgumentException("Titles and matrix lengths must be equal");
+			}
 
 
 			for(int i = 0; i < path.length - 1; i+=2) {
+			
 				path[i] = writeMatrix(MatrixUtil.unroll(matrices[i / 2]));
 				path[i + 1] = titles[i / 2];
+				
 			}
+			
 			String paths = StringUtils.join(path,",");
 
 			Process is = Runtime.getRuntime().exec("python /tmp/plot.py multi " + paths);

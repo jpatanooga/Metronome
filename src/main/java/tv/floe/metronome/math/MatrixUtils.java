@@ -17,6 +17,27 @@ import org.apache.mahout.math.function.Functions;
  */
 public class MatrixUtils {
 
+	/**
+	 * Unrolls / flattens a Matrix into a 1 row Matrix
+	 * 
+	 * @param d
+	 * @return
+	 */
+	public static Matrix unroll(Matrix d) {
+		
+		Matrix ret = new DenseMatrix( 1, MatrixUtils.length( d ) );
+		
+		for (int i = 0; i < MatrixUtils.length( d ); i++) {
+			
+			//ret.put(i,d.get(i));
+			//ret.set(i, arg1)
+			MatrixUtils.setElement(ret, i, MatrixUtils.getElement(d, i));
+			
+		}
+		
+		return ret;
+	}
+
 	
 	/**
 	 * For each column, sum all the values in the column
