@@ -41,11 +41,37 @@ public class TestMNIST_On_RBMs {
 		d2.draw();
 		d2.frame.setLocation(300, 200);
 
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		d.frame.dispose();
 		d2.frame.dispose();
 		
 		
+		
+	}
+	
+	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input) throws InterruptedException {
+		
+
+		Matrix reconstruct_all = rbm.reconstruct( input.getFirst() );
+
+//		log.info("Negative log likelihood " + rbm.getReConstructionCrossEntropy());
+
+		System.out.println(" ----- Visualizing Reconstructions ------");
+		
+		for (int j = 0; j < 10; j++) {
+			
+			// get the actual image we're looking at
+			Matrix draw1 = input.get(j).getFirst().times(255);
+			
+			// get the reconstruction row that matches this image
+			Matrix reconstructed_row_image = MatrixUtils.viewRowAsMatrix(reconstruct_all, j);
+			
+			// now generate a new image based on the reconstruction probabilities
+			Matrix draw2 = MatrixUtils.genBinomialDistribution( reconstructed_row_image, 1, new MersenneTwister(123) ).times(255);
+		
+			renderExample(draw1, reconstructed_row_image, draw2);
+			
+		}
 		
 	}
 	
@@ -72,22 +98,31 @@ public class TestMNIST_On_RBMs {
 
 		System.out.println(" ----- Training ------");
 		
-		for(int i = 0; i < 10; i++) {
+		//for(int i = 0; i < 2; i++) {
+		int epoch = 0;
+		while ( rbm.getReConstructionCrossEntropy() > 200) {
 			
-			System.out.println("Epoch " + i + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
+			System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
 			
 			//rbm.trainTillConvergence( first.getFirst(), learningRate, new Object[]{ 1 } );
 			rbm.trainTillConvergence(learningRate, 1, first.getFirst());
 			
+			epoch++;
 			
 		}
-		
+		/*
 		Matrix reconstruct = rbm.reconstruct(first.getFirst());
 
 		log.info("Negative log likelihood " + rbm.getReConstructionCrossEntropy());
 
+*/
 		System.out.println(" ----- Visualizing Reconstructions ------");
 		
+		renderBatchOfReconstructions( rbm, first );
+		
+		
+		
+		/*
 		for (int j = 0; j < 10; j++) {
 			
 			// get the actual image we're looking at
@@ -118,18 +153,18 @@ public class TestMNIST_On_RBMs {
 			System.out.println("Viz Example: " + j);
 
 		}
-		
-		
+		*/
+		/*
 		for (int i = 0; i < 3000; i++) {
 			
-			if (i% 100 == 0 || i == 0) {
+			if (i% 20 == 0 || i == 0) {
 				
 				reconstruct = rbm.reconstruct(first.getFirst());
 				
 				if (i > 0)
 					
 					//for (int j = 0; j < first.numExamples(); j++) {
-					for (int j = 0; j < 10; j++) {
+					for (int j = 0; j < 5; j++) {
 						
 
 						
@@ -144,6 +179,11 @@ public class TestMNIST_On_RBMs {
 						DrawMnistGreyscale d2 = new DrawMnistGreyscale(draw2,100,100);
 						d2.title = "TEST";
 						d2.draw();
+						
+						d.frame.setLocation(100, 200);
+
+						d2.frame.setLocation(200, 200);
+
 						Thread.sleep(5000);
 						d.frame.dispose();
 						d2.frame.dispose();
@@ -157,7 +197,7 @@ public class TestMNIST_On_RBMs {
 
 
 		}
-
+*/
 
 
 
