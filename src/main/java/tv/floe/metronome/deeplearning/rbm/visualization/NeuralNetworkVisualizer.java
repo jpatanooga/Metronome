@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.mahout.math.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -42,7 +43,7 @@ public class NeuralNetworkVisualizer {
 	}
 
 
-	public void renderFilter(DoubleMatrix w,int r,int c,long length) {
+	public void renderFilter(Matrix w,int r,int c,long length) {
 		try {
 			String filePath = writeMatrix(w);
 			Process is = Runtime.getRuntime().exec("python /tmp/plot.py filter " + filePath + " " + r + " " + c + " " + length);
@@ -63,17 +64,17 @@ public class NeuralNetworkVisualizer {
 		plotMatrices(
 				new String[]{"W","hbias","vbias","w-gradient","hbias-gradient","vbias-gradient"},
 
-				new DoubleMatrix[]{
-						network.getW(),
-						network.gethBias(),
-						network.getvBias(),
+				new Matrix[]{
+						network.getConnectionWeights(),
+						network.getHiddenBias(),
+						network.getVisibleBias(),
 						gradient.getwGradient(),
 						gradient.gethBiasGradient(),
 						gradient.getvBiasGradient()
 
 				});
 		plotActivations(network);
-		/*DoubleMatrix w = network.getW().transpose();
+		/*Matrix w = network.getW().transpose();
 		boolean isPerfectSquare = Math.sqrt(w.columns) % 1 == 0;
 		if(isPerfectSquare)
 			renderFilter(w,w.rows,w.columns,network.getInput().rows);
@@ -81,7 +82,7 @@ public class NeuralNetworkVisualizer {
 			log.warn("Cant render good representation of filter witout perfect square, please choose different hidden layer size");*/
 	}
 
-	public void plotMatrices(String[] titles,DoubleMatrix[] matrices) {
+	public void plotMatrices(String[] titles,Matrix[] matrices) {
 		String[] path = new String[matrices.length * 2];
 		try {
 			if(titles.length != matrices.length)
@@ -109,23 +110,31 @@ public class NeuralNetworkVisualizer {
 
 	
 
-	protected String writeMatrix(DoubleMatrix matrix) throws IOException {
+	protected String writeMatrix(Matrix matrix) throws IOException {
 		String filePath = System.getProperty("java.io.tmpdir") + File.separator +  UUID.randomUUID().toString();
 		File write = new File(filePath);
 		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(write,true));
 		write.deleteOnExit();
-		for(int i = 0; i < matrix.rows; i++) {
-			DoubleMatrix row = matrix.getRow(i);
+		
+		for(int i = 0; i < matrix.numRows(); i++) {
+		
+			Matrix row = matrix.getRow(i);
 			StringBuffer sb = new StringBuffer();
+			
 			for(int j = 0; j < row.length; j++) {
 				sb.append(String.format("%.10f", row.get(j)));
-				if(j < row.length - 1)
+				
+				if (j < row.length - 1) {
 					sb.append(",");
+				}
+				
 			}
+			
 			sb.append("\n");
 			String line = sb.toString();
 			bos.write(line.getBytes());
 			bos.flush();
+			
 		}
 
 		bos.close();
@@ -133,25 +142,30 @@ public class NeuralNetworkVisualizer {
 	}
 
 	public void plotWeights(NeuralNetworkVectorized network) {
+		
 		try {
 
-			String filePath = writeMatrix(network.getW()); 
+			String filePath = writeMatrix( network.getConnectionWeights() ); 
 			Process is = Runtime.getRuntime().exec("python /tmp/plot.py weights " + filePath);
 
 			log.info("Rendering weights " + filePath);
 			log.error(IOUtils.readLines(is.getErrorStream()).toString());
 
-		}catch(Exception e) {
+		} catch(Exception e) {
 
 		}
+		
 	}
 
 	public void plotActivations(NeuralNetworkVectorized network) {
+		
 		try {
-			if(network.getInput() == null)
-				throw new IllegalStateException("Unable to plot; missing input");;
+		
+			if (network.getInput() == null) {
+				throw new IllegalStateException("Unable to plot; missing input");
+			}
 
-				DoubleMatrix hbiasMean = network.getInput().mmul(network.getW()).addRowVector(network.gethBias());
+				Matrix hbiasMean = network.getInput().mmul( network.getConnectionWeights() ).addRowVector( network.getHiddenBias() );
 
 
 				String filePath = writeMatrix(hbiasMean);
