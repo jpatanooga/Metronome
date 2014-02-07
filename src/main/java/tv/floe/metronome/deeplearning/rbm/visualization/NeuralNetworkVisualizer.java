@@ -43,7 +43,7 @@ public class NeuralNetworkVisualizer {
 
 
 	//private static 	ClassPathResource r = new ClassPathResource("/scripts/plot.py");
-	private static URL script_local_url = Resources.getResource("/scripts/plot.py");
+	private static URL script_local_url = Resources.getResource("./scripts/plot.py");
 	private static Logger log = LoggerFactory.getLogger(NeuralNetworkVisualizer.class);
 
 

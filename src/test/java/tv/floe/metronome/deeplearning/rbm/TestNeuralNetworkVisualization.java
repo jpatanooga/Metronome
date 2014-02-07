@@ -32,11 +32,16 @@ public class TestNeuralNetworkVisualization {
 		NeuralNetworkVisualizer plotter = new NeuralNetworkVisualizer();
 		NeuralNetworkGradient gradient = rbm.getGradient(new Object[]{1,0.01});
 
-		for(int i = 0; i < 1000; i++) {
+		for(int i = 0; i < 20; i++) {
 			
 			rbm.trainTillConvergence(0.01, 1, input);
+			System.out.println( "> Epoch > " + i );
 			
 		}
+		
+		System.out.println(" ----- done ----- \nPlotting Weights:");
+		
+		plotter.plotWeights(rbm);
 
 
 
