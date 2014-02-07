@@ -14,6 +14,30 @@ import org.junit.Test;
 
 public class TestMatrixUtils {
 
+	@Test
+	public void testUnroll() {
+		
+		Matrix m = new DenseMatrix(2, 3);
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+		m.setQuick(0, 2, 3);
+
+		m.setQuick(1, 0, 5);
+		m.setQuick(1, 1, 10);
+		m.setQuick(1, 2, 0);
+
+		Matrix result = MatrixUtils.unroll(m);
+		
+		assertEquals(1, result.numRows());
+		assertEquals(6, result.numCols());
+		
+		assertEquals( 6.0, result.get(0, 0), 0.0 );
+		assertEquals( 5.0, result.get(0, 3), 0.0 );
+		assertEquals( 0.0, result.get(0, 5), 0.0 );
+		
+		
+	}
+	
 	
 	@Test
 	public void testLength() {
