@@ -116,10 +116,40 @@ public class TestMNIST_On_RBMs {
 		log.info("Negative log likelihood " + rbm.getReConstructionCrossEntropy());
 
 */
-		System.out.println(" ----- Visualizing Reconstructions ------");
+		System.out.println(" ----- Visualizing Reconstructions sub 200 CE ------");
 		
 		renderBatchOfReconstructions( rbm, first );
 		
+		while ( rbm.getReConstructionCrossEntropy() > 100) {
+			
+			System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
+			
+			//rbm.trainTillConvergence( first.getFirst(), learningRate, new Object[]{ 1 } );
+			rbm.trainTillConvergence(learningRate, 1, first.getFirst());
+			
+			epoch++;
+			
+		}		
+		
+		System.out.println(" ----- Visualizing Reconstructions sub 100 CE ------");
+		
+		renderBatchOfReconstructions( rbm, first );
+
+		
+		while ( rbm.getReConstructionCrossEntropy() > 10) {
+			
+			System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
+			
+			//rbm.trainTillConvergence( first.getFirst(), learningRate, new Object[]{ 1 } );
+			rbm.trainTillConvergence(learningRate, 1, first.getFirst());
+			
+			epoch++;
+			
+		}		
+		
+		System.out.println(" ----- Visualizing Reconstructions sub 10 CE ------");
+		
+		renderBatchOfReconstructions( rbm, first );
 		
 		
 		/*
