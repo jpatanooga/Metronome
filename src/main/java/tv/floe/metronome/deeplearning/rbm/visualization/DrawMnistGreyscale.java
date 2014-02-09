@@ -66,10 +66,26 @@ public class DrawMnistGreyscale {
 
 	}
 	
-	public void saveImageToDisk(BufferedImage img, String imageName) throws IOException {
+	public static void saveImageToDisk(BufferedImage img, String imageName) throws IOException {
 		
 		File outputfile = new File( imageName );
+		
+		outputfile.getParentFile().mkdirs();
+		//FileWriter writer = new FileWriter(file);
+		
+		
 		ImageIO.write(img, "png", outputfile);		
+		
+	}
+	
+	public void saveToDisk(String filename) {
+		
+		try {
+			saveImageToDisk( this.img, filename );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 

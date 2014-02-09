@@ -2,6 +2,8 @@ package tv.floe.metronome.deeplearning.rbm.datasets.mnist;
 
 import static org.junit.Assert.*;
 
+import java.util.UUID;
+
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
@@ -19,6 +21,7 @@ public class TestMNIST_On_RBMs {
 
 	private static Logger log = LoggerFactory.getLogger(TestMNIST_On_RBMs.class);
 
+	private String UUIDForRun = UUID.randomUUID().toString();
 	
 	private void renderExample( Matrix draw1, Matrix reconstructed2, Matrix draw2 ) throws InterruptedException {
 		
@@ -49,7 +52,28 @@ public class TestMNIST_On_RBMs {
 		
 	}
 	
-	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input) throws InterruptedException {
+
+	private void renderExampleToDisk( Matrix draw1, Matrix reconstructed2, Matrix draw2, String number, String CE ) throws InterruptedException {
+
+		DrawMnistGreyscale d = new DrawMnistGreyscale(draw1);
+//		d.title = "REAL";
+		d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "_ce_" + CE + "_real.png");
+		
+		DrawMnistGreyscale d2 = new DrawMnistGreyscale( draw2, 100, 100 );
+//		d2.title = "TEST";
+		d2.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "_ce_" + CE + "_test.png");
+
+		
+		
+/*		Thread.sleep(2000);
+		d.frame.dispose();
+		d2.frame.dispose();
+	*/	
+		
+		
+	}	
+	
+	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input, boolean toDisk, String CE) throws InterruptedException {
 		
 
 		Matrix reconstruct_all = rbm.reconstruct( input.getFirst() );
@@ -69,7 +93,13 @@ public class TestMNIST_On_RBMs {
 			// now generate a new image based on the reconstruction probabilities
 			Matrix draw2 = MatrixUtils.genBinomialDistribution( reconstructed_row_image, 1, new MersenneTwister(123) ).times(255);
 		
-			renderExample(draw1, reconstructed_row_image, draw2);
+			if (toDisk) {
+				
+				renderExampleToDisk(draw1, reconstructed_row_image, draw2, String.valueOf(j), CE);
+				
+			} else {
+				renderExample(draw1, reconstructed_row_image, draw2);
+			}
 			
 		}
 		
@@ -118,7 +148,7 @@ public class TestMNIST_On_RBMs {
 */
 		System.out.println(" ----- Visualizing Reconstructions sub 200 CE ------");
 		
-		renderBatchOfReconstructions( rbm, first );
+		renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
 		
 		while ( rbm.getReConstructionCrossEntropy() > 100) {
 			
@@ -133,7 +163,9 @@ public class TestMNIST_On_RBMs {
 		
 		System.out.println(" ----- Visualizing Reconstructions sub 100 CE ------");
 		
-		renderBatchOfReconstructions( rbm, first );
+//		renderBatchOfReconstructions( rbm, first );
+		renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
+		
 
 		
 		while ( rbm.getReConstructionCrossEntropy() > 10) {
@@ -149,7 +181,9 @@ public class TestMNIST_On_RBMs {
 		
 		System.out.println(" ----- Visualizing Reconstructions sub 10 CE ------");
 		
-		renderBatchOfReconstructions( rbm, first );
+//		renderBatchOfReconstructions( rbm, first );
+		renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
+		
 		
 		
 		/*
