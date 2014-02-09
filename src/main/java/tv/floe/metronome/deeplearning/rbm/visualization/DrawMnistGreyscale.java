@@ -6,7 +6,10 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -61,6 +64,13 @@ public class DrawMnistGreyscale {
 		r.setDataElements(0, 0, width, height, equiv);
 
 
+	}
+	
+	public void saveImageToDisk(BufferedImage img, String imageName) throws IOException {
+		
+		File outputfile = new File( imageName );
+		ImageIO.write(img, "png", outputfile);		
+		
 	}
 
 	
