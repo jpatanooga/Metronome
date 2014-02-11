@@ -14,6 +14,14 @@ import tv.floe.metronome.math.MatrixUtils;
 /**
  * Based on the NN design by Adam Gibson
  * 
+ * 
+ * 
+ * Connections are based on a concept of a matrix  of size ( visibleNeurons x hiddenNeurons )
+ * - where each row represents the connections for a specific visible neuron (n-th) to all other hidden neurons (m-th) 
+ * 
+ * Hidden and Visible Neurons
+ * - these are 1 x NeuronCount dim Matrices (vectors, really) that hold the states of each visible or hidden neuron based on activations
+ * 
  * @author josh
  *
  */
