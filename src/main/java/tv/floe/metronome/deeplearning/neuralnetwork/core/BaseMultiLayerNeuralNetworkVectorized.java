@@ -40,6 +40,12 @@ import tv.floe.metronome.types.Pair;
 
 public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializable,Persistable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4066891298715416874L;
+
+
 	private static Logger log = LoggerFactory.getLogger( BaseMultiLayerNeuralNetworkVectorized.class );
 	
 	
@@ -71,6 +77,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	public boolean useRegularization = true;
 	public double l2 = 0.01;
 	private double momentum = 0.1;
+	//don't use sparsity by default
+	private double sparsity = 0;
 	
 	
 	public MultiLayerNetworkOptimizer optimizer;
@@ -680,6 +688,23 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 	public synchronized void setMomentum(double momentum) {
 		this.momentum = momentum;
+	}
+	
+	public synchronized Map<Integer, MatrixTransform> getWeightTransforms() {
+		return weightTransforms;
+	}
+
+	public synchronized void setWeightTransforms(
+			Map<Integer, MatrixTransform> weightTransforms) {
+		this.weightTransforms = weightTransforms;
+	}
+
+	public synchronized double getSparsity() {
+		return sparsity;
+	}
+
+	public synchronized void setSparsity(double sparsity) {
+		this.sparsity = sparsity;
 	}
 	
 
