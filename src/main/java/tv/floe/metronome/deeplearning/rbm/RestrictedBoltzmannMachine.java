@@ -129,14 +129,6 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * 4. The change in weights is given by Equation (9)
 	 * 
 	 * 
-	 * Current Major Questions
-	 * - why keep the probabilites around?
-	 * - why call the matrix "means" instead of "probabilities" ?
-	 * 
-	 * 
-	 * 
-	 * 
-	 * TODO: rebuild this method to use the gradient method
 	 * 
 	 * @param k
 	 */
@@ -265,11 +257,19 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	}
 
 	/**
+	 * Reconstruction entropy.
+	 * 
 	 * Used to calculate how well trained the RBM currently is
 	 * 
 	 * - the input training set matrix is arranged such that there is a training example per row
 	 * 
-	 * @return
+	 * This compares the similarity of two probability
+	 * distributions, in this case that would be the input
+	 * and the reconstructed input with gaussian noise.
+	 * This will account for either regularization or none
+	 * depending on the configuration.
+	 * 
+	 * @return reconstruction error
 	 */
 	public double getReConstructionCrossEntropy() {
 
