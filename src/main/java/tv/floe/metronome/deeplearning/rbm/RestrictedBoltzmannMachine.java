@@ -159,119 +159,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		//vBias.addi(gradient.getvBiasGradient());
 		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( gradient.getvBiasGradient() );
 		
-		
-		/*
-		 * 
-		 * we initialize the Gibbs chain with the hidden sample 
-		 * generated during the positive phase, therefore implementing CD. 
-		 * Once we have established the starting point of the chain, 
-		 * we can then compute the sample at the end of the Gibbs chain, 
-		 * sample that we need for getting the gradient
-		 */
-/*		
-		this.trainingDataset = input;
-				
-		// init CDk
-		
-		// do gibbs sampling given V to get the Hidden states based on the training input
-		// compute positive phase
-		Pair<Matrix, Matrix> hiddenProbsAndSamplesStart = this.sampleHiddenGivenVisible( input );
-				
-		Pair<Pair<Matrix, Matrix>,Pair<Matrix, Matrix>> gibbsSamplingMatrices = null;
-		
-		// now run k full steps of alternating Gibbs sampling
-		
-		//negative visble "means" or "expected values"
-		Matrix negativeVisibleExpectedValues = null;
-		//negative value samples
-		Matrix negativeVisibleSamples = null;
-		//negative hidden means or expected values
-		Matrix negativeHiddenExpectedValues = null;
-		//negative hidden samples
-		Matrix negativeHiddenSamples = null;
-		
-		for ( int x = 0; x < k; x++ ) {
-			
-			if (0 == x) {
-				
-				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( hiddenProbsAndSamplesStart.getSecond() );
-								
-			} else {
-				
-				gibbsSamplingMatrices = this.gibbsSamplingStepFromHidden( negativeHiddenSamples );
-				
-			}
-			
-			// "free energy of the negative phase"
-			// now create some easier to use aliases
-			negativeVisibleExpectedValues = gibbsSamplingMatrices.getFirst().getFirst();
-			negativeVisibleSamples = gibbsSamplingMatrices.getFirst().getSecond();
-			negativeHiddenExpectedValues = gibbsSamplingMatrices.getSecond().getFirst();
-			negativeHiddenSamples = gibbsSamplingMatrices.getSecond().getSecond();
-			
-			
-		}
-				
-		// ----- now calculate equation (9) to get the weight changes ------
-		
-		// now compute the <vi hj>data		
-		Matrix trainingDataTimesInitialHiddenStates = input.transpose().times( hiddenProbsAndSamplesStart.getSecond() );
 
-		// now compute the <vi hj>model (this may be vi * phj --- double check)
-		Matrix negativeVisibleSamplesTransposeTimesNegHiddenExpValues = negativeVisibleSamples.transpose().times( negativeHiddenExpectedValues );
-				
-		// calc the delta between: data - model
-		Matrix dataModelDelta = trainingDataTimesInitialHiddenStates.minus( negativeVisibleSamplesTransposeTimesNegHiddenExpValues );
-		
-		// learningRate * delta(data - model)
-		Matrix connectionWeightChanges = dataModelDelta.times( learningRate );
-		
-		// ---- end of equation (9) section -----------------
-		
-		// update the connection weights and bias terms for visible/hidden units
-		this.connectionWeights = this.connectionWeights.plus( connectionWeightChanges );
-
-		Matrix vBiasAdd = MatrixUtils.mean( input.minus( negativeVisibleSamples ) , 0).times( learningRate ); 
-		this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd );
-
-		Matrix hBiasAdd = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0).times( learningRate ); //.times(this.learningRate);
-		this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd );
-		
-//		System.out.println("Debug: CDk (stock impl)");
-//		MatrixUtils.debug_print( connectionWeightChanges );
-//		MatrixUtils.debug_print( vBiasAdd.times( learningRate ) );
-//		MatrixUtils.debug_print( hBiasAdd.times( learningRate ) );
-		
-		if ( null != this.debugWeightAddsBuffer ) {
-			
-			// this is rarely used
-			// flag is set, lets collect some debug stats
-			
-			int idx = 0;
-			
-			
-			for (int i = 0; i < MatrixUtils.length( connectionWeightChanges ); i++) { 
-			
-				this.debugWeightAddsBuffer[ idx++ ] = MatrixUtils.getElement(connectionWeightChanges, i);
-				
-			}
-			
-			
-			for (int i = 0; i < MatrixUtils.length( vBiasAdd ); i++) {
-				
-				this.debugWeightAddsBuffer[ idx++ ] = MatrixUtils.getElement( vBiasAdd, i );
-				
-			}
-			
-			for (int i = 0; i < MatrixUtils.length( hBiasAdd ); i++) {
-			
-				this.debugWeightAddsBuffer[ idx++ ] = MatrixUtils.getElement( hBiasAdd, i );
-				
-			}			
-			
-			
-		}
-		*/
 	}
 	
 	/**
@@ -384,21 +272,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * @return
 	 */
 	public double getReConstructionCrossEntropy() {
-		
-/*		
- * 
- cross_entropy = T.mean(
-                	T.sum(
-                	
-                		self.input * T.log(T.nnet.sigmoid(pre_sigmoid_nv)) 
-                		+
-                		(1 - self.input) * T.log(1 - T.nnet.sigmoid(pre_sigmoid_nv)),
-                    
-                      axis=1)
-                 )
- * 
-	*/	
-		
+
 		// 1. get sigmoid of the inputMatrix x weights
 		
 		// probably could just call the propUp call w the training dataset as param
@@ -427,10 +301,6 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 		
 		Matrix logOneMinusSigVisible = MatrixUtils.log(oneMinusSigmoidVis);
-	
-//		MatrixUtils.debug_print_matrix_stats(this.trainingDataset, "training dataset");
-//		MatrixUtils.debug_print_matrix_stats( logSigmoidVis, "logSigV");
-		
 		
 		// D
 		// self.input * T.log(T.nnet.sigmoid(pre_sigmoid_nv))
@@ -470,7 +340,6 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * @param visible
 	 * @return
 	 */
-	//public Matrix generateProbabilitiesForHiddenStatesBasedOnVisibleStates(Matrix visible) {
 	public Matrix propUp(Matrix visible) {
 		
 		Matrix preSigmoid = visible.times( this.connectionWeights );
@@ -490,7 +359,6 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 */
 	public Pair<Matrix, Matrix> sampleHiddenGivenVisible(Matrix visible) {
 				
-		//Matrix hiddenProbs = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
 		Matrix hiddenProbs = this.propUp(visible);
 
 		Matrix hiddenBinomialSamples = MatrixUtils.genBinomialDistribution(hiddenProbs, 1, this.randNumGenerator);
@@ -500,14 +368,11 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
 	
 	/**
-
 	 * 
-	 * TODO: can this also mean "reconstruction" ?
 	 * 
 	 * @param visible
 	 * @return
 	 */
-	//public Matrix generateProbabilitiesForVisibleStatesBasedOnHiddenStates(Matrix hidden) {
 	public Matrix propDown(Matrix hidden) {
 		
 		Matrix preSigmoid = hidden.times( this.connectionWeights.transpose() );
@@ -525,7 +390,6 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 */
 	public Pair<Matrix, Matrix> sampleVisibleGivenHidden(Matrix hidden) {
 		
-		//Matrix visibleProb = this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(hidden);
 		Matrix visibleProb = this.propDown(hidden);
 
 		Matrix visibleBinomialSample = MatrixUtils.genBinomialDistribution(visibleProb, 1, this.randNumGenerator);
@@ -575,18 +439,13 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 * Reconstructs the visible input.
 	 * A reconstruction is a propagation down of the reconstructed hidden input.
 	 * 
-	 * TODO: this is a duplicate method, track down refs and remove
 	 * 
 	 */
 	public Matrix reconstructVisibleInput(Matrix visible) {
 
 		// propUp
-//		Matrix propUpHiddenResult = this.generateProbabilitiesForHiddenStatesBasedOnVisibleStates(visible);
 		Matrix propUpHiddenResult = this.propUp(visible);
-
 		
-		//return propDown(h);
-//		return this.generateProbabilitiesForVisibleStatesBasedOnHiddenStates(propUpHiddenResult);
 		return this.propDown(propUpHiddenResult);
 	}
 
