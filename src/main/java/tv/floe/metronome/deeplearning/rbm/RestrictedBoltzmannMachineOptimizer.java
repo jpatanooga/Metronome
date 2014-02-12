@@ -149,11 +149,11 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 			
 		}
 		
-		
+/*		
 		int wAddLen = MatrixUtils.length(wAdd);
 		int vBiasLen = MatrixUtils.length(vBiasAdd);
 		int hBiasLen = MatrixUtils.length(hBiasAdd);
-		
+	*/	
 //		System.out.println("Debug: CDk (optimizer impl)");
 //		MatrixUtils.debug_print( wAdd );
 //		MatrixUtils.debug_print( vBiasAdd );
