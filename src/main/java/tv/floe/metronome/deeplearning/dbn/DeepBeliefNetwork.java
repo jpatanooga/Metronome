@@ -76,7 +76,16 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 * This is where we work through each RBM layer, learning an unsupervised 
 	 * representation of the data
 	 * 
-	 * TODO: look into applying SGD around the CDk runs
+	 * This unsupervised learning method runs
+	 * contrastive divergence on each RBM layer in the network.
+	 * @param trainingRecords the input to train on
+	 * @param k the k to use for running the RBM contrastive divergence.
+	 * 
+	 * The typical tip is that the higher k is the closer to the model
+	 * you will be approximating due to more sampling. K = 1
+	 * usually gives very good results and is the default in quite a few situations.
+	 * 
+	 * The training input to each successive layer is the activations of the hidden layer of the previous pretraining layer's RBM Hidden Neurons
 	 * 
 	 * 
 	 */
@@ -98,21 +107,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			} else { 
 				layerInput = hiddenLayers[ i - 1 ].sampleHiddenGivenVisible_Data(layerInput);
 			}
-			/*
-			//log.info("Training on layer " + (i + 1));
-			RestrictedBoltzmannMachine rbmPreTrainLayer = (RestrictedBoltzmannMachine) this.preTrainingLayers[i];
-			HiddenLayer h = this.hiddenLayers[i];
 
-			for (int  epoch = 0; epoch < epochs; epoch++) {
-				
-				System.out.println("PreTrain > Layer " + i + ", Epoch " + epoch );
-				
-				rbmPreTrainLayer.trainTillConvergence(learningRate, k, layerInput);	
-				h.connectionWeights = rbmPreTrainLayer.connectionWeights;
-				h.biasTerms = rbmPreTrainLayer.hiddenBiasNeurons;
-				
-			}
-			*/
 			this.preTrainingLayers[i].trainTillConvergence(layerInput, learningRate, new Object[]{k});
 
 		}
