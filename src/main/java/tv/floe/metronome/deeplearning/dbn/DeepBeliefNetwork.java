@@ -114,6 +114,14 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 	}
 	
+	/**
+	 * Trains the Deep Belief Network
+	 * 
+	 * Step 1: Pretrain the RBM layers with Contrastive Divergence
+	 * 
+	 * Step 2: Finetune the NN layers with gentle backpropagation
+	 * 
+	 */
 	@Override
 	public void trainNetwork(Matrix input, Matrix labels, Object[] otherParams) {
 
