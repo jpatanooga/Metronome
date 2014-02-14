@@ -58,10 +58,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	
 	//the hidden layers
 	public HiddenLayer[] hiddenLayers;	
-	
-	// TODO: do we rename this to LogisticRegressionOutputLayer ?
 	public LogisticRegression logisticRegressionLayer;
-	
 	// DA / RBM Layers
 	public NeuralNetworkVectorized[] preTrainingLayers;
 	
