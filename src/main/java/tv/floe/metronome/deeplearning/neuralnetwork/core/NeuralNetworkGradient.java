@@ -1,13 +1,22 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
 
 
-public class NeuralNetworkGradient implements Serializable {
+public class NeuralNetworkGradient {
 
-	private static final long serialVersionUID = 5611230066214840732L;
+	//private static final long serialVersionUID = 5611230066214840732L;
 	private Matrix wGradient;
 	private Matrix vBiasGradient;
 	private Matrix hBiasGradient;
@@ -75,5 +84,44 @@ public class NeuralNetworkGradient implements Serializable {
 			return false;
 		return true;
 	}
+	
+	/**
+	 * Serializes this to the output stream.
+	 * @param os the output stream to write to
+	 */
+	public void write(OutputStream os) {
+		try {
+
+		    DataOutput d = new DataOutputStream(os);
+			
+		    MatrixWritable.writeMatrix(d, this.wGradient );
+		    MatrixWritable.writeMatrix(d, this.hBiasGradient );
+		    MatrixWritable.writeMatrix(d, this.vBiasGradient );			
+		    
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+
+			DataInput di = new DataInputStream(is);
+
+			this.wGradient = MatrixWritable.readMatrix( di );
+			this.hBiasGradient = MatrixWritable.readMatrix( di );
+			this.vBiasGradient = MatrixWritable.readMatrix( di );
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}		
 	
 }
