@@ -53,7 +53,7 @@ import tv.floe.metronome.types.Pair;
 public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	
 	//private double learningRate = 0.1d;
-	protected NeuralNetworkOptimizer optimizer;
+	public transient NeuralNetworkOptimizer optimizer;
 	public double[] debugWeightAddsBuffer = null; // only set when we want to check things
 	
 
@@ -562,29 +562,12 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		    
 		    d.writeInt( this.numberVisibleNeurons );
 		    d.writeInt( this.numberHiddenNeurons );
-		    d.writeInt( this.numberLayers );
-		    
-		    d.writeInt( this.hiddenLayerSizes.length );
-		    
-		    for ( int x = 0; x < this.hiddenLayerSizes.length; x++ ) {
-		    	
-		    	d.writeInt( this.hiddenLayerSizes[x] );
-		    	
-		    }
 		    
 		    MatrixWritable.writeMatrix(d, this.hiddenBiasNeurons );
 		    MatrixWritable.writeMatrix(d, this.visibleBiasNeurons );
 		    MatrixWritable.writeMatrix(d, this.connectionWeights );
 		    MatrixWritable.writeMatrix(d, this.trainingDataset );	
-		    
-		    d.writeInt( this.hiddenLayers.length );
-		    
-		    for ( int x = 0; x < this.hiddenLayers.length; x++ ) {
-		    	
-		    	this.hiddenLayers[ x ].write(os);
-		    	
-		    }
-		    
+		    		    
 		    oos.writeObject( this.randNumGenerator );
 
 			d.writeDouble( this.sparsity ); 
@@ -620,35 +603,12 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		    
 		    this.numberVisibleNeurons = di.readInt();
 		    this.numberHiddenNeurons = di.readInt();
-		    this.numberLayers = di.readInt();
-		    
-		    //d.writeInt( this.hiddenLayerSizes.length );
-		    int numHiddenLayerSizesTmp = di.readInt();
-		    this.hiddenLayerSizes = new int[ numHiddenLayerSizesTmp ];
-		    
-		    for ( int x = 0; x < numHiddenLayerSizesTmp; x++ ) {
-		    	
-		    	//d.writeInt( this.hiddenLayerSizes[x] );
-		    	this.hiddenLayerSizes[x] = di.readInt();
-		    	
-		    }
 		    
 		    this.hiddenBiasNeurons = MatrixWritable.readMatrix( di );
 		    this.visibleBiasNeurons = MatrixWritable.readMatrix( di );
 		    this.connectionWeights = MatrixWritable.readMatrix( di );
 		    this.trainingDataset = MatrixWritable.readMatrix( di );	
-		    
-		    //d.writeInt( this.hiddenLayers.length );
-		    int numHiddenLayersTmp = di.readInt();
-		    
-		    for ( int x = 0; x < numHiddenLayersTmp; x++ ) {
-		    	
-		    //	this.hiddenLayers[ x ].write(os);
-		    	this.hiddenLayers[ x ] = new HiddenLayer(1, 1, null); // true params come from deserialize
-		    	this.hiddenLayers[ x ].load( is );
-		    	
-		    }
-		    
+		    		    
 		    this.randNumGenerator = (RandomGenerator) ois.readObject();
 
 			this.sparsity = di.readDouble(); 

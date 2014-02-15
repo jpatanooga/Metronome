@@ -34,18 +34,11 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	
 	public Matrix hiddenBiasNeurons;
 	public Matrix visibleBiasNeurons;
-
 	public Matrix connectionWeights;
-	
-	//the hidden layer sizes at each layer
-	public int[] hiddenLayerSizes;	
-	public int numberLayers;
-	//the hidden layers
-	public HiddenLayer[] hiddenLayers;	
-	
+	public Matrix trainingDataset = null;	
+		
 	public RandomGenerator randNumGenerator;
 	
-	public Matrix trainingDataset = null;	
 
 	public double sparsity = 0.01;
 	/* momentum for learning */
