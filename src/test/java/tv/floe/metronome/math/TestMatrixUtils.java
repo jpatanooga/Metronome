@@ -82,6 +82,35 @@ public class TestMatrixUtils {
 	}
 	
 	@Test
+	public void testElementwiseCompare() {
+		
+		Matrix m1 = new DenseMatrix(1, 3);
+		m1.setQuick(0, 0, 6);
+		m1.setQuick(0, 1, 9);
+		m1.setQuick(0, 2, 3);
+
+		Matrix m2 = new DenseMatrix(1, 3);
+		m2.setQuick(0, 0, 5);
+		m2.setQuick(0, 1, 10);
+		m2.setQuick(0, 2, 0);
+
+		Matrix m3 = new DenseMatrix(1, 3);
+		m3.setQuick(0, 0, 6);
+		m3.setQuick(0, 1, 9);
+		m3.setQuick(0, 2, 3);
+		
+		Matrix m4 = new DenseMatrix(1, 2);
+		m4.setQuick(0, 0, 6);
+		m4.setQuick(0, 1, 9);
+		
+		assertEquals(true, MatrixUtils.elementwiseSame(m1, m3));
+		assertEquals(false, MatrixUtils.elementwiseSame(m1, m2));
+		assertEquals(false, MatrixUtils.elementwiseSame(m1, m4));
+		
+		
+	}	
+	
+	@Test
 	public void testSetElement() {
 		
 		Matrix m = new DenseMatrix(2, 3);

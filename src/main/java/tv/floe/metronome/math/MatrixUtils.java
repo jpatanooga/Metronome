@@ -881,7 +881,38 @@ public class MatrixUtils {
 		return input;
 	}
 
-	
+	/**
+	 * Compares all elements in two Matrices to see if all elements are the same
+	 * 
+	 * 
+	 */	
+	public static boolean elementwiseSame(Matrix a, Matrix b) {
+
+		if (a.numRows() != b.numRows() ) {
+			return false;
+		}
+		
+		if (a.numCols() != b.numCols()) {
+			return false;
+		}
+		
+		for ( int r = 0; r < a.numRows(); r++ ) {
+
+			for ( int c = 0; c < a.numCols(); c++ ) {
+
+				if (a.get(r, c) != b.get(r, c)) {
+					return false;
+				}
+				
+			}
+			
+		}
+
+
+		return true;
+
+
+	}		
 	
 	
 
