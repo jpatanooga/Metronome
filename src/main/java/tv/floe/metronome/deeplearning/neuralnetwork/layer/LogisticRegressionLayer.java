@@ -19,9 +19,12 @@ import tv.floe.metronome.math.MatrixUtils;
 
 /**
  * 
+ * DEPRECATED - Not used
+ * 
  * @author josh
  *
  */
+@Deprecated
 public class LogisticRegressionLayer {
 
 	//private static final long serialVersionUID = -7065564817460914364L;

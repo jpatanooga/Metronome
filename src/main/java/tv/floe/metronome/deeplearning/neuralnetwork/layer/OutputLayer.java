@@ -6,6 +6,10 @@ import org.apache.mahout.math.Matrix;
 import tv.floe.metronome.math.MatrixUtils;
 
 /**
+ * 
+ * DEPRECATED - NOT USED
+ * 
+ * 
  * By assigning a softmax activation function, a generalization of the logistic function, 
  * on the output layer of the neural network (or a softmax component in a component-based 
  * neural network) for categorical target variables, the outputs can be interpreted
@@ -15,6 +19,7 @@ import tv.floe.metronome.math.MatrixUtils;
  * @author josh
  *
  */
+@Deprecated
 public class OutputLayer {
 
 
