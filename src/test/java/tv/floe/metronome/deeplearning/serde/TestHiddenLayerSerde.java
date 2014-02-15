@@ -2,6 +2,12 @@ package tv.floe.metronome.deeplearning.serde;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
@@ -13,8 +19,12 @@ import tv.floe.metronome.math.MatrixUtils;
 
 public class TestHiddenLayerSerde {
 
+	
+	
 	@Test
-	public void test() {
+	public void test() throws FileNotFoundException {
+		
+		String tmpFilename = "/tmp/hiddenLayer.model";
 		
 		Matrix input = new DenseMatrix(new double[][] 
 		{
@@ -42,7 +52,22 @@ public class TestHiddenLayerSerde {
 		HiddenLayer layer = new HiddenLayer( 20, 2, r );
 		layer.setInput( input );
 		
+		// save / write the model
 		
+		FileOutputStream oFileOutStream = new FileOutputStream( tmpFilename, false);
+		layer.write( oFileOutStream );
+		
+		
+		
+		
+		// read / load the model
+		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
+		
+		HiddenLayer layer_deser = new HiddenLayer( 1, 1, null );
+		layer_deser.load(oFileInputStream);
+		
+		assertEquals( 20, layer_deser.neuronCountPreviousLayer );
+		assertEquals( 2, layer_deser.neuronCount );
 		
 	}
 

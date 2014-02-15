@@ -13,6 +13,7 @@ import java.io.Serializable;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.DenseVector;
@@ -44,8 +45,8 @@ public class HiddenLayer implements Serializable {
 	 */
 	private static final long serialVersionUID = 87885295280050784L;
 	
-	private int neuronCountPreviousLayer = 0;
-	private int neuronCount = 0;
+	public int neuronCountPreviousLayer = 0;
+	public int neuronCount = 0;
 	
 	public Matrix connectionWeights;
 	public Matrix biasTerms;
@@ -70,6 +71,12 @@ public class HiddenLayer implements Serializable {
 		this.neuronCount = neuronCount;
 		this.neuronCountPreviousLayer = neuronCountPrevLayer;
 		this.rndNumGenerator = rndGen;
+		
+		if ( null == rndGen ) {
+			this.rndNumGenerator = new MersenneTwister(1234);
+		} else { 
+			this.rndNumGenerator = rndGen;
+		}
 		
 
 		NormalDistribution u = new NormalDistribution(rndGen,0,.01,NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
