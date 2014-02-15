@@ -121,31 +121,11 @@ public class TestLogisticRegressionLayer {
 		
 		assertEquals( logRegression.numInputNeurons, logRegression_deser.numInputNeurons );
 		assertEquals( logRegression.numOutputNeurons, logRegression_deser.numOutputNeurons );
-		
-		Matrix a = new DenseMatrix( 1, 2 );
-		a.set(0, 0, 1 );
-		a.set(0, 1, 2 );
-		
-		Matrix b = new DenseMatrix( 1, 2 );
-		b.set(0, 0, 1 );
-		b.set(0, 1, 2 );
-		
-		System.out.println( "matrix equals: " + a.equals(b) );
-		
-		/*
-		
-		for ( int x = 0; x < layer_deser.input.numRows(); x++) {
-			
-			for ( int c = 0; c < layer_deser.input.numCols(); c++ ) {
-			
-				//layer_deser.input.viewRow(x)
-				assertEquals( input.get(x, c), layer_deser.input.get(x, c), 0.0 );
-				
-			}
-			
-		}
-		
-		*/
+
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.inputTrainingData, logRegression_deser.inputTrainingData ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.outputTrainingLabels, logRegression_deser.outputTrainingLabels ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.connectionWeights, logRegression_deser.connectionWeights ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.biasTerms, logRegression_deser.biasTerms ) );
 		
 		
 	}	
