@@ -1,13 +1,30 @@
 package tv.floe.metronome.deeplearning.dbn;
 
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
 import org.apache.commons.math3.random.RandomGenerator;
 
+import tv.floe.metronome.deeplearning.math.transforms.MatrixTransform;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
+import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 
 /**
@@ -49,7 +66,7 @@ import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
  */
 public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	
-	private RandomGenerator randomGen = new MersenneTwister(1234);
+	//private RandomGenerator randomGen = new MersenneTwister(1234);
 	
 	// default CTOR
 	public DeepBeliefNetwork() {
@@ -165,6 +182,127 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		return new RestrictedBoltzmannMachine[numLayers];	
 		
 	}
+	
+	/**
+	 * Serializes this to the output stream.
+	 * @param os the output stream to write to
+	 */
+	public void write(OutputStream os) {
+		try {
+
+		    DataOutput d = new DataOutputStream(os);
+		    ObjectOutputStream oos = new ObjectOutputStream(os);
+		 
+		    
+		    d.writeInt( this.inputNeuronCount );
+		    d.writeInt( this.outputNeuronCount );
+		    
+		    d.writeInt( this.numberLayers );
+		    
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+		    	
+		    	d.writeInt( this.hiddenLayerSizes[ x ] );
+		    	
+		    }
+
+		    // write in hidden layers
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+		    	this.hiddenLayers[ x ].write( os );
+		    	
+		    }
+		    
+		    this.logisticRegressionLayer.write( os );
+		    
+			// DA / RBM Layers
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+		    	((RestrictedBoltzmannMachine)this.preTrainingLayers[ x ]).write( os );
+		    	
+		    }
+		    
+		    oos.writeObject( this.randomGenerator );
+		    oos.writeObject( this.distribution );
+
+		    
+		    MatrixWritable.writeMatrix(d, this.inputTrainingData );
+		    MatrixWritable.writeMatrix(d, this.outputTrainingLabels );
+
+			d.writeDouble( this.learningRateUpdate );
+			d.writeBoolean( this.useRegularization );
+			d.writeDouble( this.l2 );
+			
+			d.writeDouble( this.getMomentum() );
+			d.writeDouble( this.getSparsity() );
+			
+
+			// dont serde optimizer
+			
+			// TODO: weight transforms
+
+			//  Map<Integer,MatrixTransform> weightTransforms
+		    
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+
+			DataInput di = new DataInputStream(is);
+			
+		    ObjectInputStream ois = new ObjectInputStream(is);
+		    
+		    this.inputNeuronCount = di.readInt();
+		    this.outputNeuronCount = di.readInt();
+		    this.numberLayers = di.readInt();
+		    
+		    this.hiddenLayerSizes = new int[this.numberLayers];
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+		    	
+		    	this.hiddenLayerSizes[ x ] = di.readInt();
+		    	
+		    }
+		    
+		    // this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
+		    this.logisticRegressionLayer = new LogisticRegression();
+		    this.logisticRegressionLayer.load(is);
+		    
+		    this.preTrainingLayers = new RestrictedBoltzmannMachine[ this.numberLayers ];
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+		    	RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(1, 1, null);
+		    	rbm.load(is);
+		    	this.preTrainingLayers[ x ] = rbm;
+		    	
+		    }
+		    
+		    this.randomGenerator = (RandomGenerator) ois.readObject();
+		    this.distribution = (RealDistribution) ois.readObject();
+
+		    this.inputTrainingData = MatrixWritable.readMatrix( di );	
+		    this.outputTrainingLabels = MatrixWritable.readMatrix( di );
+
+		    this.learningRateUpdate = di.readDouble();
+		    this.useRegularization = di.readBoolean();
+		    this.l2 = di.readDouble();
+		    
+		    this.setMomentum( di.readDouble() );
+		    this.setSparsity( di.readDouble() );
+		    
+		    
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}		
 
 	
 	

@@ -31,7 +31,8 @@ public class LogisticRegression implements Serializable {
 	public boolean useRegularization = true;
 	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 
-	private LogisticRegression() {}
+	// used for Serde
+	public LogisticRegression() {}
 
 	public LogisticRegression(Matrix input,Matrix labels, int nIn, int nOut) {
 		
