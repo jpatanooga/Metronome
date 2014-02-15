@@ -1,19 +1,30 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.layer;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+
+import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
 
 import tv.floe.metronome.math.MatrixUtils;
 
 /**
- * TODO: make sure this thing works right, some issues with values coming out
  * 
  * @author josh
  *
  */
 public class LogisticRegressionLayer {
 
-	private static final long serialVersionUID = -7065564817460914364L;
+	//private static final long serialVersionUID = -7065564817460914364L;
 	public int numInputNeurons;
 	public int numOutputNeurons;
 	
@@ -156,6 +167,59 @@ public class LogisticRegressionLayer {
 		return prediction;
 		
 	}	
+	
+	
+	
+	/**
+	 * Serializes this to the output stream.
+	 * @param os the output stream to write to
+	 */
+	public void write(OutputStream os) {
+		try {
+
+		    DataOutput d = new DataOutputStream(os);
+		    
+		    d.writeInt( this.numInputNeurons );
+		    d.writeInt( this.numOutputNeurons );
+			
+		    MatrixWritable.writeMatrix(d, this.inputTrainingData );
+		    MatrixWritable.writeMatrix(d, this.outputTrainingLabels );
+			
+		    MatrixWritable.writeMatrix(d, this.connectionWeights );
+		    MatrixWritable.writeMatrix(d, this.biasTerms );
+		    
+		    
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+
+			DataInput di = new DataInputStream(is);
+			
+			this.numInputNeurons = di.readInt();
+			this.numOutputNeurons = di.readInt();
+
+			this.inputTrainingData = MatrixWritable.readMatrix( di );
+			this.outputTrainingLabels = MatrixWritable.readMatrix( di );
+			
+			this.connectionWeights = MatrixWritable.readMatrix( di );
+			this.biasTerms = MatrixWritable.readMatrix( di );
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+		
 	
 	
 	
