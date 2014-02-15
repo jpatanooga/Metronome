@@ -1,9 +1,18 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,6 +218,61 @@ public class LogisticRegression implements Serializable {
 		reg.useRegularization = this.useRegularization;
 		reg.input = this.input.clone();
 		return reg;
+	}	
+	
+	/**
+	 * Serializes this to the output stream.
+	 * @param os the output stream to write to
+	 */
+	public void write(OutputStream os) {
+		try {
+
+		    DataOutput d = new DataOutputStream(os);
+		    
+		    d.writeInt( this.nIn );
+		    d.writeInt( this.nOut );
+		    
+		    d.writeDouble( this.l2 );
+			
+		    MatrixWritable.writeMatrix(d, this.input );
+		    MatrixWritable.writeMatrix(d, this.labels );			
+		    MatrixWritable.writeMatrix(d, this.connectionWeights );
+		    MatrixWritable.writeMatrix(d, this.biasTerms );
+		    
+		    d.writeBoolean( this.useRegularization );
+		    
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+
+			DataInput di = new DataInputStream(is);
+			
+			this.nIn = di.readInt();
+			this.nOut = di.readInt();
+			
+			this.l2 = di.readDouble();
+
+			this.input = MatrixWritable.readMatrix( di );
+			this.labels = MatrixWritable.readMatrix( di );
+			this.connectionWeights = MatrixWritable.readMatrix( di );
+			this.biasTerms = MatrixWritable.readMatrix( di );
+			
+			this.useRegularization = di.readBoolean();
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 	}	
 
 
