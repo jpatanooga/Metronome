@@ -2,12 +2,17 @@ package tv.floe.metronome.deeplearning.rbm;
 
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 
 import org.junit.Test;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -200,6 +205,47 @@ public class TestRestrictedBoltzmannMachine {
 		rbm.trainTillConvergence(0.1, 1, input);
 		
 	}
+	
+	@Test
+	public void testSerdeMechanics() throws FileNotFoundException {
+		
+		String tmpFilename = "/tmp/RBMSerdeTest.model";
+		
+		Matrix input = buildTestInputDataset();
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
+		
+		double ce = 0;
+		
+
+		rbm.trainTillConvergence(0.1, 1, input);
+
+		
+		
+		// save / write the model
+		
+		FileOutputStream oFileOutStream = new FileOutputStream( tmpFilename, false);
+		rbm.write( oFileOutStream );
+		
+		
+		
+		
+		// read / load the model
+		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
+		
+		LogisticRegression logRegression_deser = new LogisticRegression( null, 0, 0); 
+		logRegression_deser.load(oFileInputStream);
+		
+		assertEquals( logRegression.nIn, logRegression_deser.nIn );
+		assertEquals( logRegression.nOut, logRegression_deser.nOut );
+
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.input, logRegression_deser.input ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.labels, logRegression_deser.labels ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.connectionWeights, logRegression_deser.connectionWeights ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.biasTerms, logRegression_deser.biasTerms ) );
+		
+		
+	}	
 	
 	
 	

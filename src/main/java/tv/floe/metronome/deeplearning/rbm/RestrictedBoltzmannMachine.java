@@ -1,16 +1,28 @@
 package tv.floe.metronome.deeplearning.rbm;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
 
 
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -509,8 +521,148 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		return propDown(propUp(v));
 		
 	}
-
 	
+	/*
+	 * 
+
+		
+	 * 
+	 */
+
+	/**
+	 * Copies params from the passed in network
+	 * to this one
+	 * @param n the network to copy
+	 */
+	public void update(BaseNeuralNetworkVectorized n) {
+		/*
+		this.W = n.W;
+		this.hBias = n.hBias;
+		this.vBias = n.vBias;
+		this.l2 = n.l2;
+		this.useRegularization = n.useRegularization;
+		this.momentum = n.momentum;
+		this.nHidden = n.nHidden;
+		this.nVisible = n.nVisible;
+		this.rng = n.rng;
+		this.sparsity = n.sparsity;
+		*/
+	}
+
+
+	/**
+	 * Serializes this to the output stream.
+	 * @param os the output stream to write to
+	 */
+	public void write(OutputStream os) {
+		try {
+
+		    DataOutput d = new DataOutputStream(os);
+		    ObjectOutputStream oos = new ObjectOutputStream(os);
+		    
+		    d.writeInt( this.numberVisibleNeurons );
+		    d.writeInt( this.numberHiddenNeurons );
+		    d.writeInt( this.numberLayers );
+		    
+		    d.writeInt( this.hiddenLayerSizes.length );
+		    
+		    for ( int x = 0; x < this.hiddenLayerSizes.length; x++ ) {
+		    	
+		    	d.writeInt( this.hiddenLayerSizes[x] );
+		    	
+		    }
+		    
+		    MatrixWritable.writeMatrix(d, this.hiddenBiasNeurons );
+		    MatrixWritable.writeMatrix(d, this.visibleBiasNeurons );
+		    MatrixWritable.writeMatrix(d, this.connectionWeights );
+		    MatrixWritable.writeMatrix(d, this.trainingDataset );	
+		    
+		    d.writeInt( this.hiddenLayers.length );
+		    
+		    for ( int x = 0; x < this.hiddenLayers.length; x++ ) {
+		    	
+		    	this.hiddenLayers[ x ].write(os);
+		    	
+		    }
+		    
+		    oos.writeObject( this.randNumGenerator );
+
+			d.writeDouble( this.sparsity ); 
+			d.writeDouble( this.momentum );
+			d.writeDouble( this.l2 );
+			d.writeInt( this.renderWeightsEveryNumEpochs );
+			d.writeDouble( this.fanIn );
+			d.writeBoolean( this.useRegularization );
+
+		    
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+
+			DataInput di = new DataInputStream(is);
+			
+			//this.nIn = di.readInt();
+//			this.input = MatrixWritable.readMatrix( di );
+
+
+		    //DataOutput d = new DataOutputStream(os);
+		    ObjectInputStream ois = new ObjectInputStream(is);
+		    
+		    this.numberVisibleNeurons = di.readInt();
+		    this.numberHiddenNeurons = di.readInt();
+		    this.numberLayers = di.readInt();
+		    
+		    //d.writeInt( this.hiddenLayerSizes.length );
+		    int numHiddenLayerSizesTmp = di.readInt();
+		    this.hiddenLayerSizes = new int[ numHiddenLayerSizesTmp ];
+		    
+		    for ( int x = 0; x < numHiddenLayerSizesTmp; x++ ) {
+		    	
+		    	//d.writeInt( this.hiddenLayerSizes[x] );
+		    	this.hiddenLayerSizes[x] = di.readInt();
+		    	
+		    }
+		    
+		    this.hiddenBiasNeurons = MatrixWritable.readMatrix( di );
+		    this.visibleBiasNeurons = MatrixWritable.readMatrix( di );
+		    this.connectionWeights = MatrixWritable.readMatrix( di );
+		    this.trainingDataset = MatrixWritable.readMatrix( di );	
+		    
+		    //d.writeInt( this.hiddenLayers.length );
+		    int numHiddenLayersTmp = di.readInt();
+		    
+		    for ( int x = 0; x < numHiddenLayersTmp; x++ ) {
+		    	
+		    //	this.hiddenLayers[ x ].write(os);
+		    	this.hiddenLayers[ x ] = new HiddenLayer(1, 1, null); // true params come from deserialize
+		    	this.hiddenLayers[ x ].load( is );
+		    	
+		    }
+		    
+		    this.randNumGenerator = (RandomGenerator) ois.readObject();
+
+			this.sparsity = di.readDouble(); 
+			this.momentum = di.readDouble();
+			this.l2 = di.readDouble();
+			this.renderWeightsEveryNumEpochs = di.readInt();
+			this.fanIn = di.readDouble();
+			this.useRegularization = di.readBoolean();
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
 	
 	
 }
