@@ -1,5 +1,14 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.layer;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -8,11 +17,13 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
 import org.apache.mahout.math.Vector;
 
 
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.Sigmoid;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNetworkVectorized;
 import tv.floe.metronome.math.MatrixUtils;
 
 /**
@@ -32,6 +43,7 @@ public class HiddenLayer implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 87885295280050784L;
+	
 	private int neuronCountPreviousLayer = 0;
 	private int neuronCount = 0;
 	
@@ -176,6 +188,62 @@ public class HiddenLayer implements Serializable {
 		layer.rndNumGenerator = rndNumGenerator;
 		return layer;
 	}
+	
+	
+	/**
+	 * Serializes this to the output stream.
+	 * @param os the output stream to write to
+	 */
+	public void write(OutputStream os) {
+		try {
+
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+		    DataOutput d = new DataOutputStream(os);
+			
+			d.writeInt( this.neuronCountPreviousLayer );
+			d.writeInt( this.neuronCount );
+			
+			MatrixWritable.writeMatrix(d, this.connectionWeights );
+			MatrixWritable.writeMatrix(d, this.biasTerms );
+			
+			oos.writeObject( this.rndNumGenerator );
+			MatrixWritable.writeMatrix(d, this.input );
+		    
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+
+			ObjectInputStream ois = new ObjectInputStream(is);
+			DataInput di = new DataInputStream(is);
+			
+			this.neuronCountPreviousLayer = di.readInt();
+			this.neuronCount = di.readInt();
+			
+			this.connectionWeights = MatrixWritable.readMatrix( di );
+			this.biasTerms = MatrixWritable.readMatrix( di );
+			
+			this.rndNumGenerator = (RandomGenerator) ois.readObject();
+			
+			this.input = MatrixWritable.readMatrix( di );
+			
+			//BaseMultiLayerNeuralNetworkVectorized loaded = (BaseMultiLayerNeuralNetworkVectorized) ois.readObject();
+			//update(loaded);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+	
 	
 	
 	
