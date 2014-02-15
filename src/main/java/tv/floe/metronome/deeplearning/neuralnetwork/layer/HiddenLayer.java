@@ -79,7 +79,7 @@ public class HiddenLayer implements Serializable {
 		}
 		
 
-		NormalDistribution u = new NormalDistribution(rndGen,0,.01,NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
+		NormalDistribution u = new NormalDistribution( this.rndNumGenerator, 0, .01, NormalDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY );
 
 		
 		// init the connection weights

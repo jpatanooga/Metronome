@@ -41,7 +41,7 @@ public class TestHiddenLayerSerde {
         }
 		);
 		
-		MatrixUtils.debug_print_matrix_stats( input, "input" );
+		//MatrixUtils.debug_print_matrix_stats( input, "input" );
 		
 		
 		
@@ -68,6 +68,18 @@ public class TestHiddenLayerSerde {
 		
 		assertEquals( 20, layer_deser.neuronCountPreviousLayer );
 		assertEquals( 2, layer_deser.neuronCount );
+		
+		for ( int x = 0; x < layer_deser.input.numRows(); x++) {
+			
+			for ( int c = 0; c < layer_deser.input.numCols(); c++ ) {
+			
+				//layer_deser.input.viewRow(x)
+				assertEquals( input.get(x, c), layer_deser.input.get(x, c), 0.0 );
+				
+			}
+			
+		}
+		
 		
 	}
 
