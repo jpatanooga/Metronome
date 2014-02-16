@@ -585,45 +585,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 
 	}	
 	
-	/**
-	 * Serializes this to the output stream.
-	 * 
-	 * Used in parameter averaging
-	 * 
-	 * @param os the output stream to write to
-	 */
-	public void serializeParameters(OutputStream os) {
-		try {
-
-		    DataOutput d = new DataOutputStream(os);
-		    //ObjectOutputStream oos = new ObjectOutputStream(os);
-		    
-		    d.writeInt( this.numberVisibleNeurons );
-		    d.writeInt( this.numberHiddenNeurons );
-		    
-		    // ??
-		    MatrixWritable.writeMatrix(d, this.hiddenBiasNeurons );
-		    // ??
-		    MatrixWritable.writeMatrix(d, this.visibleBiasNeurons );
-		    // yes
-		    MatrixWritable.writeMatrix(d, this.connectionWeights );
-		    //MatrixWritable.writeMatrix(d, this.trainingDataset );	
-		    		    
-/*
-			d.writeDouble( this.sparsity ); 
-			d.writeDouble( this.momentum );
-			d.writeDouble( this.l2 );
-			d.writeInt( this.renderWeightsEveryNumEpochs );
-			d.writeDouble( this.fanIn );
-			d.writeBoolean( this.useRegularization );
-*/
-		    
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-	}		
+	
 	
 	
 	/**
@@ -666,6 +628,34 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	}	
 	
 	/**
+	 * Serializes this to the output stream.
+	 * 
+	 * Used in parameter averaging
+	 * 
+	 * @param os the output stream to write to
+	 */
+	public void serializeParameters(OutputStream os) {
+		try {
+
+		    DataOutput d = new DataOutputStream(os);
+		    
+		    d.writeInt( this.numberVisibleNeurons );
+		    d.writeInt( this.numberHiddenNeurons );
+		    
+		    // ??
+		    MatrixWritable.writeMatrix(d, this.hiddenBiasNeurons );
+		    // ??
+		    MatrixWritable.writeMatrix(d, this.visibleBiasNeurons );
+		    // yes
+		    MatrixWritable.writeMatrix(d, this.connectionWeights );
+		    		    
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}		
+	
+	/**
 	 * Load parameter values from the byte stream 
 	 * 
 	 */
@@ -674,20 +664,12 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 
 			DataInput di = new DataInputStream(is);
 			
-			//this.nIn = di.readInt();
-//			this.input = MatrixWritable.readMatrix( di );
-
-
-		    //DataOutput d = new DataOutputStream(os);
-		    //ObjectInputStream ois = new ObjectInputStream(is);
-		    
 		    this.numberVisibleNeurons = di.readInt();
 		    this.numberHiddenNeurons = di.readInt();
 		    
 		    this.hiddenBiasNeurons = MatrixWritable.readMatrix( di );
 		    this.visibleBiasNeurons = MatrixWritable.readMatrix( di );
 		    this.connectionWeights = MatrixWritable.readMatrix( di );
-		    //this.trainingDataset = MatrixWritable.readMatrix( di );	
 		    				
 		} catch (Exception e) {
 			throw new RuntimeException(e);

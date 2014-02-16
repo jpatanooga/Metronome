@@ -280,6 +280,17 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		    	
 		    }
 		    
+		    this.hiddenLayers = new HiddenLayer[ this.numberLayers ];
+		    // write in hidden layers
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+		    	this.hiddenLayers[ x ] = new HiddenLayer( 1, 1, null); 
+		    	this.hiddenLayers[ x ].load( is );
+		    	
+		    	
+		    }
+		    
+		    
 		    // this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 		    this.logisticRegressionLayer = new LogisticRegression();
 		    this.logisticRegressionLayer.load(is);
@@ -307,6 +318,73 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		    this.setSparsity( di.readDouble() );
 		    
 		    
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Serializes this to the output stream.
+	 * 
+	 * Used in parameter averaging
+	 * 
+	 * @param os the output stream to write to
+	 */
+	public void serializeParameters(OutputStream os) {
+
+	    // write in hidden layers
+	    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+	    	this.hiddenLayers[ x ].write( os );
+	    	
+	    }
+		
+	    this.logisticRegressionLayer.write( os );
+	    
+		// DA / RBM Layers
+	    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+	    	((RestrictedBoltzmannMachine)this.preTrainingLayers[ x ]).write( os );
+	    	
+	    }
+	    		    
+
+	}		
+	
+	/**
+	 * Load parameter values from the byte stream 
+	 * 
+	 */
+	public void loadParameterValues(InputStream is) {
+		try {
+
+			DataInput di = new DataInputStream(is);
+			
+		    this.hiddenLayers = new HiddenLayer[ this.numberLayers ];
+		    // write in hidden layers
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+		    	this.hiddenLayers[ x ] = new HiddenLayer( 1, 1, null); 
+		    	this.hiddenLayers[ x ].load( is );
+		    	
+		    	
+		    }
+		    
+		    
+		    // this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
+		    this.logisticRegressionLayer = new LogisticRegression();
+		    this.logisticRegressionLayer.load(is);
+		    
+		    this.preTrainingLayers = new RestrictedBoltzmannMachine[ this.numberLayers ];
+		    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+		    	this.preTrainingLayers[ x ] = new RestrictedBoltzmannMachine(1, 1, null);
+		    	((RestrictedBoltzmannMachine)this.preTrainingLayers[ x ]).load(is);
+		    	//this.preTrainingLayers[ x ] = rbm;
+		    	
+		    }
+		    				
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -117,7 +117,7 @@ public class TestMNIST_On_RBMs {
 		MnistDataSetIterator fetcher = new MnistDataSetIterator(100,100);
 		MersenneTwister rand = new MersenneTwister(123);
 
-		double learningRate = 0.005;
+		double learningRate = 0.01;
 		
 		int[] batchSteps = { 250, 200, 150, 100, 50, 25, 5 };
 		
