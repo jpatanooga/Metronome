@@ -60,7 +60,7 @@ public class TestMNIST_On_RBMs {
 		DrawMnistGreyscale d = new DrawMnistGreyscale(draw1);
 //		d.title = "REAL";
 		if (renderRealImage) {
-			d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "/" + strCE + "_ce_" + number + "_real.png");
+			d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "/" + number + "_real.png");
 		}
 		
 		DrawMnistGreyscale d2 = new DrawMnistGreyscale( draw2, 100, 100 );
