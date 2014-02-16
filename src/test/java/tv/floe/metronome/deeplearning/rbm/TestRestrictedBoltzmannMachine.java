@@ -252,13 +252,13 @@ public class TestRestrictedBoltzmannMachine {
 		// save / write the model
 		
 		FileOutputStream oFileOutStream = new FileOutputStream( tmpFilename, false);
-		rbm.write( oFileOutStream );
+		rbm.serializeParameters( oFileOutStream );
 		
 		// read / load the model
 		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
 		
 		RestrictedBoltzmannMachine rbm_deser = new RestrictedBoltzmannMachine( 1, 1, null ); 
-		rbm_deser.load(oFileInputStream);
+		rbm_deser.loadParameterValues( oFileInputStream );
 		
 		assertEquals( rbm.numberHiddenNeurons, rbm_deser.numberHiddenNeurons );
 
