@@ -362,6 +362,14 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	
 	/**
 	 * Reconstruction error.
+	 * 
+	 * Reconstruction entropy.
+	 * This compares the similarity of two probability
+	 * distributions, in this case that would be the input
+	 * and the reconstructed input with gaussian noise.
+	 * This will account for either regularization or none
+	 * depending on the configuration.
+	 * 
 	 * @return reconstruction error
 	 */
 	public double getReConstructionCrossEntropy() {
