@@ -238,7 +238,37 @@ public class TestRestrictedBoltzmannMachine {
 		
 	}	
 	
-	
+	@Test
+	public void testParameterAveragingSerdeMechanics() throws FileNotFoundException {
+		
+		String tmpFilename = "/tmp/RBMParamAvgSerdeTest.model";
+		
+		Matrix input = buildTestInputDataset();
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
+		
+		rbm.trainTillConvergence(0.1, 1, input);
+		
+		// save / write the model
+		
+		FileOutputStream oFileOutStream = new FileOutputStream( tmpFilename, false);
+		rbm.write( oFileOutStream );
+		
+		// read / load the model
+		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
+		
+		RestrictedBoltzmannMachine rbm_deser = new RestrictedBoltzmannMachine( 1, 1, null ); 
+		rbm_deser.load(oFileInputStream);
+		
+		assertEquals( rbm.numberHiddenNeurons, rbm_deser.numberHiddenNeurons );
+
+		assertEquals( true, MatrixUtils.elementwiseSame(rbm.connectionWeights, rbm_deser.connectionWeights ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(rbm.hiddenBiasNeurons, rbm_deser.hiddenBiasNeurons ) );
+		//assertEquals( true, MatrixUtils.elementwiseSame(rbm.trainingDataset, rbm_deser.trainingDataset ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(rbm.visibleBiasNeurons, rbm_deser.visibleBiasNeurons ) );
+		
+		
+	}		
 	
 	
 	
