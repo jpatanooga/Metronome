@@ -53,15 +53,19 @@ public class TestMNIST_On_RBMs {
 	}
 	
 
-	private void renderExampleToDisk( Matrix draw1, Matrix reconstructed2, Matrix draw2, String number, String CE ) throws InterruptedException {
+	private void renderExampleToDisk( Matrix draw1, Matrix reconstructed2, Matrix draw2, String number, String CE, boolean renderRealImage ) throws InterruptedException {
 
+		String strCE = String.valueOf(CE).substring(0, 5);
+		
 		DrawMnistGreyscale d = new DrawMnistGreyscale(draw1);
 //		d.title = "REAL";
-		d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + CE + "_ce_" + number + "_real.png");
+		if (renderRealImage) {
+			d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "/" + strCE + "_ce_" + number + "_real.png");
+		}
 		
 		DrawMnistGreyscale d2 = new DrawMnistGreyscale( draw2, 100, 100 );
 //		d2.title = "TEST";
-		d2.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + CE + "_ce_" + number + "_test.png");
+		d2.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "/" + strCE + "_ce_" + number + "_test.png");
 
 		
 		
@@ -73,7 +77,7 @@ public class TestMNIST_On_RBMs {
 		
 	}	
 	
-	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input, boolean toDisk, String CE) throws InterruptedException {
+	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input, boolean toDisk, String CE, boolean renderRealImage) throws InterruptedException {
 		
 
 		Matrix reconstruct_all = rbm.reconstruct( input.getFirst() );
@@ -95,7 +99,10 @@ public class TestMNIST_On_RBMs {
 		
 			if (toDisk) {
 				
-				renderExampleToDisk(draw1, reconstructed_row_image, draw2, String.valueOf(j), CE);
+//				System.out.println("Label: " + input.get(j).getSecond().viewRow(0).maxValueIndex() );
+	//			MatrixUtils.debug_print( input.get(j).getSecond() );
+				
+				renderExampleToDisk(draw1, reconstructed_row_image, draw2, String.valueOf( input.get(j).getSecond().viewRow(0).maxValueIndex() ), CE, renderRealImage);
 				
 			} else {
 				renderExample(draw1, reconstructed_row_image, draw2);
@@ -127,6 +134,7 @@ public class TestMNIST_On_RBMs {
 
 
 		rbm.trainingDataset = first.getFirst();
+		
 
 		System.out.println(" ----- Training ------");
 		
@@ -151,7 +159,11 @@ public class TestMNIST_On_RBMs {
 
 			System.out.println(" ----- Visualizing Reconstructions Step " + minCrossEntropy + " CE ------");
 			
-			renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
+			if ( stepIndex == 0 ) {
+				renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()), true );
+			} else {
+				renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()), false );
+			}
 			
 			
 		}
