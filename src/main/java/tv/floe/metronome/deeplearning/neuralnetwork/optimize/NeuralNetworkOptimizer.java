@@ -47,7 +47,7 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		
 		opt.setTolerance(tolerance);
 		opt.setMaxIterations(10000);
-		opt.optimize(50);
+		opt.optimize(5);
 		
 
 	}

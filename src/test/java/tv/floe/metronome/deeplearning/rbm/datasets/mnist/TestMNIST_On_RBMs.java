@@ -57,11 +57,11 @@ public class TestMNIST_On_RBMs {
 
 		DrawMnistGreyscale d = new DrawMnistGreyscale(draw1);
 //		d.title = "REAL";
-		d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "_ce_" + CE + "_real.png");
+		d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + CE + "_ce_" + number + "_real.png");
 		
 		DrawMnistGreyscale d2 = new DrawMnistGreyscale( draw2, 100, 100 );
 //		d2.title = "TEST";
-		d2.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "_ce_" + CE + "_test.png");
+		d2.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + CE + "_ce_" + number + "_test.png");
 
 		
 		
@@ -112,6 +112,8 @@ public class TestMNIST_On_RBMs {
 
 		double learningRate = 0.005;
 		
+		int[] batchSteps = { 250, 200, 150, 100, 50, 25, 5 };
+		
 		DataSet first = fetcher.next();
 /*
 		RestrictedBoltzmannMachine da = new RBM.Builder().numberOfVisible(784).numHidden(400).withRandom(rand).renderWeights(1000)
@@ -130,6 +132,31 @@ public class TestMNIST_On_RBMs {
 		
 		//for(int i = 0; i < 2; i++) {
 		int epoch = 0;
+		
+		
+		for (int stepIndex = 0; stepIndex < batchSteps.length; stepIndex++ ) {
+		
+			int minCrossEntropy = batchSteps[ stepIndex ];
+			
+			while ( rbm.getReConstructionCrossEntropy() > minCrossEntropy) {
+				
+				System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
+				
+				//rbm.trainTillConvergence( first.getFirst(), learningRate, new Object[]{ 1 } );
+				rbm.trainTillConvergence(learningRate, 1, first.getFirst());
+				
+				epoch++;
+				
+			}
+
+			System.out.println(" ----- Visualizing Reconstructions Step " + minCrossEntropy + " CE ------");
+			
+			renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
+			
+			
+		}
+		
+		/*
 		while ( rbm.getReConstructionCrossEntropy() > 250) {
 			
 			System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
@@ -140,13 +167,8 @@ public class TestMNIST_On_RBMs {
 			epoch++;
 			
 		}
-		/*
-		Matrix reconstruct = rbm.reconstruct(first.getFirst());
 
-		log.info("Negative log likelihood " + rbm.getReConstructionCrossEntropy());
-
-*/
-		System.out.println(" ----- Visualizing Reconstructions sub 200 CE ------");
+		System.out.println(" ----- Visualizing Reconstructions sub 250 CE ------");
 		
 		renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
 		
@@ -161,7 +183,7 @@ public class TestMNIST_On_RBMs {
 			
 		}		
 		
-		System.out.println(" ----- Visualizing Reconstructions sub 100 CE ------");
+		System.out.println(" ----- Visualizing Reconstructions sub 200 CE ------");
 		
 //		renderBatchOfReconstructions( rbm, first );
 		renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
@@ -179,13 +201,12 @@ public class TestMNIST_On_RBMs {
 			
 		}		
 		
-		System.out.println(" ----- Visualizing Reconstructions sub 10 CE ------");
+		System.out.println(" ----- Visualizing Reconstructions sub 50 CE ------");
 		
-//		renderBatchOfReconstructions( rbm, first );
 		renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
 		
 
-
+*/
 
 
 
