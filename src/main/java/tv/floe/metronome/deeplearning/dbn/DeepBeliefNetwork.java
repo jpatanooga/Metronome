@@ -185,6 +185,15 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	
 	/**
 	 * Serializes this to the output stream.
+	 * 
+	 * Current Thoughts:
+	 * - cant save entire training dataset in an IterativeReduce scenario,
+	 * 		- would copy entire dataset around the network!
+	 * 
+	 * TODO: 
+	 * - this about this critically: what is the minimum amount of info we can 
+	 * 	 get away w sending for parameter-averaging
+	 * 
 	 * @param os the output stream to write to
 	 */
 	public void write(OutputStream os) {
@@ -225,8 +234,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		    oos.writeObject( this.distribution );
 
 		    
-		    MatrixWritable.writeMatrix(d, this.inputTrainingData );
-		    MatrixWritable.writeMatrix(d, this.outputTrainingLabels );
+//		    MatrixWritable.writeMatrix(d, this.inputTrainingData );
+//		    MatrixWritable.writeMatrix(d, this.outputTrainingLabels );
 
 			d.writeDouble( this.learningRateUpdate );
 			d.writeBoolean( this.useRegularization );
@@ -287,8 +296,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		    this.randomGenerator = (RandomGenerator) ois.readObject();
 		    this.distribution = (RealDistribution) ois.readObject();
 
-		    this.inputTrainingData = MatrixWritable.readMatrix( di );	
-		    this.outputTrainingLabels = MatrixWritable.readMatrix( di );
+//		    this.inputTrainingData = MatrixWritable.readMatrix( di );	
+//		    this.outputTrainingLabels = MatrixWritable.readMatrix( di );
 
 		    this.learningRateUpdate = di.readDouble();
 		    this.useRegularization = di.readBoolean();

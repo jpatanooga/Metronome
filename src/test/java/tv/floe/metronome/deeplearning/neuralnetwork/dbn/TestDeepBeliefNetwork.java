@@ -205,6 +205,7 @@ public class TestDeepBeliefNetwork {
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
 
 		
+		
 		dbn.preTrain(x,k, preTrainLr, preTrainEpochs);
 		dbn.finetune(y,fineTuneLr, fineTuneEpochs);
 
@@ -216,6 +217,12 @@ public class TestDeepBeliefNetwork {
 		FileOutputStream oFileOutStream = new FileOutputStream( tmpFilename, false);
 		dbn.write( oFileOutStream );
 		
+		// read / load the model
+		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
+		
+		
+		DeepBeliefNetwork dbn_deserialize = new DeepBeliefNetwork(1, hiddenLayerSizes, 1, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
+		dbn_deserialize.load(oFileInputStream);
 		
 		
 /*		

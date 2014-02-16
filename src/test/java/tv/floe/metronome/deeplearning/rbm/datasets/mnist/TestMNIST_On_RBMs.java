@@ -110,7 +110,7 @@ public class TestMNIST_On_RBMs {
 		MnistDataSetIterator fetcher = new MnistDataSetIterator(100,100);
 		MersenneTwister rand = new MersenneTwister(123);
 
-		double learningRate = 0.001;
+		double learningRate = 0.005;
 		
 		DataSet first = fetcher.next();
 /*
@@ -130,7 +130,7 @@ public class TestMNIST_On_RBMs {
 		
 		//for(int i = 0; i < 2; i++) {
 		int epoch = 0;
-		while ( rbm.getReConstructionCrossEntropy() > 200) {
+		while ( rbm.getReConstructionCrossEntropy() > 250) {
 			
 			System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
 			
@@ -150,7 +150,7 @@ public class TestMNIST_On_RBMs {
 		
 		renderBatchOfReconstructions( rbm, first, true, String.valueOf(rbm.getReConstructionCrossEntropy()) );
 		
-		while ( rbm.getReConstructionCrossEntropy() > 100) {
+		while ( rbm.getReConstructionCrossEntropy() > 200) {
 			
 			System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
 			
@@ -168,7 +168,7 @@ public class TestMNIST_On_RBMs {
 		
 
 		
-		while ( rbm.getReConstructionCrossEntropy() > 10) {
+		while ( rbm.getReConstructionCrossEntropy() > 50) {
 			
 			System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
 			
