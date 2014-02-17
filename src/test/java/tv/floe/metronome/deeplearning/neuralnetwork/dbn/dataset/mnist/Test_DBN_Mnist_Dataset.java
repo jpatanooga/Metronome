@@ -2,8 +2,10 @@ package tv.floe.metronome.deeplearning.neuralnetwork.dbn.dataset.mnist;
 
 import static org.junit.Assert.*;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.log4j.PropertyConfigurator;
@@ -53,7 +55,21 @@ public class Test_DBN_Mnist_Dataset {
 		
 		
 	}
-	
+	/*
+	@Test
+	public void testMeh() throws InterruptedException {
+		
+		org.apache.commons.lang3.time.StopWatch foo = new org.apache.commons.lang3.time.StopWatch();
+		
+		foo.start();
+		Thread.sleep(5000);
+		//foo.stop();
+		
+		System.out.println( foo.toString() );
+		
+		
+	}
+	*/
 	
 
 	
@@ -79,13 +95,13 @@ public class Test_DBN_Mnist_Dataset {
 		//PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
 		
 		int[] hiddenLayerSizes = { 500, 500, 500 };
-		double learningRate = 0.005;
+		double learningRate = 0.001;
 		int preTrainEpochs = 100;
 		int fineTuneEpochs = 100;
-		int totalNumExamples = 200;
+		int totalNumExamples = 60000;
 		//int rowLimit = 100;
 				
-		int batchSize = 50;
+		int batchSize = 200;
 		
 		// mini-batches through dataset
 		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
@@ -101,11 +117,13 @@ public class Test_DBN_Mnist_Dataset {
 				
 		int recordsProcessed = 0;
 		
+		StopWatch watch = new StopWatch();
+		
 		do  {
 			
 			recordsProcessed += batchSize;
 			
-			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed );
+			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			dbn.preTrain( first.getFirst(), 1, learningRate, preTrainEpochs);
 
 			if (fetcher.hasNext()) {
@@ -123,7 +141,7 @@ public class Test_DBN_Mnist_Dataset {
 			
 			recordsProcessed += batchSize;
 			
-			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed );
+			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			
 			
 			dbn.finetune( first.getSecond(), learningRate, fineTuneEpochs );
@@ -134,11 +152,18 @@ public class Test_DBN_Mnist_Dataset {
 			
 		} while (fetcher.hasNext());
 		
+		watch.stop();
+		
 		System.out.println("----------- Training Complete! -----------");
+		System.out.println( "Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 		
 		// save model
 		
 	//	dbn.write( "/tmp/metronome/dbn/TEST_DBN_MNIST/models/mnist.model" );
+		
+		FileOutputStream oFileOutStream = new FileOutputStream( "/tmp/Metronome_DBN_Mnist.model", false);
+		dbn.write( oFileOutStream );
+		
 		
 		// now do evaluation of results ....
 		fetcher.reset();
