@@ -704,6 +704,34 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		this.sparsity = sparsity;
 	}
 	
+	public String generateNetworkSizeReport() {
+		
+		String out = "";
+		
+		long hiddenLayerConnectionCount = 0;
+		long preTrainLayerConnectionCount = 0;
+		
+		for ( int x = 0; x < this.numberLayers; x++ ) {
+			
+			hiddenLayerConnectionCount += MatrixUtils.length( this.hiddenLayers[ x ].connectionWeights );
+			
+		}
+
+		for ( int x = 0; x < this.numberLayers; x++ ) {
+			
+			preTrainLayerConnectionCount += MatrixUtils.length( this.preTrainingLayers[ x ].getConnectionWeights() );
+			
+		}
+		
+		
+		out += "Number of Hidden / RBM Layers: " + this.numberLayers;
+		out += "Total Hidden Layer Connection Count: " + hiddenLayerConnectionCount;
+		out += "Total PreTrain (RBM) Layer Connection Count: " + preTrainLayerConnectionCount;
+		
+		return out;
+		
+	}
+	
 
 	
 }

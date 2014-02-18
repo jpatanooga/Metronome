@@ -98,10 +98,10 @@ public class Test_DBN_Mnist_Dataset {
 		double learningRate = 0.001;
 		int preTrainEpochs = 100;
 		int fineTuneEpochs = 100;
-		int totalNumExamples = 60000;
+		int totalNumExamples = 4000;
 		//int rowLimit = 100;
 				
-		int batchSize = 200;
+		int batchSize = 400;
 		
 		// mini-batches through dataset
 		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
@@ -118,13 +118,23 @@ public class Test_DBN_Mnist_Dataset {
 		int recordsProcessed = 0;
 		
 		StopWatch watch = new StopWatch();
+		watch.start();
+		
+		StopWatch batchWatch = new StopWatch();
+		
 		
 		do  {
 			
 			recordsProcessed += batchSize;
 			
 			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
+			
+			batchWatch.reset();
+			batchWatch.start();
 			dbn.preTrain( first.getFirst(), 1, learningRate, preTrainEpochs);
+			batchWatch.stop();
+			
+			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
 
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
