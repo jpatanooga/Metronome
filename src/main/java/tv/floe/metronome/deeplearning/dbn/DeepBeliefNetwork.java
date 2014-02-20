@@ -126,7 +126,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 				layerInput = hiddenLayers[ i - 1 ].sampleHiddenGivenVisible_Data(layerInput);
 			}
 
-			this.preTrainingLayers[i].trainTillConvergence(layerInput, learningRate, new Object[]{k});
+			this.preTrainingLayers[i].trainTillConvergence(layerInput, learningRate, new Object[]{ k, learningRate, epochs });
 
 		}
 		
