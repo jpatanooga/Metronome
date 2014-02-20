@@ -47,7 +47,13 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		
 		opt.setTolerance(tolerance);
 		opt.setMaxIterations(10000);
-		opt.optimize(20);
+		
+		int epochs = 50; // default
+		if ( extraParams.length > 2) {
+			epochs = (Integer) extraParams[2];
+		}
+		
+		opt.optimize( epochs );
 		
 
 	}
