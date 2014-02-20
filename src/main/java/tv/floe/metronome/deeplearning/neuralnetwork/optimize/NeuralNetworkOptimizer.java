@@ -30,7 +30,7 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 	protected BaseNeuralNetworkVectorized network;
 	protected double lr;
 	protected Object[] extraParams;
-	protected double tolerance = 0.000001;
+	protected double tolerance = 0.0001;
 	protected static Logger log = LoggerFactory.getLogger(NeuralNetworkOptimizer.class);
 	protected List<Double> errors = new ArrayList<Double>();
 	protected double minLearningRate = 0.001;
