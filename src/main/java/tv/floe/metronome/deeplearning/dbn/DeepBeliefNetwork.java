@@ -108,7 +108,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 */
 	public void preTrain(Matrix trainingRecords,int k,double learningRate,int epochs) {
 		
-		if (this.inputTrainingData == null) {
+		
+		if (this.inputTrainingData == null || this.hiddenLayers == null || this.hiddenLayers[0] == null || this.logisticRegressionLayer == null) {
 			this.inputTrainingData = trainingRecords;
 			initializeLayers(trainingRecords);
 		}
