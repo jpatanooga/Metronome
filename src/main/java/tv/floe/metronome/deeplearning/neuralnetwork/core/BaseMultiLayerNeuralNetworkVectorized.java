@@ -183,6 +183,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
 		System.out.println( "Finished layer init ------  " );
+		System.out.println( "DBN Network Stats:\n" + this.generateNetworkSizeReport() );
 		
 	}
 	
@@ -724,9 +725,9 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		}
 		
 		
-		out += "Number of Hidden / RBM Layers: " + this.numberLayers;
-		out += "Total Hidden Layer Connection Count: " + hiddenLayerConnectionCount;
-		out += "Total PreTrain (RBM) Layer Connection Count: " + preTrainLayerConnectionCount;
+		out += "Number of Hidden / RBM Layers: " + this.numberLayers + "\n";
+		out += "Total Hidden Layer Connection Count: " + hiddenLayerConnectionCount + "\n";
+		out += "Total PreTrain (RBM) Layer Connection Count: " + preTrainLayerConnectionCount + "\n";
 		
 		return out;
 		

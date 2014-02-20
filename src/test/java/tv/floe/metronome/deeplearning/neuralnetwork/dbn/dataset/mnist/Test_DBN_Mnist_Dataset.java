@@ -102,6 +102,7 @@ public class Test_DBN_Mnist_Dataset {
 		//int rowLimit = 100;
 				
 		int batchSize = 400;
+		boolean showNetworkStats = true;
 		
 		// mini-batches through dataset
 		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
@@ -115,6 +116,7 @@ public class Test_DBN_Mnist_Dataset {
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
 				
+		
 		int recordsProcessed = 0;
 		
 		StopWatch watch = new StopWatch();
@@ -136,6 +138,9 @@ public class Test_DBN_Mnist_Dataset {
 			
 			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
 
+			//System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
+
+			
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
 			}
@@ -183,5 +188,86 @@ public class Test_DBN_Mnist_Dataset {
 		
 	}
 
+	/**
+	 * Note: not meant as a real unit test
+	 * 
+	 * Meant to be used to collect perf stats
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void testMnist_SingleBatchAvgPreTrainTime() throws IOException {
+		
+		//PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
+		
+		int[] hiddenLayerSizes = { 500, 500, 500 };
+		double learningRate = 0.001;
+		int preTrainEpochs = 100;
+		int fineTuneEpochs = 100;
+		int totalNumExamples = 800;
+		//int rowLimit = 100;
+				
+		int batchSize = 200;
+		boolean showNetworkStats = true;
+		
+		// mini-batches through dataset
+		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
+		DataSet first = fetcher.next();
+		int numIns = first.getFirst().numCols();
+		int numLabels = first.getSecond().numCols();
+
+		int n_layers = hiddenLayerSizes.length;
+		RandomGenerator rng = new MersenneTwister(123);
+		
+		
+		DeepBeliefNetwork dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
+				
+		
+		int recordsProcessed = 0;
+		int batchesProcessed = 0;
+		long totalBatchProcessingTime = 0;
+		
+		StopWatch watch = new StopWatch();
+		watch.start();
+		
+		StopWatch batchWatch = new StopWatch();
+		
+		
+		do  {
+			
+			recordsProcessed += batchSize;
+			batchesProcessed++;
+			
+			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
+			
+			batchWatch.reset();
+			batchWatch.start();
+			dbn.preTrain( first.getFirst(), 1, learningRate, preTrainEpochs);
+			batchWatch.stop();
+			
+			totalBatchProcessingTime += batchWatch.getTime();
+			
+			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
+
+			//System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
+
+			
+			if (fetcher.hasNext()) {
+				first = fetcher.next();
+			}
+			
+		} while (fetcher.hasNext());
+
+		double avgBatchTime = totalBatchProcessingTime / batchesProcessed;
+		double avgBatchSeconds = avgBatchTime / 1000;
+		double avgBatchMinutes = avgBatchSeconds / 60;
+		
+		System.out.println("--------------------------");
+		System.out.println("Avg Batch Processing Time: " + avgBatchMinutes + " minutes per batches of " + batchSize);
+		System.out.println("--------------------------");
+		
+	}	
+	
+	
 
 }
