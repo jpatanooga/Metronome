@@ -40,6 +40,9 @@ public class TestAdagrad {
 		//ada.computeGradients();
 		assertEquals(4.082, ada.getLearningRate(0, 0), 0.001 );
 		
+		Matrix lrs = ada.getLearningRates();
+		assertEquals(4.082, lrs.get(0, 0), 0.001 );
+		
 	}
 	
 }
