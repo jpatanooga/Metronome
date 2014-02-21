@@ -54,11 +54,12 @@ public class LogisticRegressionGradient implements Serializable {
 		return true;
 	}
 	
-	public LogisticRegressionGradient(Matrix wGradient,
-			Matrix bGradient) {
+	public LogisticRegressionGradient(Matrix wGradient, Matrix bGradient) {
+		
 		super();
 		this.wGradient = wGradient;
 		this.bGradient = bGradient;
+		
 	}
 	
 	public Matrix getwGradient() {
@@ -70,7 +71,6 @@ public class LogisticRegressionGradient implements Serializable {
 	}
 	
 	public Matrix getbGradient() {
-		//return bGradient.columnMeans();
 		return MatrixUtils.columnMeans(bGradient);
 	}
 	

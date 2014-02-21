@@ -78,6 +78,9 @@ public class Evaluation {
 		}
 	}
 
+	public double correctScores() {
+		return this.truePositives;
+	}
 
 
 	public String stats() {

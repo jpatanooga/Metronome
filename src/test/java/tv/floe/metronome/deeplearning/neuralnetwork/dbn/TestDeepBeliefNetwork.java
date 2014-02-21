@@ -115,7 +115,7 @@ public class TestDeepBeliefNetwork {
 		//matrixRand(2, 2);
 	//	xorData( 2 );
 		
-		int n = 1000;
+		int n = 100;
 		Pair<Matrix, Matrix> d = xorData(n);
 		Matrix x = d.getFirst();
 		Matrix y = d.getSecond();
@@ -126,12 +126,12 @@ public class TestDeepBeliefNetwork {
 
 		RandomGenerator rng = new MersenneTwister(123);
 
-		double preTrainLr = 0.001;
+		double preTrainLr = 0.0001;
 		int preTrainEpochs = 1000;
 		int k = 1;
 		int nIns = 2,nOuts = 2;
-		int[] hiddenLayerSizes = new int[] { 2, 2 };
-		double fineTuneLr = 0.001;
+		int[] hiddenLayerSizes = new int[] { 2 };
+		double fineTuneLr = 0.0001;
 		int fineTuneEpochs = 1000;
 /*
 		DBN dbn = new DBN.Builder()
@@ -144,12 +144,15 @@ public class TestDeepBeliefNetwork {
 */
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
-		dbn.addWeightTransform(0, new MultiplyScalar(1000));
-		dbn.addWeightTransform(1, new MultiplyScalar(100));
+		dbn.addWeightTransform(0, new MultiplyScalar(100));
+		dbn.addWeightTransform(1, new MultiplyScalar(10));
 
 		
 		
 		dbn.preTrain(x,k, preTrainLr, preTrainEpochs);
+		
+		
+		
 		dbn.finetune(y,fineTuneLr, fineTuneEpochs);
 
 
@@ -166,7 +169,7 @@ public class TestDeepBeliefNetwork {
 		//log.info(eval.stats());
 		System.out.println( eval.stats() );
 
-		
+		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + n );
 	
 	
 	}
