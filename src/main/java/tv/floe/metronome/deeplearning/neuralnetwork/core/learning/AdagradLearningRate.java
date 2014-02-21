@@ -18,21 +18,22 @@ public class AdagradLearningRate {
 	private double gamma = 10; // default for gamma (this is the numerator)
 	//private double squaredGradientSum = 0;
 	public Matrix squaredGradientSums;
-	public Matrix connectionLearningRates;
+//	public Matrix connectionLearningRates;
 	
-	public AdagradLearningRate( int rows, int cols) {
+	public AdagradLearningRate( int rows, int cols, double gamma) {
 		
-		this.connectionLearningRates = new DenseMatrix(rows, cols);
-		this.connectionLearningRates.assign(0.0);
+//		this.connectionLearningRates = new DenseMatrix(rows, cols);
+//		this.connectionLearningRates.assign(0.0);
 		
 		this.squaredGradientSums = new DenseMatrix(rows, cols);
 		this.squaredGradientSums.assign(0.0);
-		
+
+		this.gamma = gamma;
+
 	}
 	
-	public AdagradLearningRate(double gamma) {
-		this.gamma = gamma;
-	}
+//	public AdagradLearningRate(double gamma) {
+//	}
 	
 	/**
 	 * square gradient, then add to ongoing sum
@@ -49,27 +50,17 @@ public class AdagradLearningRate {
 		
 	}
 	
-	/**
-	 * eta == gamma / Math.sqrt( this.squaredGradientSum )
-	 * 
-	 * @return
-	 */
-	public void computeGradients() {
-		//if ( this.squaredGradientSum > 0) {
-			//return this.gamma / Math.sqrt( this.squaredGradientSum );
-		//} else {
-			//return this.gamma;
-		//}
+	
+	public double getLearningRate(int row, int col) {
 		
-		for ( int r = 0; r < this.connectionLearningRates.numRows(); r++ ) {
-			
-			for ( int c = 0; c < this.connectionLearningRates.numCols(); c++ ) {
-				
-				this.connectionLearningRates.set( r, c, this.gamma / Math.sqrt( this.connectionLearningRates.get(r, c) ) );
-				
-			}
-			
+		double squaredGradientSum = this.squaredGradientSums.get(row, col);
+		
+		if ( squaredGradientSum > 0) {
+			return this.gamma / Math.sqrt( squaredGradientSum );
+		} else {
+			return this.gamma;
 		}
+		
 		
 	}
 
