@@ -114,7 +114,7 @@ public class TestDeepBeliefNetwork {
 		//matrixRand(2, 2);
 	//	xorData( 2 );
 		
-		int n = 10;
+		int n = 1000;
 		Pair<Matrix, Matrix> d = xorData(n);
 		Matrix x = d.getFirst();
 		Matrix y = d.getSecond();
@@ -129,7 +129,7 @@ public class TestDeepBeliefNetwork {
 		int preTrainEpochs = 1000;
 		int k = 1;
 		int nIns = 2,nOuts = 2;
-		int[] hiddenLayerSizes = new int[] {2,2,2};
+		int[] hiddenLayerSizes = new int[] { 2, 2 };
 		double fineTuneLr = 0.001;
 		int fineTuneEpochs = 1000;
 /*
@@ -144,6 +144,7 @@ public class TestDeepBeliefNetwork {
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
 
+		
 		
 		dbn.preTrain(x,k, preTrainLr, preTrainEpochs);
 		dbn.finetune(y,fineTuneLr, fineTuneEpochs);
