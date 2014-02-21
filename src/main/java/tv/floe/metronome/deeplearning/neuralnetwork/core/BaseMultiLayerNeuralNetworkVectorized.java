@@ -697,6 +697,12 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		this.weightTransforms = weightTransforms;
 	}
 
+	public synchronized void addWeightTransform( int layer,MatrixTransform transform) {
+		
+		this.weightTransforms.put(layer,transform);
+		
+	}
+	
 	public synchronized double getSparsity() {
 		return sparsity;
 	}

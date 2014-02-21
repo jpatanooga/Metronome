@@ -15,6 +15,7 @@ import org.junit.Test;
 
 
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.deeplearning.math.transforms.MultiplyScalar;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
@@ -143,6 +144,8 @@ public class TestDeepBeliefNetwork {
 */
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
+		dbn.addWeightTransform(0, new MultiplyScalar(1000));
+		dbn.addWeightTransform(1, new MultiplyScalar(100));
 
 		
 		
