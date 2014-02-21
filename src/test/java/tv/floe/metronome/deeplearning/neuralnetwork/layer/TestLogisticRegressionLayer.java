@@ -12,6 +12,7 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.math.MatrixUtils;
 
 
@@ -20,21 +21,21 @@ public class TestLogisticRegressionLayer {
 	double[][] x = new double[][] 
 	{
 			{1,1,1,0,0,0},
-			{1,0,1,0,0,0},
-			{1,1,1,0,0,0},
-			{0,0,1,1,1,0},
-			{0,0,1,1,0,0},
-			{0,0,1,1,1,0}
+//			{1,0,1,0,0,0},
+//			{1,1,1,0,0,0},
+//			{0,0,1,1,1,0},
+//			{0,0,1,1,0,0},
+			{0,0,0,1,1,1}
 			
 	};
 	
 	double[][] y = new double[][] 
 	{
 			{1, 0},
-			{1, 0},
-			{1, 0},
-			{0, 1},
-			{0, 1},
+//			{1, 0},
+//			{1, 0},
+//			{0, 1},
+//			{0, 1},
 			{0, 1}
 	};
 	
@@ -43,7 +44,7 @@ public class TestLogisticRegressionLayer {
 
 	double[][] xTest = new double[][] {
 			{1, 1, 1, 0, 0, 0},
-			{0, 0, 1, 1, 1, 0}
+			{0, 0, 0, 1, 1, 1}
 			//{1, 1, 1, 1, 1, 0}
 	};
 	
@@ -69,14 +70,14 @@ public class TestLogisticRegressionLayer {
 		
  */
 		
-		LogisticRegressionLayer logRegression = new LogisticRegressionLayer( xTestMatrix, x[0].length, 2); 
+		LogisticRegression logRegression = new LogisticRegression( xTestMatrix, x[0].length, 2); 
 
-		double learningRate = 0.01;
+		double learningRate = 0.001;
 		
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			
 			logRegression.train(xMatrix, yMatrix, learningRate);
-			learningRate *= 0.95;
+			learningRate *= 0.999;
 
 		}
 		
@@ -86,48 +87,25 @@ public class TestLogisticRegressionLayer {
 		
 	}
 	
-
 	@Test
-	public void testSerdeMechanics() throws FileNotFoundException {
+	public void testAdagradTrainMethod() {
 		
-		String tmpFilename = "/tmp/logisticLayerTest.model";
-		
-		LogisticRegressionLayer logRegression = new LogisticRegressionLayer( xTestMatrix, x[0].length, 2); 
+		LogisticRegression logRegression = new LogisticRegression( xTestMatrix, x[0].length, 2); 
 
-		double learningRate = 0.01;
+		double learningRate = 0.001;
 		
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			
-			logRegression.train(xMatrix, yMatrix, learningRate);
-			learningRate *= 0.95;
+			//logRegression.train(xMatrix, yMatrix, learningRate);
+			logRegression.trainWithAdagrad(xMatrix, yMatrix);
 
-		}		
+		}
 		
+		Matrix predictions = logRegression.predict(xTestMatrix);
 		
-		
-		// save / write the model
-		
-		FileOutputStream oFileOutStream = new FileOutputStream( tmpFilename, false);
-		logRegression.write( oFileOutStream );
-		
-		
-		
-		
-		// read / load the model
-		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
-		
-		LogisticRegressionLayer logRegression_deser = new LogisticRegressionLayer( null, 0, 0); 
-		logRegression_deser.load(oFileInputStream);
-		
-		assertEquals( logRegression.numInputNeurons, logRegression_deser.numInputNeurons );
-		assertEquals( logRegression.numOutputNeurons, logRegression_deser.numOutputNeurons );
-
-		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.inputTrainingData, logRegression_deser.inputTrainingData ) );
-		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.outputTrainingLabels, logRegression_deser.outputTrainingLabels ) );
-		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.connectionWeights, logRegression_deser.connectionWeights ) );
-		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.biasTerms, logRegression_deser.biasTerms ) );
-		
+		MatrixUtils.debug_print(predictions);
 		
 	}	
+	
 
 }
