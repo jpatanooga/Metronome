@@ -834,6 +834,22 @@ public class MatrixUtils {
 		
 		return d;
 	}
+	
+	public static void addi(Matrix m, Matrix additionMatrix) {
+		
+		for (int r = 0; r < m.numRows(); r++) {
+
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				
+				m.set(r, c, m.get(r, c) + additionMatrix.get(r, c) );
+			
+			}
+			
+		}
+		
+		
+	}
+	
 
 	public static void subi(Matrix m, double val) {
 		
