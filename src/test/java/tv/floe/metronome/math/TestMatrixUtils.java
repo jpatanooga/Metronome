@@ -14,6 +14,32 @@ import org.junit.Test;
 
 public class TestMatrixUtils {
 
+	
+	@Test
+	public void testAddi() {
+		
+		Matrix m = new DenseMatrix(1, 3);
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+		m.setQuick(0, 2, 3);
+
+		Matrix m2 = new DenseMatrix(1, 3);
+		m2.setQuick(0, 0, 6);
+		m2.setQuick(0, 1, 9);
+		m2.setQuick(0, 2, 3);
+
+		MatrixUtils.addi(m, m2);
+		
+		assertEquals(1, m.numRows());
+		assertEquals(3, m.numCols());
+		
+		assertEquals( 12.0, m.get(0, 0), 0.0 );
+		assertEquals( 18.0, m.get(0, 1), 0.0 );
+		assertEquals( 6.0, m.get(0, 2), 0.0 );
+		
+		
+	}	
+	
 	@Test
 	public void testUnroll() {
 		
