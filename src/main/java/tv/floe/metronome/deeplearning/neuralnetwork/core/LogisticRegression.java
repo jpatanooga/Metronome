@@ -16,6 +16,7 @@ import org.apache.mahout.math.MatrixWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
 import tv.floe.metronome.math.MatrixUtils;
 
 
@@ -31,6 +32,8 @@ public class LogisticRegression implements Serializable {
 	public boolean useRegularization = true;
 	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 
+	private AdagradLearningRate adaLearningRates = null;
+	
 	// used for Serde
 	public LogisticRegression() {}
 
@@ -45,6 +48,8 @@ public class LogisticRegression implements Serializable {
 		this.connectionWeights.assign(0.0);
 		this.biasTerms = new DenseMatrix(1, nOut); //Matrix.zeros(nOut);
 		this.biasTerms.assign(0.0);
+		
+		this.adaLearningRates = new AdagradLearningRate( nIn, nOut, 10);
 		
 	}
 
@@ -73,6 +78,27 @@ public class LogisticRegression implements Serializable {
 
 	}
 
+	public void trainWithAdagrad(Matrix x, Matrix y) {
+		
+		MatrixUtils.ensureValidOutcomeMatrix(y);
+		
+		if (x.numRows() != y.numRows()) {
+			throw new IllegalArgumentException("How does this happen?");
+		}
+
+		this.input = x;
+		this.labels = y;
+
+		LogisticRegressionGradient gradient = getGradientWithAdagrad();
+
+		//W.addi(gradient.getwGradient());
+		this.connectionWeights = this.connectionWeights.plus(gradient.getwGradient());
+		
+		//b.addi(gradient.getbGradient());
+		this.biasTerms = this.biasTerms.plus(gradient.getbGradient());
+	}
+	
+	
 	public void merge(LogisticRegression l,int batchSize) {
 		
 		//W.addi(l.W.subi(W).div(batchSize));
@@ -169,6 +195,29 @@ public class LogisticRegression implements Serializable {
 		
 		
 	}
+	
+	public LogisticRegressionGradient getGradientWithAdagrad() {
+		
+		//Matrix p_y_given_x = sigmoid(input.mmul(W).addRowVector(b));
+		Matrix p_y_given_x = MatrixUtils.sigmoid( MatrixUtils.addRowVector( input.times( this.connectionWeights ), this.biasTerms.viewRow(0) ) );
+		
+		//Matrix dy = labels.sub(p_y_given_x);
+		Matrix dy = labels.minus(p_y_given_x);
+		
+		if (useRegularization) {
+			dy.divide( this.input.numRows() );
+		}
+		
+		//Matrix wGradient = input.transpose().mmul(dy).mul(lr);
+		//Matrix wGradient = input.transpose().times( dy ).times( lr );
+		Matrix wGradient = MatrixUtils.elementWiseMultiplication( input.transpose().times( dy ), this.adaLearningRates.getLearningRates() );
+		
+		Matrix bGradient = dy;
+		
+		return new LogisticRegressionGradient( wGradient, bGradient );
+		
+		
+	}	
 
 
 
