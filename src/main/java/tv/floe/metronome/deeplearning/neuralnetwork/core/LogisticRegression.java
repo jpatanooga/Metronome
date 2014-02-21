@@ -21,7 +21,7 @@ import tv.floe.metronome.math.MatrixUtils;
 
 public class LogisticRegression implements Serializable {
 
-	private static final long serialVersionUID = -7065564817460914364L;
+	private static final long serialVersionUID = -6858205768233253889L;
 	public int nIn;
 	public int nOut;
 	public Matrix input,labels;
@@ -88,23 +88,11 @@ public class LogisticRegression implements Serializable {
 	 */
 	public double negativeLogLikelihood() {
 		
-		//Matrix sigAct = softmax(input.mmul(W).addRowVector(b));
 		Matrix sigActivation = MatrixUtils.softmax( MatrixUtils.addRowVector( input.times(this.connectionWeights), this.biasTerms.viewRow(0) ) );
 		
 		if (this.useRegularization) {
 			
-			//double reg = (2 / l2) * MatrixFunctions.pow(this.W,2).sum();
-			// TODO: fix this
 			double regularization = ( 2 / l2 ) * MatrixUtils.sum( MatrixUtils.pow(this.connectionWeights, 2) );
-					
-					
-/*			return - labels.mul(log(sigAct)).add(
-					oneMinus(labels).mul(
-							log(oneMinus(sigAct))
-							))
-							.columnSums().mean() + reg;
-*/
-			//return - MatrixUtils.mean( MatrixUtils.columnSums( labels.times(MatrixUtils.log(sigActivation).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) ) + regularization;
 			
 			Matrix labelsMulLogSig = MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) );
 
@@ -117,15 +105,6 @@ public class LogisticRegression implements Serializable {
 					
 					
 		}
-		/*
-		return - labels.mul(log(sigAct)).add(
-				oneMinus(labels).mul(
-						log(oneMinus(sigAct))
-						))
-						.columnSums().mean();
-*/
-		
-//		return - MatrixUtils.mean( MatrixUtils.columnSums( MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) ).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) );return - MatrixUtils.mean( MatrixUtils.columnSums( MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) ).plus( MatrixUtils.oneMinus(labels).times(MatrixUtils.log(MatrixUtils.oneMinus(sigActivation))) ) ) ) );
 
 		Matrix labelsMulLogSig = MatrixUtils.elementWiseMultiplication( labels, MatrixUtils.log(sigActivation) );
 
@@ -161,10 +140,10 @@ public class LogisticRegression implements Serializable {
 		LogisticRegressionGradient gradient = getGradient(lr);
 
 		//W.addi(gradient.getwGradient());
-		this.connectionWeights.plus(gradient.getwGradient());
+		this.connectionWeights = this.connectionWeights.plus(gradient.getwGradient());
 		
 		//b.addi(gradient.getbGradient());
-		this.biasTerms.plus(gradient.getbGradient());
+		this.biasTerms = this.biasTerms.plus(gradient.getbGradient());
 
 	}
 
@@ -185,6 +164,7 @@ public class LogisticRegression implements Serializable {
 		Matrix wGradient = input.transpose().times( dy ).times( lr );
 		
 		Matrix bGradient = dy;
+		
 		return new LogisticRegressionGradient( wGradient, bGradient );
 		
 		
@@ -194,9 +174,12 @@ public class LogisticRegression implements Serializable {
 
 	/**
 	 * Classify input
+	 * 
 	 * @param x the input (can either be a matrix or vector)
 	 * If it's a matrix, each row is considered an example
 	 * and associated rows are classified accordingly.
+	 * 
+	 * 
 	 * Each row will be the likelihood of a label given that example
 	 * @return a probability distribution for each row
 	 */
