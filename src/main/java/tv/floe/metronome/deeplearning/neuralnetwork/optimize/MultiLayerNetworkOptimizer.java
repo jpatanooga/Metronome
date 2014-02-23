@@ -117,6 +117,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	
 	public void optimize(Matrix labels, double learningRate, int epochs) {
 		
+		System.out.println( "Using ConjugateGradient Optimizer for Logistic Layer" );
+		
 		MatrixUtils.ensureValidOutcomeMatrix(labels);
 		
 		//ensure network input is synced to the passed in labels
@@ -130,18 +132,50 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		network.logisticRegressionLayer.labels = labels;
 
 		
-//		Matrix w = network.logisticRegressionLayer.connectionWeights.clone();
-//		Matrix b = network.logisticRegressionLayer.biasTerms.clone();
-		
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.logisticRegressionLayer, learningRate );
 		CustomConjugateGradient g = new CustomConjugateGradient(opt);
 		g.optimize();
-		System.out.println("using LogisticRegressionOptimizer and CustomConjugateGradient !!!");
+		//System.out.println("using LogisticRegressionOptimizer and CustomConjugateGradient !!!");
 		
 		network.backProp(learningRate, epochs);
 		
 
 	}
+	
+	public void optimizeWSGD(Matrix labels, double learningRate, int epochs) {
+		
+		System.out.println( "Using SGD Optimizer for Logistic Layer" );
+		
+		MatrixUtils.ensureValidOutcomeMatrix(labels);
+		
+		//ensure network input is synced to the passed in labels
+		network.feedForward();
+		
+		
+		//sample from the final layer in the network and train on the result
+		Matrix layerInput = network.hiddenLayers[network.hiddenLayers.length - 1].sampleHiddenGivenLastVisible();
+		
+		network.logisticRegressionLayer.input = layerInput;
+		network.logisticRegressionLayer.labels = labels;
+
+		
+/*		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.logisticRegressionLayer, learningRate );
+		CustomConjugateGradient g = new CustomConjugateGradient(opt);
+		g.optimize();
+		//System.out.println("using LogisticRegressionOptimizer and CustomConjugateGradient !!!");
+*/
+		
+		for (int i = 0; i < 10000; i++) {
+			
+			network.logisticRegressionLayer.trainWithAdagrad( layerInput, labels );
+
+		}
+		
+		
+		network.backProp(learningRate, epochs);
+		
+
+	}	
 	
 	
 	@Override

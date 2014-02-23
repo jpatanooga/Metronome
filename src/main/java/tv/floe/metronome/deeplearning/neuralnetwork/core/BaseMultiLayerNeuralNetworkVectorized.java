@@ -412,6 +412,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		
 		optimizer = new MultiLayerNetworkOptimizer(this,learningRate);
 		optimizer.optimize( outputLabels, learningRate, epochs );
+		//optimizer.optimizeWSGD( outputLabels, learningRate, epochs );
 		
 	}
 

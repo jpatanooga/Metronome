@@ -69,11 +69,15 @@ public class TestDeepBeliefNetwork {
 		
 	}
 	
-	public static Pair<Matrix, Matrix> xorData(int n) {
+	public static Pair<Matrix, Matrix> xorDataStatic() {
 		
 		
-		Matrix x = matrixRand(n, 2); //Matrix.rand(n,2);
+		Matrix x = new DenseMatrix(4, 2); //Matrix.rand(n,2);
+		Matrix y = new DenseMatrix( 4, 2 ); //Matrix.zeros(n,2);
+		y.assign(0.0);
+
 		
+		/*
 		MatrixUtils.debug_print(x);
 		
 		x = gti(x, 0.5);
@@ -81,8 +85,6 @@ public class TestDeepBeliefNetwork {
 		MatrixUtils.debug_print(x);
 		
 		
-		Matrix y = new DenseMatrix( n, 2 ); //Matrix.zeros(n,2);
-		y.assign(0.0);
 		
 		for (int i = 0; i < x.numRows(); i++) {
 			
@@ -101,8 +103,30 @@ public class TestDeepBeliefNetwork {
 		//return new DataSet(x,y);
 	
 		MatrixUtils.debug_print(y);
+		*/
+		
+		/*
+0 0:0 1:0
+1 0:0 1:1
+1 0:1 1:0
+0 0:1 1:1
+
+		 */
+		
+		x.viewRow(0).assign( new double[] { 0, 0 } );
+		x.viewRow(1).assign( new double[] { 0, 1 } );
+		x.viewRow(2).assign( new double[] { 1, 0 } );
+		x.viewRow(3).assign( new double[] { 1, 1 } );
+		
+		y.set(0, 0, 1);
+		y.set(1, 1, 1);
+		y.set(2, 1, 1);
+		y.set(3, 0, 1);
 		
 		Pair<Matrix, Matrix> p = new Pair<Matrix, Matrix>(x, y);
+		
+		MatrixUtils.debug_print(x);
+		MatrixUtils.debug_print(y);
 		
 		return p;
 		
@@ -115,8 +139,8 @@ public class TestDeepBeliefNetwork {
 		//matrixRand(2, 2);
 	//	xorData( 2 );
 		
-		int n = 100;
-		Pair<Matrix, Matrix> d = xorData(n);
+		int n = 10;
+		Pair<Matrix, Matrix> d = xorDataStatic(); //xorData(n);
 		Matrix x = d.getFirst();
 		Matrix y = d.getSecond();
 
@@ -144,8 +168,8 @@ public class TestDeepBeliefNetwork {
 */
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
-		dbn.addWeightTransform(0, new MultiplyScalar(100));
-		dbn.addWeightTransform(1, new MultiplyScalar(10));
+//		dbn.addWeightTransform(0, new MultiplyScalar(100));
+//		dbn.addWeightTransform(1, new MultiplyScalar(10));
 
 		
 		
@@ -182,7 +206,7 @@ public class TestDeepBeliefNetwork {
 		
 		
 		int n = 10;
-		Pair<Matrix, Matrix> d = xorData(n);
+		Pair<Matrix, Matrix> d = xorDataStatic(); //xorData(n);
 		Matrix x = d.getFirst();
 		Matrix y = d.getSecond();
 
@@ -264,7 +288,7 @@ public class TestDeepBeliefNetwork {
 		
 		
 		int n = 10;
-		Pair<Matrix, Matrix> d = xorData(n);
+		Pair<Matrix, Matrix> d = xorDataStatic(); //xorData(n);
 		Matrix x = d.getFirst();
 		Matrix y = d.getSecond();
 
