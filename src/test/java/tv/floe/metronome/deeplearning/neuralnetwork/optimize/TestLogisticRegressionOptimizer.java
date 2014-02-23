@@ -9,6 +9,7 @@ import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
 import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
@@ -102,7 +103,7 @@ public class TestLogisticRegressionOptimizer {
 	}	
 	
 	@Test
-	public void test() {
+	public void testConjugateGradientLogisticRegressionOnXOR() {
 		
 
 		int n = 100;
@@ -160,7 +161,7 @@ public class TestLogisticRegressionOptimizer {
 	
 	
 	@Test
-	public void testBasic() {
+	public void testBasicConjugateGradientLogisticRegression() {
 		
 		double[][] x = new double[][] 
 				{
@@ -206,6 +207,35 @@ public class TestLogisticRegressionOptimizer {
 				
 				
 				LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( logreg, learningRate );
+				
+				// do asserts to make sure optimizer is working right
+				
+				assertEquals( 14, opt.getNumParameters() );
+				double[] params = new double[14];
+				opt.getParameters(params);
+				
+				// NLL
+				//opt.getValue()
+				
+				//opt.getValueGradient(buffer)
+				
+				LogisticRegressionGradient grad = logreg.getGradient( learningRate );
+				double[] buf = new double[ MatrixUtils.length( grad.getwGradient() ) + MatrixUtils.length( grad.getbGradient() ) ];
+				
+				System.out.println( "Weight Gradient Size: " + MatrixUtils.length( grad.getwGradient() ) );
+				System.out.println( "Bias Gradient Size: " + MatrixUtils.length( grad.getbGradient() ) );
+				
+				opt.getValueGradient( buf );
+				
+				MatrixUtils.debug_print( grad.getwGradient() );
+				MatrixUtils.debug_print( grad.getbGradient() );
+				
+				Matrix debug_buf = new DenseMatrix( 1, 14 );
+				debug_buf.viewRow(0).assign(buf);
+				
+				MatrixUtils.debug_print( debug_buf );
+				
+				
 				CustomConjugateGradient g = new CustomConjugateGradient(opt);
 				g.optimize();
 				
