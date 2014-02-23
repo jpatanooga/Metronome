@@ -110,7 +110,7 @@ public class LogisticRegressionOptimizer implements Optimizable.ByGradientValue,
 	@Override
 	public double getValue() {
 	
-		return logReg.negativeLogLikelihood();
+		return -logReg.negativeLogLikelihood();
 
 	}
 
