@@ -143,12 +143,12 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) + MatrixUtils.length( network.connectionWeights ) ) {
 				
 				//return network.hBias.get(i);
-				MatrixUtils.getElement( network.hiddenBiasNeurons, i );
+				return MatrixUtils.getElement( network.hiddenBiasNeurons, i );
 				
 			} else {
 				
 				//return network.vBias.get(i);
-				MatrixUtils.getElement( network.visibleBiasNeurons, i );
+				return MatrixUtils.getElement( network.visibleBiasNeurons, i );
 				
 			}
 			
