@@ -254,9 +254,11 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 			}
 			
 			
-		}
+		} else {
 		
-		MatrixUtils.setElement( network.connectionWeights, index, value );
+			MatrixUtils.setElement( network.connectionWeights, index, value );
+			
+		}
 		
 		
 	}
