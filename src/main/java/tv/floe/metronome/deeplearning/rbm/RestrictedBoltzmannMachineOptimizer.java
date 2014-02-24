@@ -3,6 +3,7 @@ package tv.floe.metronome.deeplearning.rbm;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -31,13 +32,72 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 		super(network, lr, trainingParams);
 	}
 
+	
+	
+	
+	@Override
+	public void getValueGradient(double[] buffer) {
+		int k = (Integer) extraParams[0];
+		numTimesIterated++;
+		
+		//System.out.println("k: " + k);
+		
+		//adaptive k based on the number of iterations.
+		//typically over time, you want to increase k.
+		if(this.k <= 0)
+			this.k = k;
+		if(numTimesIterated % 10 == 0) {
+			this.k++;
+		}
+		
+		
+		//Don't go over 15
+		if(this.k >= 15) 
+		     this.k = 15;
+		
+		k = this.k;
+
+		NeuralNetworkGradient gradient = network.getGradient(new Object[]{k,lr});
+		
+		Matrix wAdd = gradient.getwGradient();
+		Matrix vBiasAdd = gradient.getvBiasGradient();
+		Matrix hBiasAdd = gradient.gethBiasGradient();
+		
+		int idx = 0;
+		for (int i = 0; i < MatrixUtils.length( wAdd ); i++) { 
+		
+			buffer[idx++] = MatrixUtils.getElement( wAdd, i );
+			
+		}
+		
+		
+		for (int i = 0; i < MatrixUtils.length( vBiasAdd ); i++) {
+		
+			buffer[idx++] = MatrixUtils.getElement( vBiasAdd, i );
+			
+		}
+		
+
+		
+		for (int i = 0; i < MatrixUtils.length( hBiasAdd ); i++) {
+			
+			buffer[idx++] = MatrixUtils.getElement( hBiasAdd, i );
+			
+		}
+				
+		
+	}
+	
+	
+	
+	
+	
 	/**
-	 * TODO: double check  this against the stock RBM impl
+	 * DEPRECATED
 	 * 
 	 * 
 	 */
-	@Override
-	public void getValueGradient(double[] buffer) {
+	public void getValueGradient_old(double[] buffer) {
 		int k = (Integer) extraParams[0];
 		numTimesIterated++;
 		
