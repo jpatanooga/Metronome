@@ -195,7 +195,12 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		}
 		*/
 		
-		// TODO: here -----
+		for (int i = 0; i < params.length; i++) {
+		
+			setParameter( i, params[ i ] );
+			
+		}
+
 		
 	}
 
