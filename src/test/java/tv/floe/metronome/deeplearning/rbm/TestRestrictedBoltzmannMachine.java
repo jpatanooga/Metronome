@@ -18,6 +18,27 @@ import tv.floe.metronome.types.Pair;
 
 public class TestRestrictedBoltzmannMachine {
 
+
+	double[][] xor_input = new double[][] 
+	{
+			{0,0},
+			{0,1},
+			{1,0},
+			{1,1}
+			
+	};
+	
+	double[][] xor_labels = new double[][] 
+	{
+			{1, 0},
+			{0, 1},
+			{0, 1},
+			{1, 0}
+	};
+		
+	Matrix x_xor_Matrix = new DenseMatrix(xor_input);	
+	
+	
 	public static Matrix buildTestInputDataset() {
 		
 		double[][] data = new double[][]
@@ -144,15 +165,20 @@ public class TestRestrictedBoltzmannMachine {
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
 		
 		double ce = 0;
-		
-		for (int x = 0; x < 1000; x++) {
-			rbm.contrastiveDivergence(0.1, 1, input);
+		/*
+		for (int x = 0; x < 10000; x++) {
+			rbm.contrastiveDivergence(0.001, 1, input);
 
 			ce = rbm.getReConstructionCrossEntropy();
 			
-			System.out.println("ce: " + ce);
+			
 		
 		}
+		*/
+		rbm.trainTillConvergence(0.1, 1, input);
+		
+		ce = rbm.getReConstructionCrossEntropy();
+		System.out.println("ce: " + ce);
 
 		Matrix v = new DenseMatrix(new double[][]
 				{
@@ -162,8 +188,11 @@ public class TestRestrictedBoltzmannMachine {
 
 		Matrix recon = rbm.reconstructVisibleInput(v);
 		
+		MatrixUtils.debug_print(v);
+		MatrixUtils.debug_print(recon);
+		
 		// "get the cross entropy somewhere near 0.3 and we're good"
-		assertEquals(0.4, ce, 0.2 );
+		assertEquals(0.5, ce, 0.2 );
 		
 		
 		
@@ -199,12 +228,54 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
 		
+		double ce = 1000;
+		
+		//rbm.contrastiveDivergence(0.001, 10, input);
+
+		for ( int x = 0; x < 10; x++) {
+			rbm.trainTillConvergence(0.01, 1, input);
+			ce = rbm.getReConstructionCrossEntropy();
+		}
+		
+		Matrix recon = rbm.reconstruct( input );
+		
+		MatrixUtils.debug_print( input );
+		MatrixUtils.debug_print( recon );
+		
+		
+	}
+	
+	@Test
+	public void testXORTrainTilConvergenceOptimizer() {
+		
+		//trainTillConvergence
+		
+		Matrix input = x_xor_Matrix;
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(2, 4, null);
+		
 		double ce = 0;
 		
 
-		rbm.trainTillConvergence(0.1, 1, input);
+
+		rbm.trainTillConvergence(0.01, 1, input);
+
+		ce = rbm.getReConstructionCrossEntropy();
+		System.out.println("ce: " + ce);
+		rbm.trainTillConvergence(0.01, 1, input);
+
+		ce = rbm.getReConstructionCrossEntropy();
+		System.out.println("ce: " + ce);
 		
-	}
+		
+		Matrix recon = rbm.reconstruct(x_xor_Matrix);
+		
+		MatrixUtils.debug_print(recon);
+		
+		
+
+	}	
+	
 	
 	@Test
 	public void testSerdeMechanics() throws FileNotFoundException {
