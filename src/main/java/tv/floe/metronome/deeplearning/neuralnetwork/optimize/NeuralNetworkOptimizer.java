@@ -90,7 +90,7 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		 * as a solid line for the optimizer, we get the following:
 		 * 
 		 */
-
+/*
 		int idx = 0;
 		
 		for (int i = 0; i < MatrixUtils.length( network.connectionWeights ); i++) {
@@ -110,7 +110,12 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 			buffer[ idx++ ] = MatrixUtils.getElement( network.hiddenBiasNeurons, i );
 			
 		}
+		*/
 		
+		for (int i = 0; i < buffer.length; i++) {
+			buffer[ i ] = getParameter( i );
+		}
+
 		
 	}
 
