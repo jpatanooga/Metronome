@@ -260,7 +260,21 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		Matrix vBiasGradient = MatrixUtils.mean( this.trainingDataset.minus( negativeVisibleSamples ) , 0).times( learningRate ); 
 		//this.visibleBiasNeurons = this.visibleBiasNeurons.plus( vBiasAdd );
 
-		Matrix hBiasGradient = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0).times( learningRate ); //.times(this.learningRate);
+		Matrix hBiasGradient = null;
+		
+		if(this.sparsity != 0) {
+			//all hidden units must stay around this number
+//			hBiasGradient = mean(probHidden.getSecond().add( -sparsity),0).mul(learningRate);
+			hBiasGradient = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().plus( -sparsity ) , 0).times( learningRate ); //.times(this.learningRate);
+		}
+		else {
+			//update rule: the expected values of the hidden input - the negative hidden  means adjusted by the learning rate
+//			hBiasGradient = mean(probHidden.getSecond().sub(nhMeans), 0).mul(learningRate);
+			hBiasGradient = MatrixUtils.mean( hiddenProbsAndSamplesStart.getSecond().minus( negativeHiddenExpectedValues ) , 0).times( learningRate ); //.times(this.learningRate);
+		}
+		
+		
+		
 		//this.hiddenBiasNeurons = this.hiddenBiasNeurons.plus( hBiasAdd );		
 
 		return new NeuralNetworkGradient(wGradient, vBiasGradient, hBiasGradient);
