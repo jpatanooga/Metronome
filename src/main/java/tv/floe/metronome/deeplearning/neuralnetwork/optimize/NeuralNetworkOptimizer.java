@@ -121,7 +121,8 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		// beyond weight matrix
 		if (index >= MatrixUtils.length( network.connectionWeights ) ) {
 			
-			
+			int i = getAdjustedIndex(index);
+			/*
 			// beyond visible bias
 			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) ) {
 				
@@ -132,6 +133,19 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 				return MatrixUtils.getElement( network.visibleBiasNeurons, index );
 				
 			}
+			*/
+			//beyond visible bias
+			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) + MatrixUtils.length( network.connectionWeights ) ) {
+				
+				//return network.hBias.get(i);
+				MatrixUtils.getElement( network.hiddenBiasNeurons, i );
+				
+			} else {
+				
+				//return network.vBias.get(i);
+				MatrixUtils.getElement( network.visibleBiasNeurons, i );
+				
+			}
 			
 			
 		}
@@ -139,6 +153,8 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		return MatrixUtils.getElement( network.connectionWeights, index );
 
 	}
+	
+
 
 
 	/**
