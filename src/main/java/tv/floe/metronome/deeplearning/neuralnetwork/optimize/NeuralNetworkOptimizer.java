@@ -172,7 +172,7 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 	public void setParameters(double[] params) {
 
 		int idx = 0;
-		
+		/*
 		
 		for (int i = 0; i < MatrixUtils.length( network.connectionWeights ); i++ ) {
 			
@@ -193,28 +193,36 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 			MatrixUtils.setElement( network.hiddenBiasNeurons, i, params[ idx++ ] );
 			
 		}
+		*/
 		
+		// TODO: here -----
 		
 	}
 
 
 	@Override
 	public void setParameter(int index, double value) {
-/*		//beyond weight matrix
+/*		
+
+		//beyond weight matrix
 		if(index >= network.W.length) {
 			//beyond visible bias
-			if(index >= network.vBias.length) {
-				int i = index - network.hBias.length;
+			if(index >= network.vBias.length + network.W.length)  {
+				int i = getAdjustedIndex(index);
 				network.hBias.put(i, value);
 			}
 			else {
-				int i = index - network.vBias.length;
+				int i = getAdjustedIndex(index);
 				network.vBias.put(i,value);
 
 			}
 
 		}
-		network.W.put(index, value);
+		else {
+			network.W.put(index,value);
+		}
+
+		
 		*/
 		
 		// beyond weight matrix
@@ -222,14 +230,20 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 			
 			
 			// beyond visible bias
-			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) ) {
+			if (index >= MatrixUtils.length( network.visibleBiasNeurons ) + MatrixUtils.length( network.connectionWeights ) ) {
 				
-				int i = index - MatrixUtils.length( network.hiddenBiasNeurons );
+				//int i = index - MatrixUtils.length( network.hiddenBiasNeurons );
+				//MatrixUtils.setElement( network.hiddenBiasNeurons, i, value );
+				
+				int i = getAdjustedIndex(index);
+				//network.hBias.put(i, value);
 				MatrixUtils.setElement( network.hiddenBiasNeurons, i, value );
+				
 				
 			} else {
 				
-				int i = index - MatrixUtils.length( network.visibleBiasNeurons );
+				//int i = index - MatrixUtils.length( network.visibleBiasNeurons );
+				int i = getAdjustedIndex(index);
 				MatrixUtils.setElement( network.visibleBiasNeurons, i, value );
 				
 			}
