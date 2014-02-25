@@ -91,7 +91,7 @@ public class UCIDatasets {
 						} else {
 						
 							output_matrix.viewRow( vec_count ).assign(0);
-							output_matrix.viewRow( vec_count ).set( Integer.parseInt( parts[ x ] ), 1.0 );
+							output_matrix.viewRow( vec_count ).set( Integer.parseInt( parts[ x ] ) - 1, 1.0 );
 						}
 					}
 					

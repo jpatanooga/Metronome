@@ -215,10 +215,10 @@ public class TestLogisticRegressionLayer {
 	@Test
 	public void testTrainOnCovTypeDataset() throws Exception {
 		
-		Pair<Matrix, Matrix> data_set = UCIDatasets.getCovTypeDataset(10000, 8); // 1-7, 0 class is empty
+		Pair<Matrix, Matrix> data_set = UCIDatasets.getCovTypeDataset(20000, 7); // 1-7, 0 class is empty
 		
-		//MatrixUtils.debug_print(data_set.getFirst());
-		//MatrixUtils.debug_print(data_set.getSecond());
+//		MatrixUtils.debug_print(data_set.getFirst());
+//		MatrixUtils.debug_print(data_set.getSecond());
 		
 		Matrix input = data_set.getFirst();
 		Matrix labels = data_set.getSecond();
