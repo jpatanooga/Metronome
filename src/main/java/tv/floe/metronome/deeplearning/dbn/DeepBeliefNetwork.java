@@ -112,6 +112,9 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		if (this.inputTrainingData == null || this.hiddenLayers == null || this.hiddenLayers[0] == null || this.logisticRegressionLayer == null) {
 			this.inputTrainingData = trainingRecords;
 			initializeLayers(trainingRecords);
+		} else {
+			System.out.println( "PreTrain > Setting Input..." );
+			this.inputTrainingData = trainingRecords;
 		}
 		
 		Matrix layerInput = null;
@@ -121,12 +124,17 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			System.out.println("PreTrain > Layer " + i );
 			
 			if (i == 0) {
+				
 				layerInput = this.inputTrainingData;
+			
 			} else { 
+			
+				//based on the previous layer input, let's see what representation it learned
 				layerInput = hiddenLayers[ i - 1 ].sampleHiddenGivenVisible_Data(layerInput);
+			
 			}
 
-			this.preTrainingLayers[i].trainTillConvergence(layerInput, learningRate, new Object[]{ k, learningRate, epochs });
+			this.preTrainingLayers[ i ].trainTillConvergence( layerInput, learningRate, new Object[]{ k, learningRate, epochs } );
 
 		}
 		
@@ -173,6 +181,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			int nVisible, int nHidden, Matrix weights, Matrix hbias,
 			Matrix vBias, RandomGenerator rng, int index) {
 		
+				
 		return new RestrictedBoltzmannMachine( input, nVisible, nHidden, weights, hbias, vBias, rng );
 		
 	}
