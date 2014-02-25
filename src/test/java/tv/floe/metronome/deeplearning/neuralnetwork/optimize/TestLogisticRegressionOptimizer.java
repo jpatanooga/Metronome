@@ -2,12 +2,15 @@ package tv.floe.metronome.deeplearning.neuralnetwork.optimize;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
+import tv.floe.metronome.classification.neuralnetworks.iterativereduce.iris.IrisDatasetUtils;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
@@ -215,33 +218,7 @@ public class TestLogisticRegressionOptimizer {
 				
 				LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( logreg, learningRate );
 				
-				// do asserts to make sure optimizer is working right
-				/*
-				assertEquals( 14, opt.getNumParameters() );
-				double[] params = new double[14];
-				opt.getParameters(params);
-				
-				// NLL
-				//opt.getValue()
-				
-				//opt.getValueGradient(buffer)
-				
-				LogisticRegressionGradient grad = logreg.getGradient( learningRate );
-				double[] buf = new double[ MatrixUtils.length( grad.getwGradient() ) + MatrixUtils.length( grad.getbGradient() ) ];
-				
-				System.out.println( "Weight Gradient Size: " + MatrixUtils.length( grad.getwGradient() ) );
-				System.out.println( "Bias Gradient Size: " + MatrixUtils.length( grad.getbGradient() ) );
-				
-				opt.getValueGradient( buf );
-				
-				MatrixUtils.debug_print( grad.getwGradient() );
-				MatrixUtils.debug_print( grad.getbGradient() );
-				
-				Matrix debug_buf = new DenseMatrix( 1, 14 );
-				debug_buf.viewRow(0).assign(buf);
-				
-				MatrixUtils.debug_print( debug_buf );
-				*/
+
 				
 				CustomConjugateGradient g = new CustomConjugateGradient(opt);
 				g.optimize();
@@ -261,5 +238,42 @@ public class TestLogisticRegressionOptimizer {
 		
 		
 	}
+	
+	@Test
+	public void testTrainOnIrisDataset() throws IOException {
+		
+		double learningRate = 0.1;
+		
+		Pair<Matrix, Matrix> data_set = IrisDatasetUtils.getIrisAsDataset();
+		
+		MatrixUtils.debug_print(data_set.getFirst());
+		//MatrixUtils.debug_print(data_set.getSecond());
+		
+		Matrix input = data_set.getFirst();
+		Matrix labels = data_set.getSecond();
+		
+		LogisticRegression logRegression = new LogisticRegression( input, input.numCols(), labels.numCols()); 
+		logRegression.labels = labels;
+		
+		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( logRegression, learningRate );
+		CustomConjugateGradient g = new CustomConjugateGradient(opt);
+		g.optimize();
+
+		
+		Matrix predict = logRegression.predict(input);
+		//log.info(predict.toString());
+
+		Evaluation eval = new Evaluation();
+		eval.eval(labels, predict);
+		//log.info(eval.stats());
+		System.out.println( eval.stats() );
+
+		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + labels.numRows() );
+		
+		assertEquals( 0.95, eval.f1(), 0.02 );
+		
+		//MatrixUtils.debug_print(predict);		
+		
+	}	
 
 }
