@@ -90,6 +90,7 @@ public class LogisticRegression implements Serializable {
 		this.labels = y;
 
 		LogisticRegressionGradient gradient = getGradientWithAdagrad();
+		System.out.println( "gradient: " + gradient.getwGradient().get(0, 0));
 
 		//W.addi(gradient.getwGradient());
 		this.connectionWeights = this.connectionWeights.plus(gradient.getwGradient());
@@ -208,9 +209,13 @@ public class LogisticRegression implements Serializable {
 			dy.divide( this.input.numRows() );
 		}
 		
+		System.out.println( "lr-debug: " + this.adaLearningRates.getLearningRates().get(0, 0) );
+		
 		//Matrix wGradient = input.transpose().mmul(dy).mul(lr);
 		//Matrix wGradient = input.transpose().times( dy ).times( lr );
 		Matrix wGradient = MatrixUtils.elementWiseMultiplication( input.transpose().times( dy ), this.adaLearningRates.getLearningRates() );
+		
+		this.adaLearningRates.addLastIterationGradient(wGradient);
 		
 		Matrix bGradient = dy;
 		

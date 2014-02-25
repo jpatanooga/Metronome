@@ -14,6 +14,7 @@ import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.iris.IrisDatasetUtils;
+import tv.floe.metronome.datasets.UCIDatasets;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
@@ -210,6 +211,48 @@ public class TestLogisticRegressionLayer {
 		//MatrixUtils.debug_print(predict);		
 		
 	}
+	
+	@Test
+	public void testTrainOnCovTypeDataset() throws Exception {
+		
+		Pair<Matrix, Matrix> data_set = UCIDatasets.getCovTypeDataset(10000, 8); // 1-7, 0 class is empty
+		
+		//MatrixUtils.debug_print(data_set.getFirst());
+		//MatrixUtils.debug_print(data_set.getSecond());
+		
+		Matrix input = data_set.getFirst();
+		Matrix labels = data_set.getSecond();
+		
+		System.out.println( "Beginning LogReg Training on CovType");
+		
+		LogisticRegression logRegression = new LogisticRegression( input, input.numCols(), labels.numCols()); 
+
+		double learningRate = 0.001;
+		
+		for (int i = 0; i < 1000; i++) {
+			
+			logRegression.train(input, labels, learningRate);
+			learningRate *= 0.999;
+
+		}
+		
+//		Matrix predictions = logRegression.predict(xTestMatrix);
+		
+		Matrix predict = logRegression.predict(input);
+		//log.info(predict.toString());
+
+		Evaluation eval = new Evaluation();
+		eval.eval(labels, predict);
+		//log.info(eval.stats());
+		System.out.println( eval.stats() );
+
+		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + labels.numRows() );
+		
+		assertEquals( 0.95, eval.f1(), 0.1 );
+		
+		//MatrixUtils.debug_print(predict);		
+		
+	}	
 	
 	/**
 	 * TODO: this is currently broken, the underlying Adagrad is not updating right.

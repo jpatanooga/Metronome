@@ -88,6 +88,8 @@ public class LogisticRegressionOptimizer implements Optimizable.ByGradientValue,
 		
 		LogisticRegressionGradient grad = logReg.getGradient( lr );
 		
+		
+		
 		for (int i = 0; i < buffer.length; i++) {
 		
 			//if (i < logReg.W.length) {
