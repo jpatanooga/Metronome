@@ -160,6 +160,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				//this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
 				this.hiddenLayers[ i ] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], this.randomGenerator );
 				this.hiddenLayers[ i ].setInput( layer_input );
+				
+				
 
 			} else {
 				
@@ -173,12 +175,17 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				
 			}
 			
-			System.out.println("Created Hidden Layer: ConnWeight Matrix - rows: " + this.hiddenLayers[i].connectionWeights.numRows() + ", cols " + this.hiddenLayers[i].connectionWeights.numCols() );
-
+			System.out.println("Layer [" + i + "] "  );
+			
+			System.out.println("\tCreated Hidden Layer [" + i + "]: Neuron Count: " + this.hiddenLayerSizes[i] );
+			
+			System.out.println("\tCreated RBM PreTrain Layer [" + i + "]: Num Visible: " + input_size + ", Num Hidden: " + this.hiddenLayerSizes[i] );
 
 			// construct DL appropriate class for pre training layer
 			this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
 		}
+		
+		System.out.println("Logistic Output Layer: Inputs: " + this.hiddenLayerSizes[this.numberLayers-1] + ", Output Classes: " + this.outputNeuronCount );
 
 		this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
