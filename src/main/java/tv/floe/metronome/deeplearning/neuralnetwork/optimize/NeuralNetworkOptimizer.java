@@ -14,7 +14,12 @@ import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVector
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
 import tv.floe.metronome.math.MatrixUtils;
 
-
+/**
+ * Used primiarily as the base class for RestrictedBoltzmannMachineOptimizer
+ * 
+ * @author josh
+ *
+ */
 public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientValue,Serializable {
 
 	public NeuralNetworkOptimizer(BaseNeuralNetworkVectorized network, double lr,Object[] trainingParams) {
@@ -48,7 +53,7 @@ public abstract class NeuralNetworkOptimizer implements Optimizable.ByGradientVa
 		opt.setTolerance(tolerance);
 		opt.setMaxIterations(10000);
 		
-		int epochs = 50; // default
+		int epochs = 5000; // default
 		if ( extraParams.length > 2) {
 			epochs = (Integer) extraParams[2];
 		}
