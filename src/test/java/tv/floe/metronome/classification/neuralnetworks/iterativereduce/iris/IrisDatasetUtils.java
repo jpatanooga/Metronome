@@ -10,14 +10,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.mahout.math.DenseMatrix;
+import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
+import tv.floe.metronome.types.Pair;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.classification.neuralnetworks.learning.BackPropogationLearningAlgorithm;
 import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
@@ -89,6 +93,60 @@ public class IrisDatasetUtils {
 		return nnet;
 		
 	}
+	
+	
+	public static Pair<Matrix, Matrix> getIrisAsDataset() throws IOException {
+		
+
+		MetronomeRecordFactory rec_factory = new MetronomeRecordFactory("i:4 | o:3");
+	
+			
+			String recs = "src/test/resources/data/uci/iris/iris_data_normalised.mne";
+
+			Vector v_in_0 = new RandomAccessSparseVector(rec_factory.getInputVectorSize());
+			Vector v_out_0 = new RandomAccessSparseVector(rec_factory.getOutputVectorSize());
+			
+			
+//			ArrayList<Double[]> input_recs = new ArrayList<Double[]>(); 
+
+			// not very well built but in a hurry
+			BufferedReader br = new BufferedReader(new FileReader(recs));
+			
+			
+			int row_count = 0;
+			String line;
+			while ((line = br.readLine()) != null) {
+				row_count++;
+			}
+
+			Matrix input_matrix = new DenseMatrix( row_count, rec_factory.getInputVectorSize() );
+			Matrix output_matrix = new DenseMatrix( row_count, rec_factory.getOutputVectorSize() );
+			
+			int row_num = 0;
+			//String line;
+			br.close();
+			br = new BufferedReader(new FileReader(recs));
+			while ((line = br.readLine()) != null) {
+				
+
+				rec_factory.vectorizeLine( line, v_in_0, v_out_0 );
+				
+				//System.out.println("line: " + line);
+				//System.out.println("v in: " + v_in_0.toString());
+				
+				input_matrix.viewRow( row_num ).assign( v_in_0 );
+				
+				output_matrix.viewRow( row_num ).assign( v_out_0 );
+				
+				row_num++;
+				
+			}
+			br.close();	
+			
+			return new Pair< Matrix, Matrix >( input_matrix, output_matrix );
+		
+	}
+	
 	
 	public static void scoreIrisNeuralNetworkModel(String modelFileLocation) throws Exception {
 		

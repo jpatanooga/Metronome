@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -12,6 +13,7 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
+import tv.floe.metronome.classification.neuralnetworks.iterativereduce.iris.IrisDatasetUtils;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
@@ -86,7 +88,10 @@ public class TestLogisticRegressionLayer {
 
 
 		
-	
+	/**
+	 * Linear models arent going to learn this.
+	 * 
+	 */
 	@Test
 	public void testXORTrain() {
 		
@@ -149,20 +154,75 @@ public class TestLogisticRegressionLayer {
 
 		}
 		
-		Matrix predictions = logRegression.predict(xTestMatrix);
+//		Matrix predictions = logRegression.predict(xTestMatrix);
 		
-		MatrixUtils.debug_print(predictions);
+		Matrix predict = logRegression.predict(xMatrix);
+		//log.info(predict.toString());
+
+		Evaluation eval = new Evaluation();
+		eval.eval(yMatrix, predict);
+		//log.info(eval.stats());
+		System.out.println( eval.stats() );
+
+		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + yMatrix.numRows() );
+		
+		
+		MatrixUtils.debug_print(predict);
 		
 	}
 	
 	@Test
+	public void testTrainOnIrisDataset() throws IOException {
+		
+		Pair<Matrix, Matrix> data_set = IrisDatasetUtils.getIrisAsDataset();
+		
+		//MatrixUtils.debug_print(data_set.getFirst());
+		//MatrixUtils.debug_print(data_set.getSecond());
+		
+		Matrix input = data_set.getFirst();
+		Matrix labels = data_set.getSecond();
+		
+		LogisticRegression logRegression = new LogisticRegression( input, input.numCols(), labels.numCols()); 
+
+		double learningRate = 0.001;
+		
+		for (int i = 0; i < 10000; i++) {
+			
+			logRegression.train(input, labels, learningRate);
+			learningRate *= 0.999;
+
+		}
+		
+//		Matrix predictions = logRegression.predict(xTestMatrix);
+		
+		Matrix predict = logRegression.predict(input);
+		//log.info(predict.toString());
+
+		Evaluation eval = new Evaluation();
+		eval.eval(labels, predict);
+		//log.info(eval.stats());
+		System.out.println( eval.stats() );
+
+		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + labels.numRows() );
+		
+		assertEquals( 0.95, eval.f1(), 0.02 );
+		
+		//MatrixUtils.debug_print(predict);		
+		
+	}
+	
+	/**
+	 * TODO: this is currently broken, the underlying Adagrad is not updating right.
+	 * 
+	 */
+/*	@Test
 	public void testAdagradTrainMethod() {
 		
 		LogisticRegression logRegression = new LogisticRegression( xTestMatrix, x[0].length, 2); 
 
 		double learningRate = 0.001;
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 10; i++) {
 			
 			//logRegression.train(xMatrix, yMatrix, learningRate);
 			logRegression.trainWithAdagrad(xMatrix, yMatrix);
@@ -186,6 +246,6 @@ public class TestLogisticRegressionLayer {
 
 		
 	}	
-	
+	*/
 
 }
