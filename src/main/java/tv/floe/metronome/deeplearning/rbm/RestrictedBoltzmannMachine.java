@@ -171,6 +171,8 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 
 	}
 	
+
+	
 	/**
 	 * reviewed, seems decent
 	 * 
@@ -234,7 +236,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 		// learningRate * delta(data - model)
 		Matrix wGradient = dataModelDelta.times( learningRate );
-/*		
+		
 		if (useRegularization) { 
 		
 			//wGradient.subi(W.muli(l2));
@@ -246,8 +248,8 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			wGradient = wGradient.minus(this.connectionWeights);
 		
 		}
-*/
-		/*
+
+		
 		if (momentum != 0) {
 		
 			//wGradient.muli( 1 - momentum);
@@ -255,9 +257,9 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			wGradient = wGradient.times( 1 - momentum );
 			
 		}
-*/
+
 		
-		// TODO: figure out how this divide statement affects things 
+		// This is added normalization for mini-batching
 		
 		//wGradient.divi(input.rows);
 //		wGradient = wGradient.divide( this.trainingDataset.numRows() );

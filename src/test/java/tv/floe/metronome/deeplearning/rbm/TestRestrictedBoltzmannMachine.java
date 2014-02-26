@@ -272,7 +272,7 @@ public class TestRestrictedBoltzmannMachine {
 	 * 
 	 */
 	@Test
-	public void testCrossEntropyReconstruction() {
+	public void testCrossEntropyReconstructionOnSyntheticData() {
 		
 		//Matrix input = buildTestInputDataset();
 		
@@ -291,6 +291,7 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix input = new DenseMatrix(data_simple);		
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 4, null);
+		rbm.useRegularization = false;
 //		rbm.connectionWeights = rbm.connectionWeights.times( 100 );
 		
 		//MatrixUtils.debug_print( rbm.connectionWeights );
@@ -320,7 +321,7 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix v = new DenseMatrix(new double[][]
 				{
 					{1, 1, 1, 0, 0, 0},
-					{0, 0, 0, 1, 1, 1}
+					{0, 0, 1, 1, 1, 0}
 				}
 		);	
 
@@ -328,6 +329,18 @@ public class TestRestrictedBoltzmannMachine {
 		
 		MatrixUtils.debug_print(v);
 		MatrixUtils.debug_print(recon);
+		
+		// vector 0
+		for ( int row = 0; row < v.numRows(); row++ ) {
+		
+			for ( int col = 0; col < v.numCols(); col++ ) {
+			
+				assertEquals( v.viewRow(row).get(col), recon.viewRow(row).get(col), 0.3 );
+			
+			}
+			
+		}
+		
 		
 		// "get the cross entropy somewhere near 0.3 and we're good"
 		//assertEquals(0.5, ce, 0.2 );
@@ -367,7 +380,7 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix input = buildTestInputDataset();
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
-		
+		rbm.useRegularization = false;
 		double ce = 1000;
 		
 		//rbm.contrastiveDivergence(0.001, 10, input);
@@ -393,6 +406,7 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix input = x_xor_Matrix;
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(2, 4, null);
+		rbm.useRegularization = false;
 		
 		double ce = 0;
 		
@@ -407,6 +421,8 @@ public class TestRestrictedBoltzmannMachine {
 		ce = rbm.getReConstructionCrossEntropy();
 		System.out.println("ce: " + ce);
 		
+		ce = rbm.getReConstructionCrossEntropy();
+		System.out.println("ce: " + ce);
 		
 		Matrix recon = rbm.reconstruct(x_xor_Matrix);
 		

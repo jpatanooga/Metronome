@@ -519,6 +519,12 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 
 	}
 
+	public void scaleWeights( double scale ) {
+		
+		this.connectionWeights = this.connectionWeights.times( scale );
+		
+	}
+	
 	public void jostleWeighMatrix() {
 		/*
 		 * Initialize based on the number of visible units..
