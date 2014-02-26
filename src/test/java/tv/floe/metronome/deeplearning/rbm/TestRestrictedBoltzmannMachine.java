@@ -291,9 +291,9 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix input = new DenseMatrix(data_simple);		
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 4, null);
-		//rbm.connectionWeights.times( 1000 );
+//		rbm.connectionWeights = rbm.connectionWeights.times( 100 );
 		
-		MatrixUtils.debug_print( rbm.connectionWeights );
+		//MatrixUtils.debug_print( rbm.connectionWeights );
 		//MatrixUtils.debug_print( rbm.visibleBiasNeurons );
 		//MatrixUtils.debug_print( rbm.hiddenBiasNeurons );
 		

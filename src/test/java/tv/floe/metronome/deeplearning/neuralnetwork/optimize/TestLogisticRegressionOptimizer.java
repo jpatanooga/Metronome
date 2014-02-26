@@ -15,6 +15,7 @@ import tv.floe.metronome.datasets.UCIDatasets;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.NonZeroStoppingConjugateGradient;
 import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -257,7 +258,8 @@ public class TestLogisticRegressionOptimizer {
 		logRegression.labels = labels;
 		
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( logRegression, learningRate );
-		CustomConjugateGradient g = new CustomConjugateGradient(opt);
+		//CustomConjugateGradient g = new CustomConjugateGradient(opt);
+		NonZeroStoppingConjugateGradient g = new NonZeroStoppingConjugateGradient(opt);
 		g.optimize();
 
 		
@@ -295,7 +297,8 @@ public class TestLogisticRegressionOptimizer {
 		logRegression.labels = labels;
 		
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( logRegression, learningRate );
-		CustomConjugateGradient g = new CustomConjugateGradient(opt);
+		//CustomConjugateGradient g = new CustomConjugateGradient(opt);
+		NonZeroStoppingConjugateGradient g = new NonZeroStoppingConjugateGradient(opt);
 		g.optimize();
 		
 		

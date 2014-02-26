@@ -256,8 +256,11 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			
 		}
 */
+		
+		// TODO: figure out how this divide statement affects things 
+		
 		//wGradient.divi(input.rows);
-		wGradient = wGradient.divide( this.trainingDataset.numRows() );
+//		wGradient = wGradient.divide( this.trainingDataset.numRows() );
 		
 		
 		// ---- end of equation (9) section -----------------
