@@ -5,9 +5,9 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
 	* Parallel linear regression
     * Parallel logistic regression
     * Parallel K-means
-    * Scales linearly with input size
-    * Built on top of BSP-style computation framework "Iterative Reduce" (Hadoop / YARN)
-
+    * Restricted Boltzmann Machines
+* Scales linearly with input size
+* Built on top of BSP-style computation framework "Iterative Reduce" (Hadoop / YARN)
 * Packaged in a new suite of parallel iterative algorithms called Metronome on [IterativeReduce] (https://github.com/emsixteeen/IterativeReduce)
     * 100% Java, ASF 2.0 Licensed, on github
 
