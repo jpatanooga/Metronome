@@ -45,8 +45,8 @@ public class CustomConjugateGradient  implements Optimizer {
 	LineOptimizer.ByGradient lineMaximizer;
 
 	double initialStepSize = 1;
-	double tolerance = 0.0001;
-	double gradientTolerance = 0.001;
+	double tolerance = 0.00001;
+	double gradientTolerance = 0.00001;
 	int maxIterations = 1000;
 	private String myName = "";
 	//private NeuralNetEpochListener listener;

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
@@ -12,6 +13,7 @@ import org.apache.mahout.math.Vector;
 
 import org.junit.Test;
 
+import tv.floe.metronome.classification.neuralnetworks.iterativereduce.iris.IrisDatasetUtils;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -124,6 +126,7 @@ public class TestRestrictedBoltzmannMachine {
 		assertEquals( 2, hidden.numCols() );
 		assertEquals( 7, hidden.numRows() );
 		
+		MatrixUtils.debug_print(input);
 		MatrixUtils.debug_print(recon);
 		
 	}
@@ -152,6 +155,117 @@ public class TestRestrictedBoltzmannMachine {
 		
 	}
 	
+	
+	
+	/**
+	 * 
+	 * Looks at how well CDk drops in an SGD fashion
+	 * 
+	 */
+	@Test
+	public void testBaseCDk_NonCG() {
+		
+		//Matrix input = buildTestInputDataset();
+		
+		double[][] data_simple = new double[][]
+				{
+					{1,1,1,0,0,0},
+					{0,0,0,1,1,1}
+/*					{1,1,1,0,0,0},
+					{0,0,1,1,1,0},
+					{0,0,1,1,0,0},
+					{0,0,1,1,1,0},
+					{0,0,1,1,1,0}
+					*/
+				};
+		
+		Matrix input = new DenseMatrix(data_simple);		
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
+		
+//		MatrixUtils.debug_print( rbm.connectionWeights );
+//		MatrixUtils.debug_print( rbm.visibleBiasNeurons );
+//		MatrixUtils.debug_print( rbm.hiddenBiasNeurons );
+		
+		
+		double ce = 0;
+		
+		for (int x = 0; x < 1000; x++) {
+			
+			rbm.contrastiveDivergence(0.001, 5, input);
+			//rbm.trainTillConvergence(0.001, 1, input);
+
+			ce = rbm.getReConstructionCrossEntropy();
+			
+			System.out.println("ce: " + ce);
+			
+		
+		}
+		
+		//rbm.trainTillConvergence(0.1, 1, input);
+		
+		
+		ce = rbm.getReConstructionCrossEntropy();
+		System.out.println("ce: " + ce);
+
+		Matrix v = new DenseMatrix(new double[][]
+				{
+					{1, 1, 1, 0, 0, 0},
+					{0, 0, 0, 1, 1, 1}
+				}
+		);	
+
+		Matrix recon = rbm.reconstructVisibleInput(v);
+		
+		System.out.println("target vectors to reconstruct: ");
+		MatrixUtils.debug_print(v);
+		
+		System.out.println("reconstruction: ");
+		MatrixUtils.debug_print(recon);
+		
+		// "get the cross entropy somewhere near 0.3 and we're good"
+		//assertEquals(0.5, ce, 0.2 );
+
+		System.out.println("weights and biases: ");
+
+		MatrixUtils.debug_print( rbm.connectionWeights );
+		MatrixUtils.debug_print( rbm.visibleBiasNeurons );
+		MatrixUtils.debug_print( rbm.hiddenBiasNeurons );
+		
+
+	}	
+	
+	@Test
+	public void testRBMTrainingOnIrisDataset() throws IOException {
+		
+		Pair<Matrix, Matrix> data_set = IrisDatasetUtils.getIrisAsDataset();
+		
+		//MatrixUtils.debug_print(data_set.getFirst());
+		//MatrixUtils.debug_print(data_set.getSecond());
+		
+		Matrix input = data_set.getFirst();
+		//Matrix labels = data_set.getSecond();
+		
+		int visible_neuron_count = input.numCols();
+		int hidden_neuron_count = visible_neuron_count / 2;
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(visible_neuron_count, hidden_neuron_count, null);
+
+
+		
+		double ce = 0;
+		
+		rbm.trainTillConvergence(0.001, 1, input);
+
+		ce = rbm.getReConstructionCrossEntropy();
+			
+			
+		ce = rbm.getReConstructionCrossEntropy();
+		System.out.println("ce: " + ce);
+		
+	}
+	
+	
 
 	/**
 	 * Tests to see if the Cross Entropy drops below a certain level after 1000 epochs
@@ -160,22 +274,45 @@ public class TestRestrictedBoltzmannMachine {
 	@Test
 	public void testCrossEntropyReconstruction() {
 		
-		Matrix input = buildTestInputDataset();
+		//Matrix input = buildTestInputDataset();
 		
-		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null);
+		double[][] data_simple = new double[][]
+				{
+					{1,1,1,0,0,0},
+					{0,0,0,1,1,1},
+					{1,1,1,0,0,0},
+					{0,0,1,1,1,0},
+					{0,0,1,1,0,0},
+					{0,0,1,1,1,0},
+					{0,0,1,1,1,0}
+					
+				};
+		
+		Matrix input = new DenseMatrix(data_simple);		
+		
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 4, null);
+		//rbm.connectionWeights.times( 1000 );
+		
+		MatrixUtils.debug_print( rbm.connectionWeights );
+		//MatrixUtils.debug_print( rbm.visibleBiasNeurons );
+		//MatrixUtils.debug_print( rbm.hiddenBiasNeurons );
+		
 		
 		double ce = 0;
-		/*
-		for (int x = 0; x < 10000; x++) {
-			rbm.contrastiveDivergence(0.001, 1, input);
+		
+		for (int x = 0; x < 10; x++) {
+			
+			//rbm.contrastiveDivergence(0.01, 1, input);
+			rbm.trainTillConvergence(0.01, 1, input);
 
 			ce = rbm.getReConstructionCrossEntropy();
 			
 			
 		
 		}
-		*/
-		rbm.trainTillConvergence(0.1, 1, input);
+		
+		//rbm.trainTillConvergence(0.1, 1, input);
+		
 		
 		ce = rbm.getReConstructionCrossEntropy();
 		System.out.println("ce: " + ce);
@@ -183,6 +320,7 @@ public class TestRestrictedBoltzmannMachine {
 		Matrix v = new DenseMatrix(new double[][]
 				{
 					{1, 1, 1, 0, 0, 0},
+					{0, 0, 0, 1, 1, 1}
 				}
 		);	
 
@@ -192,9 +330,11 @@ public class TestRestrictedBoltzmannMachine {
 		MatrixUtils.debug_print(recon);
 		
 		// "get the cross entropy somewhere near 0.3 and we're good"
-		assertEquals(0.5, ce, 0.2 );
+		//assertEquals(0.5, ce, 0.2 );
 		
-		
+//		MatrixUtils.debug_print( rbm.connectionWeights );
+//		MatrixUtils.debug_print( rbm.visibleBiasNeurons );
+//		MatrixUtils.debug_print( rbm.hiddenBiasNeurons );
 		
 /*
 		MatrixUtils.debug_print( rbm.hiddenBiasNeurons );

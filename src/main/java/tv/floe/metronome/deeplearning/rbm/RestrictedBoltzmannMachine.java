@@ -101,7 +101,11 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			
 			for(int c = 0; c < this.connectionWeights.numCols(); c++) { 
 			
-				this.connectionWeights.setQuick( r, c, u.sample() );
+				double init_weight = u.sample( ) * 1000;
+				
+				//System.out.println("w: " + init_weight);
+				
+				this.connectionWeights.setQuick( r, c, init_weight );
 			
 			}
 
@@ -152,6 +156,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			
 		}
 		
+		// actually performs CDk
 		NeuralNetworkGradient gradient = getGradient(new Object[]{k,learningRate});
 		
 		//W.addi(gradient.getwGradient());
@@ -229,17 +234,20 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 		// learningRate * delta(data - model)
 		Matrix wGradient = dataModelDelta.times( learningRate );
-		
+/*		
 		if (useRegularization) { 
 		
 			//wGradient.subi(W.muli(l2));
+			
+			//System.out.println("regularization! " + l2);
 			
 			// TODO: figure out if this should stick around like this
 			this.connectionWeights = this.connectionWeights.times(l2);
 			wGradient = wGradient.minus(this.connectionWeights);
 		
 		}
-		
+*/
+		/*
 		if (momentum != 0) {
 		
 			//wGradient.muli( 1 - momentum);
@@ -247,7 +255,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			wGradient = wGradient.times( 1 - momentum );
 			
 		}
-
+*/
 		//wGradient.divi(input.rows);
 		wGradient = wGradient.divide( this.trainingDataset.numRows() );
 		
@@ -504,7 +512,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 
 		//System.out.println("using Mallet's optimization");
 		
-		optimizer = new RestrictedBoltzmannMachineOptimizer(this, learningRate, new Object[]{k});
+		optimizer = new RestrictedBoltzmannMachineOptimizer(this, learningRate, new Object[]{ k });
 		optimizer.train(input);
 
 		

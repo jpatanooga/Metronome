@@ -57,7 +57,8 @@ public class RestrictedBoltzmannMachineOptimizer extends NeuralNetworkOptimizer 
 		
 		k = this.k;
 
-		NeuralNetworkGradient gradient = network.getGradient(new Object[]{k,lr});
+		// this is where the RBM actually performs CDk
+		NeuralNetworkGradient gradient = network.getGradient( new Object[]{ k, lr } );
 		
 		Matrix wAdd = gradient.getwGradient();
 		Matrix vBiasAdd = gradient.getvBiasGradient();
