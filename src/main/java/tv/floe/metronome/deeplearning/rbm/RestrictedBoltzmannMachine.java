@@ -128,6 +128,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 	}
 	
+	
 	public void setupCDkDebugBuffer(double[] buffer) {
 		this.debugWeightAddsBuffer = buffer;
 	}
@@ -495,9 +496,19 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	 */
 	@Override
 	public void trainTillConvergence(Matrix input, double learningRate, Object[] params) {
+		
+		if ( null != input) {
+			this.trainingDataset = input;
+		}
+		
 		// still java 6!
-		int k = (Integer) params[0];
-		trainTillConvergence(learningRate, k, input);
+		//int k = (Integer) params[0];
+		//trainTillConvergence(learningRate, k, input);
+		
+		optimizer = new RestrictedBoltzmannMachineOptimizer( this, learningRate, params );
+		optimizer.train( input );
+		
+		
 	}
 	
 	/**
