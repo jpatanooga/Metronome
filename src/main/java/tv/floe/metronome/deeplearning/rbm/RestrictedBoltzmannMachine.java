@@ -101,7 +101,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 			
 			for(int c = 0; c < this.connectionWeights.numCols(); c++) { 
 			
-				double init_weight = u.sample( ) * 1000;
+				double init_weight = u.sample( );
 				
 				//System.out.println("w: " + init_weight);
 				
