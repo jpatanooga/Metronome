@@ -82,6 +82,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	
 	protected Map<Integer,MatrixTransform> weightTransforms = new HashMap<Integer,MatrixTransform>();
 	
+	//hidden bias transforms; for initialization
+	private Map<Integer,MatrixTransform> hiddenBiasTransforms = new HashMap<Integer,MatrixTransform>();
+	//visible bias transforms for initialization
+	private Map<Integer,MatrixTransform> visibleBiasTransforms = new HashMap<Integer,MatrixTransform>();
+		
 	
 	/**
 	 * CTOR
@@ -193,6 +198,18 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		System.out.println( "DBN Network Stats:\n" + this.generateNetworkSizeReport() );
 		
 	}
+	
+	public synchronized Map<Integer, MatrixTransform> getHiddenBiasTransforms() {
+		
+		return hiddenBiasTransforms;
+		
+	}
+		 
+	public synchronized Map<Integer, MatrixTransform> getVisibleBiasTransforms() {
+		
+		return visibleBiasTransforms;
+		
+	}	
 	
 
 	public List<Matrix> feedForward() {
@@ -621,6 +638,10 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 			this.hiddenLayers[ i ] = network.hiddenLayers[ i ].clone();
 			
 		}
+		
+		this.weightTransforms = network.weightTransforms;
+		this.visibleBiasTransforms = network.visibleBiasTransforms;
+		this.hiddenBiasTransforms = network.hiddenBiasTransforms;
 
 
 	}	
@@ -677,10 +698,25 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 		for (int i = 0; i < this.preTrainingLayers.length; i++) {
 			
-			if (weightTransforms.containsKey(i)) { 
+			if (weightTransforms.containsKey(i)) {
+				
 		//		layers[i].setW(weightTransforms.get(i).apply(layers[i].getW()));
 				this.preTrainingLayers[i].setConnectionWeights( weightTransforms.get(i).apply( this.preTrainingLayers[i].getConnectionWeights() ) );
+				
 			}
+			
+			if (hiddenBiasTransforms.containsKey(i)) {
+				
+				preTrainingLayers[i].sethBias(getHiddenBiasTransforms().get(i).apply(preTrainingLayers[i].getHiddenBias()));
+				
+			}
+			
+ 			if (this.visibleBiasTransforms.containsKey(i)) {
+ 				
+ 				preTrainingLayers[i].setVisibleBias(getVisibleBiasTransforms().get(i).apply(preTrainingLayers[i].getVisibleBias()));
+ 				
+ 			}
+			
 			
 			
 			
