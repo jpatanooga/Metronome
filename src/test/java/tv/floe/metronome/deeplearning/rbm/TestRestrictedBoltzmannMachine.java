@@ -292,7 +292,7 @@ public class TestRestrictedBoltzmannMachine {
 		
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 4, null);
 		rbm.useRegularization = false;
-//		rbm.connectionWeights = rbm.connectionWeights.times( 100 );
+		rbm.connectionWeights = rbm.connectionWeights.times( 1000 );
 		
 		//MatrixUtils.debug_print( rbm.connectionWeights );
 		//MatrixUtils.debug_print( rbm.visibleBiasNeurons );

@@ -24,17 +24,22 @@ public class TestNeuralNetworkVisualization {
 				.withMomentum(0).build();
 */
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine( 784, 400, null );
+		rbm.useRegularization = false;
+		rbm.momentum = 0 ;
+		rbm.sparsity = 0.01;
 
+		double learningRate = 0.001;
 		
 		Matrix input = fetcher.next().getFirst();
 		rbm.trainingDataset = input;
 
 		NeuralNetworkVisualizer plotter = new NeuralNetworkVisualizer();
-		NeuralNetworkGradient gradient = rbm.getGradient(new Object[]{1,0.01});
+//		NeuralNetworkGradient gradient = rbm.getGradient(new Object[]{1,0.01});
 
-		for(int i = 0; i < 20; i++) {
+		for(int i = 0; i < 1; i++) {
 			
-			rbm.trainTillConvergence(0.01, 1, input);
+			//rbm.trainTillConvergence(0.01, 1, input);
+			rbm.trainTillConvergence(input, learningRate, new Object[]{ 1, learningRate, 2 } );
 			System.out.println( "> Epoch > " + i );
 			
 		}

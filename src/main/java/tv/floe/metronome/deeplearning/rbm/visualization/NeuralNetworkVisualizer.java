@@ -55,7 +55,13 @@ public class NeuralNetworkVisualizer {
 	public void renderFilter(Matrix w,int r,int c,long length) {
 		try {
 			String filePath = writeMatrix(w);
-			Process is = Runtime.getRuntime().exec("python /tmp/plot.py filter " + filePath + " " + r + " " + c + " " + length);
+			
+			String python_cmd = "python /tmp/plot.py filter " + filePath + " " + r + " " + c + " " + length;
+			
+			System.out.println(python_cmd);
+			
+			//Process is = Runtime.getRuntime().exec("python /tmp/plot.py filter " + filePath + " " + r + " " + c + " " + length);
+			Process is = Runtime.getRuntime().exec( python_cmd );
 			log.info("Std out " + IOUtils.readLines(is.getInputStream()).toString());
 			log.info("Rendering weights " + filePath);
 			log.error(IOUtils.readLines(is.getErrorStream()).toString());
@@ -113,7 +119,15 @@ public class NeuralNetworkVisualizer {
 			
 			String paths = StringUtils.join(path,",");
 
-			Process is = Runtime.getRuntime().exec("python /tmp/plot.py multi " + paths);
+			String python_cmd = "python /tmp/plot.py multi " + paths;
+			
+			System.out.println(python_cmd);
+			
+			//Process is = Runtime.getRuntime().exec("python /tmp/plot.py filter " + filePath + " " + r + " " + c + " " + length);
+			Process is = Runtime.getRuntime().exec( python_cmd );
+			
+			
+//			Process is = Runtime.getRuntime().exec("python /tmp/plot.py multi " + paths);
 
 			log.info("Rendering multiple matrices... ");
 			log.info("Std out " + IOUtils.readLines(is.getInputStream()).toString());
@@ -132,7 +146,7 @@ public class NeuralNetworkVisualizer {
 		String filePath = System.getProperty("java.io.tmpdir") + File.separator +  UUID.randomUUID().toString();
 		File write = new File(filePath);
 		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(write,true));
-		write.deleteOnExit();
+		//write.deleteOnExit();
 		
 		for(int i = 0; i < matrix.numRows(); i++) {
 		/*
@@ -181,7 +195,13 @@ public class NeuralNetworkVisualizer {
 		try {
 
 			String filePath = writeMatrix( network.getConnectionWeights() ); 
-			Process is = Runtime.getRuntime().exec("python /tmp/plot.py weights " + filePath);
+
+			String python_cmd = "python /tmp/plot.py weights " + filePath;
+			System.out.println(python_cmd);			
+			Process is = Runtime.getRuntime().exec( python_cmd );
+			
+			
+//			Process is = Runtime.getRuntime().exec("python /tmp/plot.py weights " + filePath);
 
 			log.info("Rendering weights " + filePath);
 			log.error(IOUtils.readLines(is.getErrorStream()).toString());

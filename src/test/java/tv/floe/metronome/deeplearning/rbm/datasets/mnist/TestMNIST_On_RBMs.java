@@ -14,6 +14,7 @@ import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.deeplearning.rbm.visualization.DrawMnistGreyscale;
+import tv.floe.metronome.deeplearning.rbm.visualization.RBMRenderer;
 import tv.floe.metronome.math.MatrixUtils;
 
 
@@ -67,6 +68,8 @@ public class TestMNIST_On_RBMs {
 //		d2.title = "TEST";
 		d2.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "/" + strCE + "_ce_" + number + "_test.png");
 
+		//RBMRenderer rbm_hbias_test = new RBMRenderer();
+		//rbm_hbias_test.renderHiddenBiases(100, 100, draw2, "/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "/RBM_RENDER_TEST_" + strCE + "_ce_" + number + "_test.png");
 		
 		
 /*		Thread.sleep(2000);
@@ -77,12 +80,40 @@ public class TestMNIST_On_RBMs {
 		
 	}	
 	
+
+	private void renderhBiasToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws InterruptedException {
+
+		String strCE = String.valueOf(CE).substring(0, 5);
+		
+		
+
+		RBMRenderer rbm_hbias_test = new RBMRenderer();
+		rbm_hbias_test.renderHiddenBiases(100, 100, rbm.hiddenBiasNeurons, "/tmp/Metronome/RBM/" + UUIDForRun + "/hbias_" + strCE + "_ce.png");
+		
+		
+	}		
+	
+	private void renderActivationsToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws InterruptedException {
+		
+		String strCE = String.valueOf(CE).substring(0, 5);
+
+		// Matrix hbiasMean = network.getInput().mmul(network.getW()).addRowVector(network.gethBias());
+		
+		Matrix hbiasMean = MatrixUtils.addRowVector( rbm.getInput().times( rbm.connectionWeights ), rbm.getHiddenBias().viewRow(0) );
+
+		RBMRenderer renderer = new RBMRenderer();
+		//rbm_hbias_test.renderHiddenBiases(100, 100, hbiasMean, "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png");
+		
+		renderer.renderActivations(100, 100, hbiasMean, "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png");
+		
+	}
+	
 	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input, boolean toDisk, String CE, boolean renderRealImage) throws InterruptedException {
 		
 
 		Matrix reconstruct_all = rbm.reconstruct( input.getFirst() );
 
-//		log.info("Negative log likelihood " + rbm.getReConstructionCrossEntropy());
+		log.info("Negative log likelihood " + rbm.getReConstructionCrossEntropy());
 
 		System.out.println(" ----- Visualizing Reconstructions ------");
 		
@@ -104,20 +135,30 @@ public class TestMNIST_On_RBMs {
 				
 				renderExampleToDisk(draw1, reconstructed_row_image, draw2, String.valueOf( input.get(j).getSecond().viewRow(0).maxValueIndex() ), CE, renderRealImage);
 				
+				 
+				
+			
+				
 			} else {
 				renderExample(draw1, reconstructed_row_image, draw2);
 			}
 			
 		}
+
+//		renderhBiasToDisk( rbm.hiddenBiasNeurons, String.valueOf( input.get(j).getSecond().viewRow(0).maxValueIndex() ), CE, renderRealImage);
+		
+		//this.renderhBiasToDisk(rbm, CE);
+		this.renderActivationsToDisk(rbm, CE);
+		
 		
 	}
 	
 	@Test
 	public void testMnist() throws Exception {
-		MnistDataSetIterator fetcher = new MnistDataSetIterator(100,100);
+		MnistDataSetIterator fetcher = new MnistDataSetIterator(100,200);
 		MersenneTwister rand = new MersenneTwister(123);
 
-		double learningRate = 0.01;
+		double learningRate = 0.001;
 		
 		int[] batchSteps = { 250, 200, 150, 100, 50, 25, 5 };
 		
@@ -128,19 +169,24 @@ public class TestMNIST_On_RBMs {
 				.withMomentum(0).build();
 */
 		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine( 784, 400, null );
-
+		rbm.useRegularization = false;
+		//rbm.scaleWeights( 1000 );
+		rbm.momentum = 0 ;
+		rbm.sparsity = 0.01;
 		// TODO: investigate "render weights"
 
 
 
 		rbm.trainingDataset = first.getFirst();
-		
+
+		//MatrixUtils.debug_print( rbm.trainingDataset );
 
 		System.out.println(" ----- Training ------");
 		
 		//for(int i = 0; i < 2; i++) {
 		int epoch = 0;
 		
+		System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
 		
 		for (int stepIndex = 0; stepIndex < batchSteps.length; stepIndex++ ) {
 		
@@ -151,7 +197,9 @@ public class TestMNIST_On_RBMs {
 				System.out.println("Epoch " + epoch + " Negative Log Likelhood: " + rbm.getReConstructionCrossEntropy() );
 				
 				//rbm.trainTillConvergence( first.getFirst(), learningRate, new Object[]{ 1 } );
-				rbm.trainTillConvergence(learningRate, 1, first.getFirst());
+				//rbm.trainTillConvergence(learningRate, 1, first.getFirst());
+				// new Object[]{1,0.01,1000}
+				rbm.trainTillConvergence(first.getFirst(), learningRate, new Object[]{ 1, learningRate, 10 } );
 				
 				epoch++;
 				
