@@ -95,16 +95,19 @@ public class TestMNIST_On_RBMs {
 	
 	private void renderActivationsToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws InterruptedException {
 		
-		String strCE = String.valueOf(CE).substring(0, 5);
+		String strCE = CE;
+		if (CE.equals("init") == false) {
+			strCE = String.valueOf(CE).substring(0, 5);
+		}
 
 		// Matrix hbiasMean = network.getInput().mmul(network.getW()).addRowVector(network.gethBias());
 		
-		Matrix hbiasMean = MatrixUtils.addRowVector( rbm.getInput().times( rbm.connectionWeights ), rbm.getHiddenBias().viewRow(0) );
+		Matrix hbiasMean = MatrixUtils.sigmoid( MatrixUtils.addRowVector( rbm.getInput().times( rbm.connectionWeights ), rbm.getHiddenBias().viewRow(0) ) );
 
 		RBMRenderer renderer = new RBMRenderer();
 		//rbm_hbias_test.renderHiddenBiases(100, 100, hbiasMean, "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png");
 		
-		renderer.renderActivations(100, 100, hbiasMean, "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png");
+		renderer.renderActivations(100, 100, hbiasMean, "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png", 1);
 		
 	}
 	
@@ -181,6 +184,10 @@ public class TestMNIST_On_RBMs {
 
 		//MatrixUtils.debug_print( rbm.trainingDataset );
 
+		// render base activations pre train
+		
+		this.renderActivationsToDisk(rbm, "init");
+		
 		System.out.println(" ----- Training ------");
 		
 		//for(int i = 0; i < 2; i++) {

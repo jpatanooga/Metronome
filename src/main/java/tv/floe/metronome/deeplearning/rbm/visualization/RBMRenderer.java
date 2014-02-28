@@ -107,46 +107,78 @@ public class RBMRenderer {
 	
 	
 
-	public void renderActivations(int heightOffset, int widthOffset, Matrix render_data, String filename) {
+	public void renderActivations(int heightOffset, int widthOffset, Matrix activation_data, String filename, int scale ) {
 		
-		this.width = render_data.numCols();
-		this.height = render_data.numRows();
+		this.width = activation_data.numCols();
+		this.height = activation_data.numRows();
 		
 //		BufferedImage image = new BufferedImage(width, height,  
 //			    BufferedImage.TYPE_BYTE_GRAY);
+		
+		System.out.println( "----- renderActivations ------" );
 		
 		img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 		this.heightOffset = heightOffset;
 		this.widthOffset = widthOffset;
 		WritableRaster r = img.getRaster();
-		int[] equiv = new int[ MatrixUtils.length( render_data ) ];
+		int[] equiv = new int[ MatrixUtils.length( activation_data ) ];
 		
-		double max = MatrixUtils.max(render_data);
-		double min = MatrixUtils.min(render_data);
+		double max = 0.1 * scale; //MatrixUtils.max(render_data);
+		double min = -0.1 * scale; //MatrixUtils.min(render_data);
 		double range = max - min;
 		double mid_of_range = range / 2;
+		/*
+		System.out.println( "projected Max: " + max );
+		System.out.println( "projected Min: " + min );
+		System.out.println( "Range: " + range );
+		System.out.println( "MiddleRange: " + mid_of_range );
 		
-		Matrix normalized_render_data = render_data.plus( mid_of_range ).divide(range);
+
+		System.out.println( "\norig activation_data data: " );
+		//MatrixUtils.debug_print( render_data );
+		MatrixUtils.debug_print_row(activation_data, 0);
+		*/
+/*
+		double normalized_max = MatrixUtils.max( activation_data );
+		double normalized_min = MatrixUtils.min( activation_data );
+		
+		System.out.println( "actual Max: " + normalized_max );
+		System.out.println( "actual Min: " + normalized_min );
+	*/
+		
+//		Matrix normalized_render_data = activation_data.plus( mid_of_range ).divide(range);
+		
+		
+		
+		//System.out.println( "\nnormalized render data: " );
+		//MatrixUtils.debug_print( normalized_render_data );
+		/*
+		normalized_max = MatrixUtils.max( normalized_render_data );
+		normalized_min = MatrixUtils.min( normalized_render_data );
+		
+		System.out.println( "Max: " + normalized_max );
+		System.out.println( "Min: " + normalized_min );
+		*/
 		
 		for (int i = 0; i < equiv.length; i++) {
 			
 			//equiv[i] = (int) Math.round( MatrixUtils.getElement(render_data, i) );
-			equiv[i] = (int) Math.round( MatrixUtils.getElement(normalized_render_data, i) * 256 );
+			equiv[i] = (int) Math.round( MatrixUtils.getElement(activation_data, i) * 255 );
 			//if ( i > 50 ) {
 			//	equiv[i] = i;
 			//} else {
-			//	equiv[i] = -228;
+				//equiv[i] = 0;
 			//}
 			//equiv[i] = i;
 			//int tempInt = equiv[i];
 			//equiv[i] = ( ( tempInt << 24 ) | ( tempInt << 16 ) | tempInt ) ; 
-			//System.out.println( "> " + equiv[i] );
+		//	System.out.println( "> " + equiv[i] );
 			
 		}
 		
 		//MatrixUtils.debug_print(render_data);
 		
-		System.out.println( "activations size: Cols: " + render_data.numCols() + ", Rows: " + render_data.numRows()  );
+		System.out.println( "activations size: Cols: " + activation_data.numCols() + ", Rows: " + activation_data.numRows()  );
 		
 		//r.setDataElements(0, 0, width, height, equiv);
 		r.setPixels(0, 0, width, height, equiv);
