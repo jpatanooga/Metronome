@@ -105,6 +105,37 @@ public class RBMRenderer {
 		
 	}
 	
+	/**
+	 * 
+	 * Figure 2. Histograms of hBias, W, vBias (top row) 
+	 * and the last batch updates to each (bottom row). 
+	 * 
+	 */
+	public void renderHistograms() {
+		
+		
+		
+	}
+	
+	/**
+	 * 
+	 * Once the probability image and weight histograms are 
+	 * behaving satisfactorily, we plot the learned filter 
+	 * for each hidden neuron, one per column of W. Each filter 
+	 * is of the same dimension as the input data, and it is 
+	 * most useful to visualize the filters in the same way 
+	 * as the input data is visualized.
+	 * 
+	 */
+	public void renderFilters() {
+		
+		// for each hidden neuron
+		
+			// plot the learned filter (same dim as the input data)
+		
+		
+	}
+	
 	
 
 	public void renderActivations(int heightOffset, int widthOffset, Matrix activation_data, String filename, int scale ) {
@@ -112,8 +143,6 @@ public class RBMRenderer {
 		this.width = activation_data.numCols();
 		this.height = activation_data.numRows();
 		
-//		BufferedImage image = new BufferedImage(width, height,  
-//			    BufferedImage.TYPE_BYTE_GRAY);
 		
 		System.out.println( "----- renderActivations ------" );
 		
@@ -126,64 +155,19 @@ public class RBMRenderer {
 		double max = 0.1 * scale; //MatrixUtils.max(render_data);
 		double min = -0.1 * scale; //MatrixUtils.min(render_data);
 		double range = max - min;
-		double mid_of_range = range / 2;
-		/*
-		System.out.println( "projected Max: " + max );
-		System.out.println( "projected Min: " + min );
-		System.out.println( "Range: " + range );
-		System.out.println( "MiddleRange: " + mid_of_range );
-		
 
-		System.out.println( "\norig activation_data data: " );
-		//MatrixUtils.debug_print( render_data );
-		MatrixUtils.debug_print_row(activation_data, 0);
-		*/
-/*
-		double normalized_max = MatrixUtils.max( activation_data );
-		double normalized_min = MatrixUtils.min( activation_data );
-		
-		System.out.println( "actual Max: " + normalized_max );
-		System.out.println( "actual Min: " + normalized_min );
-	*/
-		
-//		Matrix normalized_render_data = activation_data.plus( mid_of_range ).divide(range);
-		
-		
-		
-		//System.out.println( "\nnormalized render data: " );
-		//MatrixUtils.debug_print( normalized_render_data );
-		/*
-		normalized_max = MatrixUtils.max( normalized_render_data );
-		normalized_min = MatrixUtils.min( normalized_render_data );
-		
-		System.out.println( "Max: " + normalized_max );
-		System.out.println( "Min: " + normalized_min );
-		*/
 		
 		for (int i = 0; i < equiv.length; i++) {
 			
-			//equiv[i] = (int) Math.round( MatrixUtils.getElement(render_data, i) );
 			equiv[i] = (int) Math.round( MatrixUtils.getElement(activation_data, i) * 255 );
-			//if ( i > 50 ) {
-			//	equiv[i] = i;
-			//} else {
-				//equiv[i] = 0;
-			//}
-			//equiv[i] = i;
-			//int tempInt = equiv[i];
-			//equiv[i] = ( ( tempInt << 24 ) | ( tempInt << 16 ) | tempInt ) ; 
-		//	System.out.println( "> " + equiv[i] );
 			
 		}
 		
-		//MatrixUtils.debug_print(render_data);
 		
 		System.out.println( "activations size: Cols: " + activation_data.numCols() + ", Rows: " + activation_data.numRows()  );
 		
-		//r.setDataElements(0, 0, width, height, equiv);
 		r.setPixels(0, 0, width, height, equiv);
 		
-		//d.saveToDisk("/tmp/Metronome/RBM/" + UUIDForRun + "/" + number + "/" + number + "_real.png");
 		this.saveToDisk(filename);
 		
 	}	
