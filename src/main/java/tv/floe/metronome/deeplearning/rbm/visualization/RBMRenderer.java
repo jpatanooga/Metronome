@@ -8,6 +8,8 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -16,6 +18,7 @@ import javax.swing.JLabel;
 
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
 
 public class RBMRenderer {
@@ -111,8 +114,41 @@ public class RBMRenderer {
 	 * and the last batch updates to each (bottom row). 
 	 * 
 	 */
-	public void renderHistograms() {
+	public void renderAllHistograms(RestrictedBoltzmannMachine rbm) {
 		
+		
+		
+	}
+	
+	/**
+	 * Groups values into 1 of 10 bins, sums, and renders
+	 * 
+	 * @param data
+	 * @param numberBins
+	 */
+	public void renderHistogram(Matrix data, int numberBins) {
+		
+		// TODO: how are double mapped into bins?
+		// 
+		
+		// Map< bin-ID, count >
+		Map<Integer, Integer> mapHistory = new TreeMap<Integer, Integer>();
+		for ( int row = 0; row < data.numRows(); row++ ) {
+			for (int col = 0; col < data.numCols(); col++ ) {
+		 			
+		 			// at this point we need round values into bins
+		 			
+	                int value = 0; //data[c][r];
+	                int amount = 0;
+	                if (mapHistory.containsKey(value)) {
+	                    amount = mapHistory.get(value);
+	                    amount++;
+	                } else {
+	                    amount = 1;
+	                }
+	                mapHistory.put(value, amount);
+			}
+		}		
 		
 		
 	}
