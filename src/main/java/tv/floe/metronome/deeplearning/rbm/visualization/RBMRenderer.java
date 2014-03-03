@@ -129,16 +129,29 @@ public class RBMRenderer {
 	public void renderHistogram(Matrix data, int numberBins) {
 		
 		// TODO: how are double mapped into bins?
+		// TODO: calc max
+		// TODO: calc bins - we want 10 bins
 		// 
+		
+		int binCount = 10;
+		double min = data.get(0, 0);
+		double max = data.get(0, 0);
+		double range = max - min;
+		double stepSize = range / binCount;
+		
+		// calc bins
 		
 		// Map< bin-ID, count >
 		Map<Integer, Integer> mapHistory = new TreeMap<Integer, Integer>();
+		
 		for ( int row = 0; row < data.numRows(); row++ ) {
+			
 			for (int col = 0; col < data.numCols(); col++ ) {
-		 			
+		 	
+				double value = data.get( row, col );
+				
 		 			// at this point we need round values into bins
-		 			
-	                int value = 0; //data[c][r];
+		 			/*
 	                int amount = 0;
 	                if (mapHistory.containsKey(value)) {
 	                    amount = mapHistory.get(value);
@@ -147,7 +160,9 @@ public class RBMRenderer {
 	                    amount = 1;
 	                }
 	                mapHistory.put(value, amount);
+	                */
 			}
+			
 		}		
 		
 		

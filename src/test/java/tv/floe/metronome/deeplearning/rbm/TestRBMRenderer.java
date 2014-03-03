@@ -123,5 +123,11 @@ public class TestRBMRenderer {
 		renderActivationsToDisk(rbm, "_init", 1);		
 		
 	}
+	
+	public void testGenerateHistogramBins() {
+		
+		
+		
+	}
 
 }
