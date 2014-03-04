@@ -3,6 +3,7 @@ package tv.floe.metronome.deeplearning.rbm;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.mahout.math.DenseMatrix;
@@ -13,6 +14,7 @@ import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
 import tv.floe.metronome.deeplearning.rbm.visualization.RBMRenderer;
 import tv.floe.metronome.math.MatrixUtils;
+import tv.floe.metronome.types.Pair;
 
 public class TestRBMRenderer {
 
@@ -124,8 +126,49 @@ public class TestRBMRenderer {
 		
 	}
 	
+	@Test
+	public void testComputeHistogramBucketIndex() {
+		
+		RBMRenderer renderer = new RBMRenderer();
+
+		int bin = renderer.computeHistogramBucketIndex( -0.2, 0.05, -0.1, 10 );
+		
+		System.out.println("bin: " + bin);
+		
+		assertEquals( 2, bin );
+		
+	}
+	
+	@Test
 	public void testGenerateHistogramBins() {
 		
+		double[][] data_simple = new double[][]
+				{
+					{1,1,1,0,0,0},
+					{0,0,0,1,1,1},
+					{1,1,1,0,0,0},
+					{0,0,1,1,1,0},
+					{0,0,1,1,0,0},
+					{0,0,1,1,1,0},
+					{0,0,1,1,1,0}
+					
+				};
+		
+		Matrix input = new DenseMatrix(data_simple);		
+		
+		
+		RBMRenderer renderer = new RBMRenderer();
+		
+		Map<Integer, Pair<String, Integer>> map = renderer.generateHistogramBuckets( input, 2 ); 
+		
+		for (Map.Entry<Integer, Pair<String, Integer>> entry : map.entrySet()) {
+			
+			Integer key = entry.getKey();
+			Pair<String, Integer> value = entry.getValue();
+
+			System.out.println(key + " => " + value.getFirst() + ",  " + value.getSecond());
+			  
+		}
 		
 		
 	}

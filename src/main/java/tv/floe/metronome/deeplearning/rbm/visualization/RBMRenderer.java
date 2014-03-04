@@ -20,6 +20,7 @@ import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
+import tv.floe.metronome.types.Pair;
 
 public class RBMRenderer {
 
@@ -120,6 +121,115 @@ public class RBMRenderer {
 		
 	}
 	
+	public int computeHistogramBucketIndex(double min, double stepSize, double value, int numberBins) {
+		
+		for ( int x = 0; x < numberBins; x++ ) {
+			
+			double tmp = (x * stepSize) + min;
+			
+			if ( value <= tmp ) {
+				return x;
+			}
+			
+		}
+		
+		return -1;
+		
+	}
+	
+	private String buildBucketLabel(int bucketIndex, double stepSize, double min) {
+		
+		double val = min + (bucketIndex * stepSize);
+		String ret = "" + val;
+		
+		return ret;
+				
+	}
+	
+	/**
+	 * Take some matrix input data and a bucket count and compute:
+	 * 
+	 * - a list of N buckets, each with:
+	 * 1. a bucket label
+	 * 2. a bucket count
+	 * 
+	 * over the input dataset
+	 * 
+	 * @param data
+	 * @param numberBins
+	 * @return
+	 */
+	public Map<Integer, Pair<String, Integer>> generateHistogramBuckets(Matrix data, int numberBins) {
+		
+		//Pair<> p = new Pair<>();
+		Map<Integer, Pair<String, Integer>> mapHistory = new TreeMap<Integer, Pair<String, Integer>>(); 
+		
+		//int binCount = 10;
+		double min = MatrixUtils.min(data); //data.get(0, 0);
+		double max = MatrixUtils.max(data); //data.get(0, 0);
+		
+		double range = max - min;
+		double stepSize = range / numberBins;
+		
+		System.out.println( "min: " + min );
+		System.out.println( "max: " + max );
+		System.out.println( "range: " + range );
+		System.out.println( "stepSize: " + stepSize );
+		
+		
+		for ( int row = 0; row < data.numRows(); row++ ) {
+			
+			for (int col = 0; col < data.numCols(); col++ ) {
+		 	
+				double matrix_value = data.get( row, col );
+				
+		 		// at this point we need round values into bins
+				
+				int bucket_key = this.computeHistogramBucketIndex(min, stepSize, matrix_value, numberBins);
+				
+                //int amount = 0;
+				Pair<String, Integer> entry = null;
+				
+                if (mapHistory.containsKey( bucket_key )) {
+                	
+                	// entry exists, increment
+                	
+                    entry = mapHistory.get( bucket_key );
+                    //amount++;
+                    int tmp = entry.getSecond(); //. = entry.getSecond() + 1;
+                    tmp++;
+                    
+                    
+                } else {
+                	
+                	// entry does not exit, create, insert
+                    //amount = 1;
+                	
+                	// create new key
+                	//bucket_key = 1;
+                	
+                	// bucket label
+                	String bucket_label = buildBucketLabel(bucket_key, stepSize, min);
+                	
+                	// new entry
+                	entry = new Pair<String, Integer>(bucket_label, 1);
+                
+                	// update data structure
+                	mapHistory.put( bucket_key, entry );
+                }
+                
+                
+                
+			}
+			
+		}	
+		
+		
+		
+		return mapHistory;
+	}
+	
+	
 	/**
 	 * Groups values into 1 of 10 bins, sums, and renders
 	 * 
@@ -133,11 +243,6 @@ public class RBMRenderer {
 		// TODO: calc bins - we want 10 bins
 		// 
 		
-		int binCount = 10;
-		double min = data.get(0, 0);
-		double max = data.get(0, 0);
-		double range = max - min;
-		double stepSize = range / binCount;
 		
 		// calc bins
 		
