@@ -127,15 +127,52 @@ public class RBMRenderer {
 			
 			double tmp = (x * stepSize) + min;
 			
-			if ( value <= tmp ) {
+			if ( value >= tmp && value <= (tmp + stepSize) ) {
 				return x;
 			}
 			
 		}
 		
-		return -1;
+		return -10;
 		
 	}
+	
+	/**
+	 * 
+	 * This is faster but produces rounding errors
+	 * 
+	 * @param min
+	 * @param stepSize
+	 * @param value
+	 * @param numberBins
+	 * @return
+	 */
+	public int computeHistogramBucketIndexAlt(double min, double stepSize, double value, int numberBins) {
+		
+		
+	//	System.out.println("pre round: val: " + value + ", delta on min: " + (value - min) + ", bin-calc: " + ((value - min) / stepSize));
+		System.out.println("pre round: val: " + value + ", bin-calc: " + ((value - min) / stepSize));
+		
+		
+		
+		// int bin = (int) ((value - min) / stepSize);
+		
+		int bin = (int) (((value - min)) / (stepSize));
+		
+		/*
+		for ( int x = 0; x < numberBins; x++ ) {
+			
+			double tmp = (x * stepSize) + min;
+			
+			if ( value <= tmp ) {
+				return x;
+			}
+			
+		}
+		*/
+		return bin;
+		
+	}	
 	
 	private String buildBucketLabel(int bucketIndex, double stepSize, double min) {
 		
@@ -159,10 +196,12 @@ public class RBMRenderer {
 	 * @param numberBins
 	 * @return
 	 */
-	public Map<Integer, Pair<String, Integer>> generateHistogramBuckets(Matrix data, int numberBins) {
+	//public Map<Integer, Pair<String, Integer>> generateHistogramBuckets(Matrix data, int numberBins) {
+	public Map<Integer, Integer> generateHistogramBuckets(Matrix data, int numberBins) {
 		
 		//Pair<> p = new Pair<>();
-		Map<Integer, Pair<String, Integer>> mapHistory = new TreeMap<Integer, Pair<String, Integer>>(); 
+//		Map<Integer, Pair<String, Integer>> mapHistory = new TreeMap<Integer, Pair<String, Integer>>(); 
+		Map<Integer, Integer> mapHistory = new TreeMap<Integer, Integer>();
 		
 		//int binCount = 10;
 		double min = MatrixUtils.min(data); //data.get(0, 0);
@@ -175,7 +214,9 @@ public class RBMRenderer {
 		System.out.println( "max: " + max );
 		System.out.println( "range: " + range );
 		System.out.println( "stepSize: " + stepSize );
+		System.out.println( "numberBins: " + numberBins );
 		
+		//stepSize = 1;
 		
 		for ( int row = 0; row < data.numRows(); row++ ) {
 			
@@ -187,8 +228,13 @@ public class RBMRenderer {
 				
 				int bucket_key = this.computeHistogramBucketIndex(min, stepSize, matrix_value, numberBins);
 				
+			//	int bucket_key_alt = this.computeHistogramBucketIndexAlt(min, stepSize, matrix_value, numberBins);
+
+			//	System.out.println("> bin key: " + bucket_key + ", alt: " + bucket_key_alt);
+				
                 //int amount = 0;
-				Pair<String, Integer> entry = null;
+				//Pair<String, Integer> entry = null;
+				int entry = 0;
 				
                 if (mapHistory.containsKey( bucket_key )) {
                 	
@@ -196,9 +242,11 @@ public class RBMRenderer {
                 	
                     entry = mapHistory.get( bucket_key );
                     //amount++;
-                    int tmp = entry.getSecond(); //. = entry.getSecond() + 1;
-                    tmp++;
+                    //int tmp = entry.getSecond(); //. = entry.getSecond() + 1;
+                    //tmp++;
+                    entry++;
                     
+                    mapHistory.put( bucket_key, entry );
                     
                 } else {
                 	
@@ -212,7 +260,7 @@ public class RBMRenderer {
                 	String bucket_label = buildBucketLabel(bucket_key, stepSize, min);
                 	
                 	// new entry
-                	entry = new Pair<String, Integer>(bucket_label, 1);
+                	entry = 1; // new Pair<String, Integer>(bucket_label, 1);
                 
                 	// update data structure
                 	mapHistory.put( bucket_key, entry );
