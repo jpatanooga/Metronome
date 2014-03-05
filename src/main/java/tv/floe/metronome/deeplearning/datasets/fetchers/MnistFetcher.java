@@ -28,6 +28,9 @@ public class MnistFetcher {
 	
 	
 	public  File downloadAndUntar() throws IOException {
+		
+		System.out.println("Downloading and Untaring MNIST dataset from network.");
+		
 		if(fileDir != null) {
 			return fileDir;
 		}

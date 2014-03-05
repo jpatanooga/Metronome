@@ -29,9 +29,11 @@ public class MnistDataFetcher extends BaseDataFetcher implements DataSetFetcher 
 	public final static int NUM_EXAMPLES = 60000;
 
 	public MnistDataFetcher() throws IOException {
-		if(!new File("/tmp/mnist").exists())
+		if (!new File("/tmp/mnist").exists()) {
 			new MnistFetcher().downloadAndUntar();
-		man = new MnistManager("/tmp/MNIST/" + MnistFetcher.trainingFilesFilename_unzipped,"/tmp/MNIST/" + MnistFetcher.trainingFileLabelsFilename_unzipped);
+		}
+		
+		man = new MnistManager( "/tmp/MNIST/" + MnistFetcher.trainingFilesFilename_unzipped, "/tmp/MNIST/" + MnistFetcher.trainingFileLabelsFilename_unzipped );
 		numOutcomes = 10;
 		totalExamples = NUM_EXAMPLES;
 		//1 based cursor
