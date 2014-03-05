@@ -1,7 +1,10 @@
 package tv.floe.metronome.deeplearning.rbm.visualization;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -281,43 +284,114 @@ public class RBMRenderer {
 	/**
 	 * Groups values into 1 of 10 bins, sums, and renders
 	 * 
+	 * NOTE: this is "render histogram BS code";
+	 * - I'm not exactly concerned with how pretty it is.
+	 * 
 	 * @param data
 	 * @param numberBins
 	 */
 	public void renderHistogram(Matrix data, int numberBins) {
 		
-		// TODO: how are double mapped into bins?
-		// TODO: calc max
-		// TODO: calc bins - we want 10 bins
-		// 
+		Map<Integer, Integer> mapHistory = this.generateHistogramBuckets( data, numberBins );
+
+		int xOffset = 50;
+		int yOffset = -50;
+		
+		int graphWidth = 600;
+		int graphHeight = 400;
+
+		BufferedImage img = new BufferedImage( graphWidth, graphHeight, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2d = img.createGraphics();
 		
 		
-		// calc bins
+		final int BAR_WIDTH = 40;
+	    final int X_POSITION = 0;
+	    final int Y_POSITION = 200;
+	    int MIN_BAR_WIDTH = 4;
 		
-		// Map< bin-ID, count >
-		Map<Integer, Integer> mapHistory = new TreeMap<Integer, Integer>();
+		g2d.setColor(Color.LIGHT_GRAY);
+        //g2d.drawRect(xOffset, yOffset, graphWidth, graphHeight);
+        g2d.fillRect(0, 0, graphWidth, graphHeight);
+		//g2d.fill(new Rectangle(x, y, width, height));
+        
+   //     int barWidth = Math.max(MIN_BAR_WIDTH,
+   //             (int) Math.floor((float) graphWidth
+   //             / (float) mapHistory.size()));
+        int barWidth = BAR_WIDTH;
+        
+        System.out.println("width = " + graphWidth + "; size = "
+                + mapHistory.size() + "; barWidth = " + barWidth);
+        
+        int maxValue = 0;
+        for (Integer key : mapHistory.keySet()) {
+            int value = mapHistory.get(key);
+            maxValue = Math.max(maxValue, value);
+        }
+        
+        // draw Y-scale
+        
+        System.out.println( "max-value: " + maxValue );
+        
+        double plotAreaHeight = (graphHeight + yOffset);
+        
+        double yScaleStepSize = plotAreaHeight / 4;
+        
+        double yLabelStepSize = (double)maxValue / 4.0;
+        
+        for ( int yStep = 0; yStep < 5; yStep++ ) {
+        	
+        	double curLabel = yStep * yLabelStepSize ;
+        	
+            int curY = (graphHeight + yOffset) - Math.round(((float) (curLabel)
+                    / (float) maxValue) * (graphHeight + yOffset - 20));
+        	
+            System.out.println( "curY: " + curY );
+        	
+            g2d.setColor(Color.BLACK);
+            g2d.drawString("" + curLabel, 10, curY );
+        	
+        	
+        }
+        
+        
+        int xPos = xOffset;
+        
+        for (Integer key : mapHistory.keySet()) {
+            
+        	int value = mapHistory.get(key);
+            
+            int barHeight = Math.round(((float) value
+                    / (float) maxValue) * (graphHeight + yOffset - 20));
+            
+            //g2d.setColor(new Color(key, key, key));
+            g2d.setColor(Color.BLUE);
+            
+            int yPos = graphHeight + yOffset - barHeight;
+
+//            Rectangle2D bar = new Rectangle2D.Float(
+  //                  xPos, yPos, barWidth, barHeight);
+            
+            //g2d.fill(bar);
+            g2d.fillRect(xPos, yPos, barWidth, barHeight);
+            g2d.setColor(Color.DARK_GRAY);
+            g2d.drawRect(xPos, yPos, barWidth, barHeight);
+            
+            g2d.setColor(Color.BLACK);
+            g2d.drawString("0.25", xPos + ((barWidth / 2) - 10), barHeight + 20 + yPos);
+            //g2d.draw(bar);
+            xPos += barWidth + 10;
+        }
+        
+        		
 		
-		for ( int row = 0; row < data.numRows(); row++ ) {
-			
-			for (int col = 0; col < data.numCols(); col++ ) {
-		 	
-				double value = data.get( row, col );
-				
-		 			// at this point we need round values into bins
-		 			/*
-	                int amount = 0;
-	                if (mapHistory.containsKey(value)) {
-	                    amount = mapHistory.get(value);
-	                    amount++;
-	                } else {
-	                    amount = 1;
-	                }
-	                mapHistory.put(value, amount);
-	                */
-			}
-			
-		}		
-		
+		try {
+			saveImageToDisk( img, "/tmp/rbm_render_histogram_test.png" );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		g2d.dispose();
 		
 	}
 	
