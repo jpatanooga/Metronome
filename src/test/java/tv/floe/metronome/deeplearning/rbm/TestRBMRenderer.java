@@ -37,6 +37,24 @@ public class TestRBMRenderer {
 	}
 	
 	
+	private static void renderWeightValuesToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws InterruptedException {
+		
+		String strCE = String.valueOf(CE).substring(0, 5);
+
+		// Matrix hbiasMean = network.getInput().mmul(network.getW()).addRowVector(network.gethBias());
+		
+		//Matrix hbiasMean = MatrixUtils.addRowVector( rbm.getInput().times( rbm.connectionWeights ), rbm.getHiddenBias().viewRow(0) );
+		//Matrix hbiasMean = MatrixUtils.sigmoid( MatrixUtils.addRowVector( rbm.getInput().times( rbm.connectionWeights ), rbm.getHiddenBias().viewRow(0) ) );
+
+
+		RBMRenderer renderer = new RBMRenderer();
+		//rbm_hbias_test.renderHiddenBiases(100, 100, hbiasMean, "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png");
+		
+		renderer.renderHistogram( rbm.connectionWeights, "/tmp/Metronome/unit_test/RBMRenderer/weight_histogram_" + strCE + "_ce.png", 10 );
+		
+	}	
+	
+	
 	@Test
 	public void testRBMRenders() throws InterruptedException {
 
@@ -124,6 +142,8 @@ public class TestRBMRenderer {
 		
 		renderActivationsToDisk(rbm, "_init", 1);		
 		
+		renderWeightValuesToDisk( rbm, "_init" );
+		
 	}
 	
 	@Test
@@ -202,8 +222,8 @@ public class TestRBMRenderer {
 		
 		double[][] data_simple = new double[][]
 				{
-					{ 0.1, 0.5, 0.25, 1.0, -0.5},
-					{ -0.4, -0.3, -0.25, -0.1, -0.5},
+					{ 0.1, 0.5, 0.25, 1.0, -0.5 },
+					{ -0.4, -0.3, -0.25, -0.1, -0.5 },
 					{ 0.1, 0.5, 0.5, 0.5, 0.1 },
 					
 				};
@@ -235,6 +255,8 @@ public class TestRBMRenderer {
 		assertEquals( 10, val_key_0.intValue() );
 		assertEquals( 5, val_key_1.intValue() );
 		
+		
+		renderer.renderHistogram(input, "/tmp/debug_render_rbm_histogram.png", 2);
 		
 		
 	}	

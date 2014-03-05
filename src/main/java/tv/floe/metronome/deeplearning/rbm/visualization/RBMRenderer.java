@@ -11,6 +11,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -37,43 +38,7 @@ public class RBMRenderer {
 	private int heightOffset = 0;
 	private int widthOffset = 0;
 
-	/*
-	public RBMRenderer(Matrix data,int heightOffset,int widthOffset) {
-		
-		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		this.heightOffset = heightOffset;
-		this.widthOffset = widthOffset;
-		WritableRaster r = img.getRaster();
-		int[] equiv = new int[ MatrixUtils.length( data ) ];
-		
-		for (int i = 0; i < equiv.length; i++) {
-			
-			equiv[i] = (int) Math.round( MatrixUtils.getElement(data, i) );
-			
-		}
-		
-		r.setDataElements(0, 0, width, height, equiv);
 
-
-	}
-	
-	public RBMRenderer(Matrix data) {
-		
-		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		WritableRaster r = img.getRaster();
-		int[] equiv = new int[ MatrixUtils.length( data ) ];
-		
-		for (int i = 0; i < equiv.length; i++) {
-			
-			equiv[i] = (int) Math.round( MatrixUtils.getElement(data, i) );
-			
-		}
-		
-		r.setDataElements(0, 0, width, height, equiv);
-
-
-	}
-	*/
 	
 	public RBMRenderer() { }
 	
@@ -154,7 +119,7 @@ public class RBMRenderer {
 		
 		
 	//	System.out.println("pre round: val: " + value + ", delta on min: " + (value - min) + ", bin-calc: " + ((value - min) / stepSize));
-		System.out.println("pre round: val: " + value + ", bin-calc: " + ((value - min) / stepSize));
+	//	System.out.println("pre round: val: " + value + ", bin-calc: " + ((value - min) / stepSize));
 		
 		
 		
@@ -177,10 +142,23 @@ public class RBMRenderer {
 		
 	}	
 	
+	public static double round(double unrounded, int precision, int roundingMode)
+	{
+	    BigDecimal bd = new BigDecimal(unrounded);
+	    BigDecimal rounded = bd.setScale(precision, roundingMode);
+	    return rounded.doubleValue();
+	}
+	
 	private String buildBucketLabel(int bucketIndex, double stepSize, double min) {
 		
+		System.out.println( "label> min " + min + ", stepSize: " + stepSize );
+		
+		System.out.println("bucketIndex > " + bucketIndex);
+		
 		double val = min + (bucketIndex * stepSize);
-		String ret = "" + val;
+		String ret = "" + round(val, 2, BigDecimal.ROUND_HALF_UP);
+		
+		System.out.println("label-ret: " + val);
 		
 		return ret;
 				
@@ -199,26 +177,23 @@ public class RBMRenderer {
 	 * @param numberBins
 	 * @return
 	 */
-	//public Map<Integer, Pair<String, Integer>> generateHistogramBuckets(Matrix data, int numberBins) {
 	public Map<Integer, Integer> generateHistogramBuckets(Matrix data, int numberBins) {
 		
-		//Pair<> p = new Pair<>();
-//		Map<Integer, Pair<String, Integer>> mapHistory = new TreeMap<Integer, Pair<String, Integer>>(); 
 		Map<Integer, Integer> mapHistory = new TreeMap<Integer, Integer>();
 		
-		//int binCount = 10;
-		double min = MatrixUtils.min(data); //data.get(0, 0);
-		double max = MatrixUtils.max(data); //data.get(0, 0);
+		double min = MatrixUtils.min(data);
+		double max = MatrixUtils.max(data);
 		
 		double range = max - min;
 		double stepSize = range / numberBins;
-		
+
+		/*
 		System.out.println( "min: " + min );
 		System.out.println( "max: " + max );
 		System.out.println( "range: " + range );
 		System.out.println( "stepSize: " + stepSize );
 		System.out.println( "numberBins: " + numberBins );
-		
+		*/
 		//stepSize = 1;
 		
 		for ( int row = 0; row < data.numRows(); row++ ) {
@@ -231,12 +206,6 @@ public class RBMRenderer {
 				
 				int bucket_key = this.computeHistogramBucketIndex(min, stepSize, matrix_value, numberBins);
 				
-			//	int bucket_key_alt = this.computeHistogramBucketIndexAlt(min, stepSize, matrix_value, numberBins);
-
-			//	System.out.println("> bin key: " + bucket_key + ", alt: " + bucket_key_alt);
-				
-                //int amount = 0;
-				//Pair<String, Integer> entry = null;
 				int entry = 0;
 				
                 if (mapHistory.containsKey( bucket_key )) {
@@ -244,9 +213,6 @@ public class RBMRenderer {
                 	// entry exists, increment
                 	
                     entry = mapHistory.get( bucket_key );
-                    //amount++;
-                    //int tmp = entry.getSecond(); //. = entry.getSecond() + 1;
-                    //tmp++;
                     entry++;
                     
                     mapHistory.put( bucket_key, entry );
@@ -254,12 +220,8 @@ public class RBMRenderer {
                 } else {
                 	
                 	// entry does not exit, create, insert
-                    //amount = 1;
                 	
                 	// create new key
-                	//bucket_key = 1;
-                	
-                	// bucket label
                 	String bucket_label = buildBucketLabel(bucket_key, stepSize, min);
                 	
                 	// new entry
@@ -269,16 +231,17 @@ public class RBMRenderer {
                 	mapHistory.put( bucket_key, entry );
                 }
                 
-                
-                
 			}
-			
-		}	
+		}
 		
-		
-		
+	
 		return mapHistory;
-	}
+			
+			
+	}	
+
+
+		
 	
 	
 	/**
@@ -290,10 +253,17 @@ public class RBMRenderer {
 	 * @param data
 	 * @param numberBins
 	 */
-	public void renderHistogram(Matrix data, int numberBins) {
+	public void renderHistogram(Matrix data, String filename, int numberBins) {
 		
 		Map<Integer, Integer> mapHistory = this.generateHistogramBuckets( data, numberBins );
 
+		double min = MatrixUtils.min(data); //data.get(0, 0);
+		double max = MatrixUtils.max(data); //data.get(0, 0);
+		
+		double range = max - min;
+		double stepSize = range / numberBins;
+		
+		
 		int xOffset = 50;
 		int yOffset = -50;
 		
@@ -319,8 +289,8 @@ public class RBMRenderer {
    //             / (float) mapHistory.size()));
         int barWidth = BAR_WIDTH;
         
-        System.out.println("width = " + graphWidth + "; size = "
-                + mapHistory.size() + "; barWidth = " + barWidth);
+ //       System.out.println("width = " + graphWidth + "; size = "
+   //             + mapHistory.size() + "; barWidth = " + barWidth);
         
         int maxValue = 0;
         for (Integer key : mapHistory.keySet()) {
@@ -330,7 +300,7 @@ public class RBMRenderer {
         
         // draw Y-scale
         
-        System.out.println( "max-value: " + maxValue );
+        //System.out.println( "max-value: " + maxValue );
         
         double plotAreaHeight = (graphHeight + yOffset);
         
@@ -345,7 +315,7 @@ public class RBMRenderer {
             int curY = (graphHeight + yOffset) - Math.round(((float) (curLabel)
                     / (float) maxValue) * (graphHeight + yOffset - 20));
         	
-            System.out.println( "curY: " + curY );
+            //System.out.println( "curY: " + curY );
         	
             g2d.setColor(Color.BLACK);
             g2d.drawString("" + curLabel, 10, curY );
@@ -358,8 +328,12 @@ public class RBMRenderer {
         
         for (Integer key : mapHistory.keySet()) {
             
+        	
+        	
         	int value = mapHistory.get(key);
             
+        	String bucket_label = this.buildBucketLabel(key, stepSize, min);
+        	
             int barHeight = Math.round(((float) value
                     / (float) maxValue) * (graphHeight + yOffset - 20));
             
@@ -377,7 +351,7 @@ public class RBMRenderer {
             g2d.drawRect(xPos, yPos, barWidth, barHeight);
             
             g2d.setColor(Color.BLACK);
-            g2d.drawString("0.25", xPos + ((barWidth / 2) - 10), barHeight + 20 + yPos);
+            g2d.drawString(bucket_label, xPos + ((barWidth / 2) - 10), barHeight + 20 + yPos);
             //g2d.draw(bar);
             xPos += barWidth + 10;
         }
@@ -385,7 +359,8 @@ public class RBMRenderer {
         		
 		
 		try {
-			saveImageToDisk( img, "/tmp/rbm_render_histogram_test.png" );
+			//saveImageToDisk( img, "/tmp/rbm_render_histogram_test.png" );
+			saveImageToDisk( img, filename );
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -451,10 +426,6 @@ public class RBMRenderer {
 	}	
 	
 	
-	public void renderHistogramMatrix() {
-		
-		
-	}
 	
 	public void renderFilter() {
 		
