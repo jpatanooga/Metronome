@@ -153,12 +153,20 @@ public class TestRBMRenderer {
 					{0,0,1,1,1,0}
 					
 				};
+
+		double[][] data_simple2 = new double[][]
+				{
+					{1,1,1,1,1,1},
+					{0,1,1,1,1,1}
+					
+				};
 		
-		Matrix input = new DenseMatrix(data_simple);		
+		
+		Matrix input = new DenseMatrix(data_simple2);		
 		
 		
 		RBMRenderer renderer = new RBMRenderer();
-		
+/*		
 		Map<Integer, Pair<String, Integer>> map = renderer.generateHistogramBuckets( input, 2 ); 
 		
 		for (Map.Entry<Integer, Pair<String, Integer>> entry : map.entrySet()) {
@@ -169,8 +177,67 @@ public class TestRBMRenderer {
 			System.out.println(key + " => " + value.getFirst() + ",  " + value.getSecond());
 			  
 		}
+*/		
+		Map<Integer, Integer> map = renderer.generateHistogramBuckets( input, 2 );
+
+		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+			
+			Integer key = entry.getKey();
+			Integer val = entry.getValue();
+			System.out.println(key + " => " + key + ",  " + val );
+			  
+		}
 		
+		Integer val_key_0 = map.get(0);
+		Integer val_key_1 = map.get(1);
+		
+		assertEquals( 1, val_key_0.intValue() );
+		assertEquals( 11, val_key_1.intValue() );
 		
 	}
 
+	
+	@Test
+	public void testGenerateHistogramBins2() {
+		
+		double[][] data_simple = new double[][]
+				{
+					{ 0.1, 0.5, 0.25, 1.0, -0.5},
+					{ -0.4, -0.3, -0.25, -0.1, -0.5},
+					{ 0.1, 0.5, 0.5, 0.5, 0.1 },
+					
+				};
+		
+		Matrix input = new DenseMatrix(data_simple);		
+		
+		
+		RBMRenderer renderer = new RBMRenderer();
+		
+		//Map<Integer, Pair<String, Integer>> map = renderer.generateHistogramBuckets( input, 2 ); 
+		Map<Integer, Integer> map = renderer.generateHistogramBuckets( input, 2 );
+		
+//		for (Map.Entry<Integer, Pair<String, Integer>> entry : map.entrySet()) {
+		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+			
+			Integer key = entry.getKey();
+			Integer val = entry.getValue();
+			//Pair<String, Integer> value = entry.getValue();
+
+			//System.out.println(key + " => " + value.getFirst() + ",  " + value.getSecond());
+			System.out.println(key + " => " + key + ",  " + val );
+			  
+		}
+		
+		Integer val_key_0 = map.get(0);
+		Integer val_key_1 = map.get(1);
+		
+		
+		assertEquals( 10, val_key_0.intValue() );
+		assertEquals( 5, val_key_1.intValue() );
+		
+		
+		
+	}	
+	
+	
 }
