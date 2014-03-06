@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.Vector;
 
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 import tv.floe.metronome.math.MatrixUtils;
@@ -151,14 +152,14 @@ public class RBMRenderer {
 	
 	private String buildBucketLabel(int bucketIndex, double stepSize, double min) {
 		
-		System.out.println( "label> min " + min + ", stepSize: " + stepSize );
+		//System.out.println( "label> min " + min + ", stepSize: " + stepSize );
 		
-		System.out.println("bucketIndex > " + bucketIndex);
+		//System.out.println("bucketIndex > " + bucketIndex);
 		
 		double val = min + (bucketIndex * stepSize);
 		String ret = "" + round(val, 2, BigDecimal.ROUND_HALF_UP);
 		
-		System.out.println("label-ret: " + val);
+		//System.out.println("label-ret: " + val);
 		
 		return ret;
 				
@@ -378,16 +379,104 @@ public class RBMRenderer {
 	 * is of the same dimension as the input data, and it is 
 	 * most useful to visualize the filters in the same way 
 	 * as the input data is visualized.
+	 * @throws Exception 
 	 * 
 	 */
-	public void renderFilters() {
+	public void renderFilters( Matrix data, String filename, int patchWidth, int patchHeight ) throws Exception {
+
+		int[] equiv = new int[ data.viewColumn(0).size()  ];
+		
+		
+		
+		int numberCols = data.numCols();
+		
+
+		double min = MatrixUtils.min(data);
+		double max = MatrixUtils.max(data);
+
+		
+		int patchesPerRow = 10;
+		
+		int numPatchRows = numberCols / patchesPerRow;
+		
+		int patchBorder = 2;
+		
+		int filterImgWidth = ( patchWidth + patchBorder ) * patchesPerRow;
+		int filterImgHeight = numPatchRows * (patchHeight + patchBorder);
+		
+		System.out.println("Filter Width: " + filterImgWidth);
+		System.out.println("Filter Height: " + filterImgHeight);
+		
+		System.out.println("Patch array size: " + equiv.length );
+		
+		
+		img = new BufferedImage( filterImgWidth, filterImgHeight, BufferedImage.TYPE_BYTE_GRAY);
+		WritableRaster r = img.getRaster();
+		
 		
 		// for each hidden neuron
 		
 			// plot the learned filter (same dim as the input data)
 		
+		if (patchWidth * patchHeight != data.numRows()) {
+			throw new Exception( "patch size does not match filter patch size" );
+		}
+		
+		for ( int col = 0; col < data.numCols(); col++ ) {
+			
+			int curRow = 0;
+			
+			
+			int curX = (col % patchesPerRow ) * (patchWidth + patchBorder );
+			int curY = col / patchesPerRow * ( patchHeight + patchBorder );
+			
+			Vector column = data.viewColumn( col );
+			
+			// now reshape the column into the shape of the filter patch
+			
+			
+			// render the filter patch
+			
+			System.out.println("rendering " + column.size() + " pixels in column " + col + " for filter patch " + patchWidth + " x " + patchHeight + ", total size: " + (patchWidth * patchHeight) + " at " + curX );
+			
+			for (int i = 0; i < column.size(); i++) {
+				
+				// normPatch = ((patch - patch.min()) /
+	             //  (patch.max()-patch.min()+1e-6))
+				
+				//equiv[i] =
+				double patch_normal = ( column.get(i) - min ) / ( max - min + 0.000001 );
+				//System.out.println( "patch normal: " + patch_normal );
+				equiv[i] = (int) (255 * patch_normal);
+				
+			}
+			
+			
+			//System.out.println( "activations size: Cols: " + activation_data.numCols() + ", Rows: " + activation_data.numRows()  );
+			
+			// now draw patch to raster image
+			
+		//	System.out.println("curX: " + equiv.length);
+			
+			r.setPixels( curX, curY, patchWidth, patchHeight, equiv );
+		//	r.setPixels( curX, curY, 10, 10, equiv );
+			
+			
+			
+		}
+		
+		try {
+			//saveImageToDisk( img, "/tmp/rbm_render_histogram_test.png" );
+			saveImageToDisk( img, filename );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
 		
 	}
+	
 	
 	
 
@@ -427,10 +516,6 @@ public class RBMRenderer {
 	
 	
 	
-	public void renderFilter() {
-		
-		
-	}
 	
 	
 	public static void saveImageToDisk(BufferedImage img, String imageName) throws IOException {
