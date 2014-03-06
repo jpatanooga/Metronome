@@ -54,6 +54,16 @@ public class TestRBMRenderer {
 		
 	}	
 	
+	private static void renderFiltersToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws Exception {
+		
+		String strCE = String.valueOf(CE).substring(0, 5);
+
+		RBMRenderer renderer = new RBMRenderer();
+		
+		//renderer.renderHistogram( rbm.connectionWeights, "/tmp/Metronome/unit_test/RBMRenderer/weight_histogram_" + strCE + "_ce.png", 10 );
+		renderer.renderFilters(rbm.connectionWeights, "/tmp/Metronome/unit_test/RBMRenderer/filter_unit_test.png", 28, 28 );
+		
+	}	
 	
 	@Test
 	public void testRBMRenders() throws InterruptedException {
@@ -110,7 +120,7 @@ public class TestRBMRenderer {
 	}
 	
 	@Test
-	public void testMNISTRenderPath() throws InterruptedException, IOException {
+	public void testMNISTRenderPath() throws Exception {
 		
 		MnistDataSetIterator fetcher = new MnistDataSetIterator(100,200);
 		MersenneTwister rand = new MersenneTwister(123);
@@ -143,6 +153,8 @@ public class TestRBMRenderer {
 		renderActivationsToDisk(rbm, "_init", 1);		
 		
 		renderWeightValuesToDisk( rbm, "_init" );
+		
+		renderFiltersToDisk( rbm, "_init" );
 		
 	}
 	
