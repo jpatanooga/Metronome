@@ -114,7 +114,12 @@ public class TestMNIST_On_RBMs {
 	
 	private void renderWeightValuesToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws InterruptedException {
 		
-		String strCE = String.valueOf(CE).substring(0, 5);
+		//String strCE = String.valueOf(CE).substring(0, 5);
+		String strCE = CE;
+		if (CE.equals("init") == false) {
+			strCE = String.valueOf(CE).substring(0, 5);
+		}
+		
 
 		// Matrix hbiasMean = network.getInput().mmul(network.getW()).addRowVector(network.gethBias());
 		
@@ -132,7 +137,12 @@ public class TestMNIST_On_RBMs {
 	
 	private void renderFiltersToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws Exception {
 		
-		String strCE = String.valueOf(CE).substring(0, 5);
+		//String strCE = String.valueOf(CE).substring(0, 5);
+		String strCE = CE;
+		if (CE.equals("init") == false) {
+			strCE = String.valueOf(CE).substring(0, 5);
+		}
+		
 
 		RBMRenderer renderer = new RBMRenderer();
 		

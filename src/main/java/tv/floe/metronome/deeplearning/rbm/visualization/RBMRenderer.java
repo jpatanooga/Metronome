@@ -426,11 +426,17 @@ public class RBMRenderer {
 			
 			int curRow = 0;
 			
+			// TODO: calc min/max per patch!
+			
+			
 			
 			int curX = (col % patchesPerRow ) * (patchWidth + patchBorder );
 			int curY = col / patchesPerRow * ( patchHeight + patchBorder );
 			
 			Vector column = data.viewColumn( col );
+			
+			double col_max = column.maxValue();
+			double col_min = column.minValue();
 			
 			// now reshape the column into the shape of the filter patch
 			
@@ -441,12 +447,8 @@ public class RBMRenderer {
 			
 			for (int i = 0; i < column.size(); i++) {
 				
-				// normPatch = ((patch - patch.min()) /
-	             //  (patch.max()-patch.min()+1e-6))
-				
-				//equiv[i] =
-				double patch_normal = ( column.get(i) - min ) / ( max - min + 0.000001 );
-				//System.out.println( "patch normal: " + patch_normal );
+				//double patch_normal = ( column.get(i) - min ) / ( max - min + 0.000001 );
+				double patch_normal = ( column.get(i) - col_min ) / ( col_max - col_min + 0.000001 );
 				equiv[i] = (int) (255 * patch_normal);
 				
 			}
