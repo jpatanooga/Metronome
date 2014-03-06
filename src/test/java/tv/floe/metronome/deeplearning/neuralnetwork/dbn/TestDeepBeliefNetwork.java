@@ -24,6 +24,41 @@ import tv.floe.metronome.types.Pair;
 
 public class TestDeepBeliefNetwork {
 
+
+	double[][] x_toy = new double[][] 
+	{
+			{1,1,1,0,0,0},
+			{1,0,1,0,0,0},
+			{1,1,1,0,0,0},
+			{0,0,1,1,1,0},
+			{0,0,1,1,0,0},
+			{0,0,0,1,1,1}
+			
+	};
+	
+	double[][] y_toy = new double[][] 
+	{
+			{1, 0},
+			{1, 0},
+			{1, 0},
+			{0, 1},
+			{0, 1},
+			{0, 1}
+	};
+	
+	Matrix x_toy_Matrix = new DenseMatrix(x_toy);
+	Matrix y_toy_Matrix = new DenseMatrix(y_toy);
+
+	double[][] x_toy_Test = new double[][] {
+			{1, 1, 1, 0, 0, 0},
+			{0, 0, 0, 1, 1, 1}
+			//{1, 1, 1, 1, 1, 0}
+	};
+	
+	Matrix xTestMatrix = new DenseMatrix(x_toy_Test);
+		
+	
+	
 	public static Matrix gti(Matrix m, double val) {
 		
 		Matrix res = m.like();
@@ -68,81 +103,32 @@ public class TestDeepBeliefNetwork {
 		return res;
 		
 	}
-	
-	public static Pair<Matrix, Matrix> xorDataStatic() {
-		
-		
-		Matrix x = new DenseMatrix(4, 2); //Matrix.rand(n,2);
-		Matrix y = new DenseMatrix( 4, 2 ); //Matrix.zeros(n,2);
-		y.assign(0.0);
 
-		
-		/*
-		MatrixUtils.debug_print(x);
-		
-		x = gti(x, 0.5);
-		
-		MatrixUtils.debug_print(x);
-		
-		
-		
-		for (int i = 0; i < x.numRows(); i++) {
+	double[][] xor_input = new double[][] 
+	{
+			{0,0},
+			{0,1},
+			{1,0},
+			{1,1}
 			
-			if (x.get(i,0) == x.get(i,1)) {
-				
-				y.set(i,0,1);
-				
-			} else {
-				
-				y.set(i,1,1);
-				
-			}
-			
-		}
-		
-		//return new DataSet(x,y);
+	};
 	
-		MatrixUtils.debug_print(y);
-		*/
+	double[][] xor_labels = new double[][] 
+	{
+			{1, 0},
+			{0, 1},
+			{0, 1},
+			{1, 0}
+	};
 		
-		/*
-0 0:0 1:0
-1 0:0 1:1
-1 0:1 1:0
-0 0:1 1:1
+	Matrix x_xor_Matrix = new DenseMatrix(xor_input);
+	Matrix y_xor_Matrix = new DenseMatrix(xor_labels);
 
-		 */
-		
-		x.viewRow(0).assign( new double[] { 0, 0 } );
-		x.viewRow(1).assign( new double[] { 0, 1 } );
-		x.viewRow(2).assign( new double[] { 1, 0 } );
-		x.viewRow(3).assign( new double[] { 1, 1 } );
-		
-		y.set(0, 0, 1);
-		y.set(1, 1, 1);
-		y.set(2, 1, 1);
-		y.set(3, 0, 1);
-		
-		Pair<Matrix, Matrix> p = new Pair<Matrix, Matrix>(x, y);
-		
-		MatrixUtils.debug_print(x);
-		MatrixUtils.debug_print(y);
-		
-		return p;
-		
-	}
 	
 	
 	@Test
 	public void testXor() {
 
-		//matrixRand(2, 2);
-	//	xorData( 2 );
-		
-		int n = 10;
-		Pair<Matrix, Matrix> d = xorDataStatic(); //xorData(n);
-		Matrix x = d.getFirst();
-		Matrix y = d.getSecond();
 
 
 
@@ -173,11 +159,11 @@ public class TestDeepBeliefNetwork {
 
 		
 		
-		dbn.preTrain(x,k, preTrainLr, preTrainEpochs);
+		dbn.preTrain(x_xor_Matrix,k, preTrainLr, preTrainEpochs);
 		
 		
 		
-		dbn.finetune(y,fineTuneLr, fineTuneEpochs);
+		dbn.finetune(y_xor_Matrix,fineTuneLr, fineTuneEpochs);
 
 
 
@@ -185,18 +171,88 @@ public class TestDeepBeliefNetwork {
 
 
 
-		Matrix predict = dbn.predict(x);
+		Matrix predict = dbn.predict( x_xor_Matrix );
+		System.out.println("--- Predictions XOR ----");
+		MatrixUtils.debug_print(predict);
 		//log.info(predict.toString());
 
 		Evaluation eval = new Evaluation();
-		eval.eval(y, predict);
+		eval.eval( y_xor_Matrix, predict );
 		//log.info(eval.stats());
 		System.out.println( eval.stats() );
 
-		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + n );
+		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + x_xor_Matrix.numRows() );
 	
 	
 	}
+	
+
+	
+	@Test
+	public void testToyInput() {
+
+
+
+
+
+
+		RandomGenerator rng = new MersenneTwister(123);
+
+		double preTrainLr = 0.0001;
+		int preTrainEpochs = 1000;
+		int k = 1;
+		
+		int nIns = x_toy[0].length;
+		int nOuts = y_toy[0].length;
+		
+		int[] hiddenLayerSizes = new int[] { 10, 8 };
+		double fineTuneLr = 0.0001;
+		int fineTuneEpochs = 1000;
+		
+		MatrixUtils.debug_print(x_toy_Matrix);
+		
+/*
+		DBN dbn = new DBN.Builder()
+		.transformWeightsAt(0, new MultiplyScalar(1000))
+		.transformWeightsAt(1, new MultiplyScalar(100))
+
+		.hiddenLayerSizes(hiddenLayerSizes).numberOfInputs(nIns).renderWeights(0)
+		.useRegularization(false).withMomentum(0).withDist(new NormalDistribution(0,0.001))
+		.numberOfOutPuts(nOuts).withRng(rng).build();
+*/
+		
+		DeepBeliefNetwork dbn = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
+//		dbn.addWeightTransform(0, new MultiplyScalar(100));
+//		dbn.addWeightTransform(1, new MultiplyScalar(10));
+
+		
+		
+		dbn.preTrain(x_toy_Matrix,k, preTrainLr, preTrainEpochs);
+		
+		
+		
+		dbn.finetune(y_toy_Matrix,fineTuneLr, fineTuneEpochs);
+
+
+
+
+
+
+
+		Matrix predict = dbn.predict( x_toy_Matrix );
+		System.out.println("--- Predictions Toy Matrix ----");
+		MatrixUtils.debug_print(predict);
+		//log.info(predict.toString());
+
+		Evaluation eval = new Evaluation();
+		eval.eval( y_toy_Matrix, predict );
+		//log.info(eval.stats());
+		System.out.println( eval.stats() );
+
+		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + x_toy_Matrix.numRows() );
+	
+	
+	}	
 	
 	
 	@Test
@@ -204,12 +260,12 @@ public class TestDeepBeliefNetwork {
 		
 		String tmpFilename = "/tmp/DBNSerdeTest.model";
 		
-		
+		/*
 		int n = 10;
 		Pair<Matrix, Matrix> d = xorDataStatic(); //xorData(n);
 		Matrix x = d.getFirst();
 		Matrix y = d.getSecond();
-
+*/
 
 
 
@@ -237,8 +293,8 @@ public class TestDeepBeliefNetwork {
 
 		
 		
-		dbn.preTrain(x,k, preTrainLr, preTrainEpochs);
-		dbn.finetune(y,fineTuneLr, fineTuneEpochs);
+		dbn.preTrain(x_xor_Matrix,k, preTrainLr, preTrainEpochs);
+		dbn.finetune(y_xor_Matrix,fineTuneLr, fineTuneEpochs);
 
 		
 		
@@ -287,12 +343,6 @@ public class TestDeepBeliefNetwork {
 		String tmpFilename = "/tmp/DBNParameterAvgSerdeTest.model";
 		
 		
-		int n = 10;
-		Pair<Matrix, Matrix> d = xorDataStatic(); //xorData(n);
-		Matrix x = d.getFirst();
-		Matrix y = d.getSecond();
-
-
 
 
 
@@ -319,8 +369,8 @@ public class TestDeepBeliefNetwork {
 
 		
 		
-		dbn.preTrain(x,k, preTrainLr, preTrainEpochs);
-		dbn.finetune(y,fineTuneLr, fineTuneEpochs);
+		dbn.preTrain( x_xor_Matrix,k, preTrainLr, preTrainEpochs );
+		dbn.finetune( y_xor_Matrix,fineTuneLr, fineTuneEpochs );
 
 		
 		

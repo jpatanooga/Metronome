@@ -8,7 +8,7 @@ import tv.floe.metronome.math.MatrixUtils;
 
 /**
  * 
- * Vectorized Learning Rate used per layer
+ * Vectorized Learning Rate used per Connection Weight
  * 
  * @author josh
  *
@@ -47,6 +47,8 @@ public class AdagradLearningRate {
 		
 		//this.connectionLearningRates.
 		MatrixUtils.addi(this.squaredGradientSums, gradientsSquared);
+		
+		MatrixUtils.debug_print(squaredGradientSums);
 		
 	}
 	
