@@ -111,7 +111,37 @@ public class TestMNIST_On_RBMs {
 		
 	}
 	
-	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input, boolean toDisk, String CE, boolean renderRealImage) throws InterruptedException {
+	
+	private void renderWeightValuesToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws InterruptedException {
+		
+		String strCE = String.valueOf(CE).substring(0, 5);
+
+		// Matrix hbiasMean = network.getInput().mmul(network.getW()).addRowVector(network.gethBias());
+		
+		//Matrix hbiasMean = MatrixUtils.addRowVector( rbm.getInput().times( rbm.connectionWeights ), rbm.getHiddenBias().viewRow(0) );
+		//Matrix hbiasMean = MatrixUtils.sigmoid( MatrixUtils.addRowVector( rbm.getInput().times( rbm.connectionWeights ), rbm.getHiddenBias().viewRow(0) ) );
+
+
+		RBMRenderer renderer = new RBMRenderer();
+		//rbm_hbias_test.renderHiddenBiases(100, 100, hbiasMean, "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png");
+		
+		// "/tmp/Metronome/RBM/" + UUIDForRun + "/activations_" + strCE + "_ce.png"
+		renderer.renderHistogram( rbm.connectionWeights, "/tmp/Metronome/RBM/" + UUIDForRun + "/weight_histogram_" + strCE + "_ce.png", 10 );
+		
+	}	
+	
+	private void renderFiltersToDisk( RestrictedBoltzmannMachine rbm, String CE ) throws Exception {
+		
+		String strCE = String.valueOf(CE).substring(0, 5);
+
+		RBMRenderer renderer = new RBMRenderer();
+		
+		//renderer.renderHistogram( rbm.connectionWeights, "/tmp/Metronome/unit_test/RBMRenderer/weight_histogram_" + strCE + "_ce.png", 10 );
+		renderer.renderFilters(rbm.connectionWeights, "/tmp/Metronome/RBM/" + UUIDForRun + "/filters_" + strCE + "_ce.png", 28, 28 );
+		
+	}		
+	
+	public void renderBatchOfReconstructions(RestrictedBoltzmannMachine rbm, DataSet input, boolean toDisk, String CE, boolean renderRealImage) throws Exception {
 		
 
 		Matrix reconstruct_all = rbm.reconstruct( input.getFirst() );
@@ -152,7 +182,8 @@ public class TestMNIST_On_RBMs {
 		
 		//this.renderhBiasToDisk(rbm, CE);
 		this.renderActivationsToDisk(rbm, CE);
-		
+		this.renderWeightValuesToDisk(rbm, CE);
+		this.renderFiltersToDisk(rbm, CE);
 		
 	}
 	
@@ -187,6 +218,9 @@ public class TestMNIST_On_RBMs {
 		// render base activations pre train
 		
 		this.renderActivationsToDisk(rbm, "init");
+		this.renderWeightValuesToDisk(rbm, "init");
+		this.renderFiltersToDisk(rbm, "init");
+		
 		
 		System.out.println(" ----- Training ------");
 		
