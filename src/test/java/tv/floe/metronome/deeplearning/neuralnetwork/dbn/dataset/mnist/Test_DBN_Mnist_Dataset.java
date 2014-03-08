@@ -94,14 +94,14 @@ public class Test_DBN_Mnist_Dataset {
 		
 		//PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
 		
-		int[] hiddenLayerSizes = { 500, 500, 500 };
-		double learningRate = 0.001;
-		int preTrainEpochs = 100;
+		int[] hiddenLayerSizes = { 500, 400, 250 };
+		double learningRate = 0.01;
+		int preTrainEpochs = 10;
 		int fineTuneEpochs = 100;
-		int totalNumExamples = 4000;
+		int totalNumExamples = 200;
 		//int rowLimit = 100;
 				
-		int batchSize = 400;
+		int batchSize = 50;
 		boolean showNetworkStats = true;
 		
 		// mini-batches through dataset
@@ -116,6 +116,9 @@ public class Test_DBN_Mnist_Dataset {
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
 				
+		dbn.useRegularization = false;
+		dbn.setSparsity(0.01);
+		dbn.setMomentum(0);
 		
 		int recordsProcessed = 0;
 		
@@ -222,6 +225,10 @@ public class Test_DBN_Mnist_Dataset {
 		
 		DeepBeliefNetwork dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
 				
+		dbn.useRegularization = false;
+		dbn.setSparsity(0.01);
+		dbn.setMomentum(0);
+		
 		
 		int recordsProcessed = 0;
 		int batchesProcessed = 0;
