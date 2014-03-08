@@ -133,6 +133,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 				layerInput = hiddenLayers[ i - 1 ].sampleHiddenGivenVisible_Data(layerInput);
 			
 			}
+			
+			System.out.println("k = " + k + ", lr = " + learningRate );
 
 			this.preTrainingLayers[ i ].trainTillConvergence( layerInput, learningRate, new Object[]{ k, learningRate, epochs } );
 
@@ -181,8 +183,13 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			int nVisible, int nHidden, Matrix weights, Matrix hbias,
 			Matrix vBias, RandomGenerator rng, int index) {
 		
-				
-		return new RestrictedBoltzmannMachine( input, nVisible, nHidden, weights, hbias, vBias, rng );
+		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine( input, nVisible, nHidden, weights, hbias, vBias, rng ); 
+		
+		rbm.useRegularization = this.useRegularization;
+		rbm.setSparsity( this.getSparsity() );
+		rbm.setMomentum( this.getMomentum() );
+		
+		return rbm;
 		
 	}
 
