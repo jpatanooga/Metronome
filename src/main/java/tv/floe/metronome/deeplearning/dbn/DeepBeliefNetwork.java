@@ -134,8 +134,6 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			
 			}
 			
-			System.out.println("k = " + k + ", lr = " + learningRate );
-
 			this.preTrainingLayers[ i ].trainTillConvergence( layerInput, learningRate, new Object[]{ k, learningRate, epochs } );
 
 		}
