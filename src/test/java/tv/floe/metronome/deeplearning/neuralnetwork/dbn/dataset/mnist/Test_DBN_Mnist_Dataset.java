@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -72,6 +74,91 @@ public class Test_DBN_Mnist_Dataset {
 	*/
 	
 
+	private DataSet filterDataset( int[] classIndexes, int datasetSize ) throws IOException {
+		
+		int batchSize = 100 * datasetSize;
+		int totalNumExamples = 100 * datasetSize;
+		
+		
+		
+		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
+		DataSet recordBatch = fetcher.next();
+		
+		
+		Map<Integer, Integer> filter = new HashMap<Integer, Integer>();
+		for (int x = 0; x < classIndexes.length; x++ ) {
+			
+			filter.put(classIndexes[x], 1);
+			
+		}
+		
+		
+		
+		Matrix input = recordBatch.getFirst();
+		Matrix labels = recordBatch.getSecond();
+		
+		Matrix inputFiltered = new DenseMatrix( datasetSize, input.numCols() );
+		Matrix labelsFiltered = new DenseMatrix( datasetSize, labels.numCols() );
+		
+		int recFound = 0;
+		
+		for ( int row = 0; row < input.numRows(); row++ ) {
+			
+			int rowLabel = labels.viewRow( row ).maxValueIndex();
+			
+			if ( filter.containsKey(rowLabel)) {
+				
+				inputFiltered.viewRow(recFound).assign( input.viewRow(row) );
+				labelsFiltered.viewRow(recFound).assign( labels.viewRow(row) );
+				recFound++;
+				
+				if ( recFound >= inputFiltered.numRows() ) {
+					break;
+				}
+				
+			}
+			
+			
+		}
+
+		if ( recFound < inputFiltered.numRows() ) {
+
+			System.out.println("We did not fill the filtered input count fully.");
+			
+		}
+		
+		
+		//DataSet ret = new DataSet();
+		return new DataSet( inputFiltered, labelsFiltered );
+	}
+	
+	
+	@Test
+	public void testFilterDataset() throws IOException {
+		
+		int totalNumExamples = 20;
+				
+		int batchSize = 1;
+		
+		int[] filter = { 0, 1 };
+		DataSet recordBatch = this.filterDataset( filter, 20 );
+		
+		Matrix input = recordBatch.getFirst();
+		Matrix labels = recordBatch.getSecond();
+		
+		assertEquals(20, input.numRows() );
+		assertEquals(20, labels.numRows() );
+		
+		//MatrixUtils.debug_print( input );
+		
+		MatrixUtils.debug_print( labels );
+		
+		MatrixUtils.debug_print_matrix_stats(labels, "lables");
+		
+		System.out.println( "label: " + labels.viewRow(0).maxValueIndex() );
+		
+		
+	}
 	
 	
 	/**
@@ -98,17 +185,25 @@ public class Test_DBN_Mnist_Dataset {
 		double learningRate = 0.001;
 		int preTrainEpochs = 1000;
 		int fineTuneEpochs = 1000;
-		int totalNumExamples = 10;
+		int totalNumExamples = 20;
 		//int rowLimit = 100;
 				
-		int batchSize = 10;
+		int batchSize = 1;
 		boolean showNetworkStats = true;
 		
 		// mini-batches through dataset
-		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
-		DataSet first = fetcher.next();
-		int numIns = first.getFirst().numCols();
-		int numLabels = first.getSecond().numCols();
+//		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
+//		DataSet first = fetcher.next();
+		
+		int[] filter = { 0, 1 };
+		DataSet recordBatch = this.filterDataset( filter, 20 );
+		
+		
+		//int numIns = first.getFirst().numCols();
+		//int numLabels = first.getSecond().numCols();
+		
+		int numIns = recordBatch.getFirst().numCols();
+		int numLabels = recordBatch.getSecond().numCols();
 
 		int n_layers = hiddenLayerSizes.length;
 		RandomGenerator rng = new MersenneTwister(123);
@@ -128,7 +223,7 @@ public class Test_DBN_Mnist_Dataset {
 		StopWatch batchWatch = new StopWatch();
 		
 		
-		do  {
+//		do  {
 			
 			recordsProcessed += batchSize;
 			
@@ -136,14 +231,14 @@ public class Test_DBN_Mnist_Dataset {
 			
 			batchWatch.reset();
 			batchWatch.start();
-			dbn.preTrain( first.getFirst(), 1, learningRate, preTrainEpochs);
+			dbn.preTrain( recordBatch.getFirst(), 1, learningRate, preTrainEpochs);
 			batchWatch.stop();
 			
 			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
 
 			//System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
 
-			
+/*			
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
 			}
@@ -187,7 +282,7 @@ public class Test_DBN_Mnist_Dataset {
 		fetcher.reset();
 		
 		ModelTester.evaluateModel(fetcher, dbn);
-		
+		*/
 		
 	}
 
