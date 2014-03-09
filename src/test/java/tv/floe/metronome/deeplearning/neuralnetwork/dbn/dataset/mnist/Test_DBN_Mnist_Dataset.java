@@ -94,14 +94,14 @@ public class Test_DBN_Mnist_Dataset {
 		
 		//PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
 		
-		int[] hiddenLayerSizes = { 500, 400, 250 };
-		double learningRate = 0.01;
-		int preTrainEpochs = 10;
-		int fineTuneEpochs = 100;
-		int totalNumExamples = 200;
+		int[] hiddenLayerSizes = { 500, 250, 100 };
+		double learningRate = 0.001;
+		int preTrainEpochs = 1000;
+		int fineTuneEpochs = 1000;
+		int totalNumExamples = 10;
 		//int rowLimit = 100;
 				
-		int batchSize = 50;
+		int batchSize = 10;
 		boolean showNetworkStats = true;
 		
 		// mini-batches through dataset
