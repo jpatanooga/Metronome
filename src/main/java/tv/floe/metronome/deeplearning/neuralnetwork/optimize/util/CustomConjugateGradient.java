@@ -135,8 +135,8 @@ public class CustomConjugateGradient  implements Optimizer {
 		long curr = 0;
 		for (int iterationCount = 0; iterationCount < numIterations; iterationCount++) {
 			curr = System.currentTimeMillis();
-			logger.info(myName + " ConjugateGradient: At iteration " + iterations + ", cost = " + fp + " -"
-					+ (curr - last));
+//			logger.info(myName + " ConjugateGradient: At iteration " + iterations + ", cost = " + fp + " -"
+//					+ (curr - last));
 			last = curr;
 			try {
 				step = lineMaximizer.optimize(xi, step);
@@ -149,7 +149,7 @@ public class CustomConjugateGradient  implements Optimizer {
 			// This termination provided by "Numeric Recipes in C".
 			if ((0 < tolerance) && (2.0 * Math.abs(fret - fp) <= tolerance * (Math.abs(fret) + Math.abs(fp) + eps))) {
 				logger.info("\nConjugateGradient converged: old value= " + fp + " new value= " + fret + " tolerance="
-						+ tolerance);
+						+ tolerance + ", iterations: " + iterationCount);
 				converged = true;
 				return true;
 			}
