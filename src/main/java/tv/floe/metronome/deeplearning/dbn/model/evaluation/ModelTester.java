@@ -52,6 +52,35 @@ public class ModelTester {
 	}	
 	
 	
+	
+	public static void evaluateModel( Matrix inputs, Matrix labels, BaseMultiLayerNeuralNetworkVectorized model ) throws IOException {
+		
+
+		Evaluation eval = new Evaluation();
+		//BaseMultiLayerNeuralNetworkVectorized load = BaseMultiLayerNeuralNetworkVectorized.loadFromFile(new FileInputStream(new File(modelLocation)));
+		
+//		while (iterator.hasNext()) {
+			
+//			DataSet inputs = iterator.next();
+
+//			Matrix in = inputs.getFirst();
+//			Matrix outcomes = inputs.getSecond();
+
+		Matrix predicted = model.predict(inputs);
+		
+		eval.eval( labels, predicted );
+			
+//		}
+		
+		
+		
+		log.warn( "evaluateModel" );
+		log.info( eval.stats() );		
+		
+		//writeReportToDisk( eval, pathForReport );
+		
+	}		
+	
 	public static void evaluateSavedModel( BaseDatasetIterator iterator, String modelLocation, String pathForReport ) throws IOException {
 		
 
