@@ -177,14 +177,14 @@ public class Test_DBN_Mnist_Dataset {
 	 * 
 	 */
 	@Test
-	public void testMnist() throws IOException {
+	public void testMnistTwoLabels() throws IOException {
 		
 		//PropertyConfigurator.configure( "src/test/resources/log4j/log4j_testing.properties" );
 		
 		int[] hiddenLayerSizes = { 500, 250, 100 };
-		double learningRate = 0.001;
-		int preTrainEpochs = 1000;
-		int fineTuneEpochs = 1000;
+		double learningRate = 0.01;
+		int preTrainEpochs = 100;
+		int fineTuneEpochs = 100;
 		int totalNumExamples = 20;
 		//int rowLimit = 100;
 				
@@ -253,18 +253,18 @@ public class Test_DBN_Mnist_Dataset {
 		do {
 			
 			recordsProcessed += batchSize;
-			
+*/			
 			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			
 			
-			dbn.finetune( first.getSecond(), learningRate, fineTuneEpochs );
-			
+			dbn.finetune( recordBatch.getSecond(), learningRate, fineTuneEpochs );
+/*			
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
 			}
 			
 		} while (fetcher.hasNext());
-		
+*/		
 		watch.stop();
 		
 		System.out.println("----------- Training Complete! -----------");
@@ -279,10 +279,11 @@ public class Test_DBN_Mnist_Dataset {
 		
 		
 		// now do evaluation of results ....
-		fetcher.reset();
+//		fetcher.reset();
+	
 		
-		ModelTester.evaluateModel(fetcher, dbn);
-		*/
+		
+		ModelTester.evaluateModel( recordBatch.getFirst(), recordBatch.getSecond(), dbn);
 		
 	}
 
