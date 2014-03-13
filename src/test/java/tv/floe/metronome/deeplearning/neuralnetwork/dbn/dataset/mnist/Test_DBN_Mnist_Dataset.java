@@ -195,8 +195,8 @@ public class Test_DBN_Mnist_Dataset {
 //		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
 //		DataSet first = fetcher.next();
 		
-		int[] filter = { 0, 1 };
-		DataSet recordBatch = this.filterDataset( filter, 20 );
+		int[] filter = { 0, 1, 2 };
+		DataSet recordBatch = this.filterDataset( filter, 30 );
 		
 		
 		//int numIns = first.getFirst().numCols();
