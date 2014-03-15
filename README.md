@@ -1,11 +1,12 @@
 Metronome is a suite of parallel iterative algorithms that run natively on Hadoop's Next Generation YARN platform. 
 
 *  Algorithms
-	* Parallel Neural Networks
-	* Parallel linear regression
+    * Parallel Neural Networks
+    * Parallel linear regression
     * Parallel logistic regression
     * Parallel K-means
     * Restricted Boltzmann Machines
+    * Deep Belief Networks (Layers of RBMs with a discriminitive layer)
 * Scales linearly with input size
 * Built on top of BSP-style computation framework "Iterative Reduce" (Hadoop / YARN)
 * Packaged in a new suite of parallel iterative algorithms called Metronome on [IterativeReduce] (https://github.com/emsixteeen/IterativeReduce)
