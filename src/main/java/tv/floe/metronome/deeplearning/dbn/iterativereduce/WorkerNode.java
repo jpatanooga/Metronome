@@ -206,9 +206,12 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	public void setup(Configuration c) {
 		
 		
-		
+
+
 
 	    this.conf = c;
+	    
+	    String useRegularization = "false";
 	    
 	    try {
 	      
@@ -216,31 +219,41 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 //	    this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
 	      
 	      this.learningRate = Double.parseDouble(this.conf.get(
-		          "tv.floe.metronome.neuralnetwork.conf.LearningRate", "0.1"));
+		          "tv.floe.metronome.dbn.conf.LearningRate", "0.001"));
 	      
-//	      this.trainingErrorThreshold = Double.parseDouble(this.conf.get(
-//	          "tv.floe.metronome.neuralnetwork.conf.TrainingErrorThreshold", "0.2"));
+	      this.batchSize = this.conf.getInt("tv.floe.metronome.dbn.conf.batchSize",  1);
 	      
-/*	      
-	    this.layerNeuronCounts = LoadStringConfVarOrException(
-		          "tv.floe.metronome.neuralnetwork.conf.LayerNeuronCounts",
-		          "Error loading config: could not load Layer Neuron Counts!");
-	*/	      
-/*
-	      String metricsOn = this.conf.get("tv.floe.metronome.neuralnetwork.conf.MetricsOn");
-	    if (metricsOn != null && metricsOn.equals("true")) {
-	    	this.metricsOn = true;
-	    }
-*/
-/*
-	      // maps to either CSV, 20newsgroups, or RCV1
-	      this.RecordFactoryClassname = LoadStringConfVarOrException(
-	          "tv.floe.metronome.neuralnetwork.conf.RecordFactoryClassname",
-	          "Error loading config: could not load RecordFactory classname");
-	*/      
+	      this.numIns = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberInputs", 784);
 	      
-	    		  
+	      this.numLabels = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberLabels", 10 );
+	      
+	      //500, 250, 100
+	      String hiddenLayerConfSizes = this.conf.get( "tv.floe.metronome.dbn.conf.hiddenLayerSizes" );
+	      
+	      String[] layerSizes = hiddenLayerConfSizes.split(",");
+	      this.hiddenLayerSizes = new int[ layerSizes.length ];
+	      for ( int x = 0; x < layerSizes.length; x++ ) {
+	    	  this.hiddenLayerSizes[ x ] = Integer.parseInt( layerSizes[ x ] );
+	      }
+	      
 
+	
+		    useRegularization = this.conf.get("tv.floe.metronome.dbn.conf.useRegularization");
+	
+		
+			
+			this.n_layers = hiddenLayerSizes.length;
+			
+			
+			this.dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
+	
+			if (useRegularization != null && useRegularization.equals("true")) {
+		    	this.dbn.useRegularization = true;
+		    }
+			
+			this.dbn.setSparsity( Double.parseDouble( this.conf.get( "tv.floe.metronome.dbn.conf.sparsity", "0.01") ) );
+			this.dbn.setMomentum( Double.parseDouble( this.conf.get( "tv.floe.metronome.dbn.conf.momentum", "0" ) ) );		
+			
 	      
 	      
 	    } catch (Exception e) {
@@ -249,25 +262,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	    }
 	    		
 
-		
-		this.batchSize = 1;
-		
-		// TODO: wire to conf
-		this.numIns = 784; 
-		this.numLabels = 10; 
-
-		// TODO: get hidden layer sizes from conf
-		//this.hiddenLayerSizes = 0;
-		
-		this.n_layers = hiddenLayerSizes.length;
-		
-		
-		this.dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
-				
-		this.dbn.useRegularization = false;
-		this.dbn.setSparsity( 0.01 );
-		this.dbn.setMomentum( 0 );		
-		
+	
 		
 	}
 	
