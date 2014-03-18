@@ -1,5 +1,7 @@
 package tv.floe.metronome.deeplearning.dbn.iterativereduce;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.apache.commons.lang3.time.StopWatch;
@@ -70,7 +72,14 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 		DBNParameterVector vector = new DBNParameterVector();
 		//vector.parameter_vector = this.polr.getBeta().clone(); // this.polr.getGamma().getMatrix().clone();
-/*
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		this.dbn.write(out);
+		
+		vector.dbn_payload = out.toByteArray();
+		
+		/*
 		if (this.lineParser.hasMoreRecords()) {
 			vector.IterationComplete = 0;
 		} else {
@@ -178,12 +187,16 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	
 	@Override
 	public DBNParameterVectorUpdateable compute(List<DBNParameterVectorUpdateable> arg0) {
+		
 		return compute();
+		
 	}
 	
 	@Override
 	public DBNParameterVectorUpdateable getResults() {
+		
 		return new DBNParameterVectorUpdateable( this.GenerateParameterVectorUpdate() );
+	
 	}
 	
 	/**
@@ -276,8 +289,11 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 		DBNParameterVector master_update = master_update_updateable.get();
 		
+		ByteArrayInputStream b = new ByteArrayInputStream( master_update.dbn_payload );
+		
+		
 		// now update the local DBN worker instance
-		//this.dbn
+		this.dbn.load(b);
 		
 		
 	}
