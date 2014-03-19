@@ -5,12 +5,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hadoop.io.Text;
+import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.RandomAccessSparseVector;
+import org.apache.mahout.math.Vector;
 
 import com.cloudera.iterativereduce.io.TextRecordParser;
 
 import tv.floe.metronome.deeplearning.datasets.MnistManager;
 import tv.floe.metronome.deeplearning.datasets.iterator.DataSetFetcher;
+import tv.floe.metronome.io.records.MetronomeRecordFactory;
+import tv.floe.metronome.io.records.RecordFactory;
 import tv.floe.metronome.math.ArrayUtils;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
@@ -24,9 +30,11 @@ import tv.floe.metronome.types.Pair;
  * 
  * TODO:
  * - need to setup the Metronome vectorizer to parse the line into a vector
+ * 		- replaces the functionality of the MnistManager
+ * 
  * - need to collect and cache the lines from the data block locally
  * - need to setup a mechanism to batch out records from the cache into a vectorized format
- * 		namely a Matrix
+ * 		- 
  * 
  * 
  * Down the Road
@@ -44,18 +52,30 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 	private static final long serialVersionUID = 1L;
 	//private transient MnistManager man;
 	public final static int NUM_EXAMPLES = 60000;
-	private TextRecordParser parser = null;
+
+	int currentVectorIndex = 0;
+	
+	TextRecordParser record_reader = null;
+	RecordFactory vector_factory = null;
+	
+	// tells the record factory how to layout the vectors in|out
+	private String vectorSchema = "i:784 | o:10";
+
+	boolean bCacheIsHot = false;
 
 	/**
 	 * For now we'll just give the fetcher an instantiated parser
 	 * - may can be a more elegant way to do this
+	 * 
+	 * We're assuming a text input format with a Metronome vector layout
 	 * 
 	 * @param hdfsLineParser
 	 * @throws IOException
 	 */
 	public MnistHDFSDataFetcher( TextRecordParser hdfsLineParser ) throws IOException {
 
-		this.parser = hdfsLineParser;
+		this.record_reader = hdfsLineParser;
+		this.vector_factory = new MetronomeRecordFactory( this.vectorSchema );
 		
 /*		
 		if (!new File("/tmp/mnist").exists()) {
@@ -64,11 +84,11 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 	*/	
 		//man = new MnistManager( "/tmp/MNIST/" + MnistFetcher.trainingFilesFilename_unzipped, "/tmp/MNIST/" + MnistFetcher.trainingFileLabelsFilename_unzipped );
 		numOutcomes = 10;
-		totalExamples = NUM_EXAMPLES;
+		//totalExamples = NUM_EXAMPLES;
 		//1 based cursor
 		cursor = 1;
 		//man.setCurrent(cursor);
-		int[][] image;
+		//int[][] image;
 /*
 		try {
 			image = man.readImage();
@@ -76,70 +96,127 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 			throw new IllegalStateException("Unable to read image");
 		}
 */
-		inputColumns = ArrayUtils.flatten(image).length;
+		inputColumns = 784; //ArrayUtils.flatten(image).length;
 
 
 	}
 
+	/**
+	 * Converts a line of Metronome record format to the Pair<Image,Label> format expected by the dataset code
+	 * 
+	 * expects the data to be in the raw state from the binary image files
+	 * 
+	 * TODO:
+	 * - look at efficiency here, prolly need to let the vector factory convert straight to Matrix recs
+	 * 
+	 * @param line
+	 * @return
+	 */
+	public Pair<Matrix,Matrix> convertMetronomeTextLineToMatrixInputPair( String line ) {
+		
+		Vector v_in = new RandomAccessSparseVector( this.vector_factory.getFeatureVectorSize());
+		Vector v_out = new RandomAccessSparseVector( this.vector_factory.getOutputVectorSize());
+		
+		//rec_factory.vectorizeLine(record_0, v_in, v_out);
+		try {
+			this.vector_factory.vectorizeLine(line, v_in, v_out);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Matrix input = new DenseMatrix( 1, v_in.size() );
+		input.viewRow(0).assign(v_in);
+		
+		// normalize
+		for (int d = 0; d < input.numCols(); d++) {
+			
+			if (input.get(0, d) > 30) {
+				
+				input.set(0, d, 1);
+				
+			} else {
+				
+				input.set(0, d, 0);
+				
+			}
+			
+		}		
+		
+		Matrix label = new DenseMatrix( 1, v_out.size() );
+		label.viewRow(0).assign(v_out);
+		
+		//Matrix out = createOutputVector(man.readLabel());
+		boolean found = false;
+		
+		for (int col = 0; col < label.numCols(); col++) {
+			
+			if (label.get(0, col) > 0) {
+				found = true;
+				break;
+			}
+			
+		}
+		
+		if (!found) {
+			
+			throw new IllegalStateException("Found a matrix without an outcome");
+			
+		}
+		
+		
+		return new Pair<Matrix, Matrix>(input, label);
+		
+	}
+
+	/**
+	 * NOTE:
+	 * 
+	 * - be sure to preserve the data normalization
+	 * 
+	 * TODO:
+	 * - cache the read vectors into batches
+	 * 		- do we cache the batch or just let that get recreated?
+	 * 
+	 */
 	@Override
 	public void fetch(int numExamples) {
-		if(!hasMore())
+		
+	    Text value = new Text();	    
+	    boolean result = true;
+		
+		
+		//if (!hasMore()) {
+		if (false == this.record_reader.hasMoreRecords()) {
+			
 			throw new IllegalStateException("Unable to get more; there are no more images");
+			
+		}
 
+		// so here we replace the MnistManager with the Hadoop based record reader to start pulling text based
+		// lines off hdfs
 
+		// so we need to convert each line into a 1 row matrix along w a 1 row matrix for the label
 
 		//we need to ensure that we don't overshoot the number of examples total
 		List<Pair<Matrix,Matrix>> toConvert = new ArrayList<Pair<Matrix,Matrix>>();
 
-		for(int i = 0; i < numExamples; i++,cursor++) {
-			if(!hasMore())
+		for (int i = 0; i < numExamples; i++, cursor++ ) {
+			
+			if (false == this.record_reader.hasMoreRecords()) {
+				
 				break;
-			if(man == null) {
-				try {
-					man = new MnistManager("/tmp/MNIST/" + MnistFetcher.trainingFilesFilename_unzipped,"/tmp/MNIST/" + MnistFetcher.trainingFileLabelsFilename_unzipped);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
+				
 			}
-			man.setCurrent(cursor);
-			//note data normalization
+			
 			try {
-				Matrix in = MatrixUtils.toMatrix(ArrayUtils.flatten(man.readImage()));
-				
-				for (int d = 0; d < in.numCols(); d++) {
-					
-					if (in.get(0, d) > 30) {
-						
-						in.set(0, d, 1);
-						
-					} else {
-						
-						in.set(0, d, 0);
-						
-					}
-					
-				}
-
-
-				Matrix out = createOutputVector(man.readLabel());
-				boolean found = false;
-				
-				for (int col = 0; col < out.numCols(); col++) {
-					
-					if (out.get(0, col) > 0) {
-						found = true;
-						break;
-					}
-					
-				}
-				if(!found)
-					throw new IllegalStateException("Found a matrix without an outcome");
-
-				toConvert.add(new Pair<Matrix, Matrix>(in,out));
+				result = this.record_reader.next(value);
 			} catch (IOException e) {
-				throw new IllegalStateException("Unable to read image");
-
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
+			toConvert.add( this.convertMetronomeTextLineToMatrixInputPair( value.toString() ));
 		}
 
 
