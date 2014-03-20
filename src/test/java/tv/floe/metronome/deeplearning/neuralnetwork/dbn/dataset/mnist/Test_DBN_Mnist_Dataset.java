@@ -191,21 +191,6 @@ public class Test_DBN_Mnist_Dataset {
 		return new DataSet( inputFiltered, labelsFiltered );
 	}
 	
-	private boolean metronomeVectorMatchesMatrixEntry(Vector metronome_vec, Vector matrix_vec) {
-		
-		
-		
-		return true;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	@Test
 	public void testMnistConversionToMetronomeFormatIsValid() throws IOException {
@@ -225,7 +210,7 @@ public class Test_DBN_Mnist_Dataset {
 		
 		
 		
-		MetronomeRecordFactory vector_factory = new MetronomeRecordFactory( "i:784 | o:10" );
+		//MetronomeRecordFactory vector_factory = new MetronomeRecordFactory( "i:784 | o:10" );
 		
 		
 		// setup splits ala HDFS style -------------------
