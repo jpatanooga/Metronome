@@ -10,12 +10,21 @@ import java.util.Map;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.Vector;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.cloudera.iterativereduce.io.TextRecordParser;
 
 
 
@@ -23,15 +32,65 @@ import org.slf4j.LoggerFactory;
 
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist.MNIST_DatasetUtils;
 import tv.floe.metronome.deeplearning.datasets.DataSet;
+import tv.floe.metronome.deeplearning.datasets.fetchers.MnistHDFSDataFetcher;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
+import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistHDFSDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
 import tv.floe.metronome.deeplearning.dbn.model.evaluation.ModelTester;
 import tv.floe.metronome.eval.Evaluation;
+import tv.floe.metronome.io.records.CachedVector;
+import tv.floe.metronome.io.records.CachedVectorReader;
+import tv.floe.metronome.io.records.MetronomeRecordFactory;
+import tv.floe.metronome.io.records.libsvmRecordFactory;
 import tv.floe.metronome.math.MatrixUtils;
 
 public class Test_DBN_Mnist_Dataset {
 	
 	private static Logger log = LoggerFactory.getLogger(Test_DBN_Mnist_Dataset.class);
+	
+	
+	
+
+	  private static JobConf defaultConf = new JobConf();
+	  private static FileSystem localFs = null; 
+	  static {
+	    try {
+	      defaultConf.set("fs.defaultFS", "file:///");
+	      localFs = FileSystem.getLocal(defaultConf);
+	    } catch (IOException e) {
+	      throw new RuntimeException("init failure", e);
+	    }
+	  }
+	
+	
+	private InputSplit[] generateDebugSplits(Path input_path, JobConf job) {
+
+		long block_size = localFs.getDefaultBlockSize();
+
+		System.out.println("default block size: " + (block_size / 1024 / 1024)
+				+ "MB");
+
+		// ---- set where we'll read the input files from -------------
+		FileInputFormat.setInputPaths(job, input_path);
+
+		// try splitting the file in a variety of sizes
+		TextInputFormat format = new TextInputFormat();
+		format.configure(job);
+
+		int numSplits = 1;
+
+		InputSplit[] splits = null;
+
+		try {
+			splits = format.getSplits(job, numSplits);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return splits;
+
+	}	
 	
 	
 	public static Matrix segmentOutSomeTestData(Matrix input, int max_count) {
@@ -130,6 +189,115 @@ public class Test_DBN_Mnist_Dataset {
 		
 		//DataSet ret = new DataSet();
 		return new DataSet( inputFiltered, labelsFiltered );
+	}
+	
+	private boolean metronomeVectorMatchesMatrixEntry(Vector metronome_vec, Vector matrix_vec) {
+		
+		
+		
+		return true;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@Test
+	public void testMnistConversionToMetronomeFormatIsValid() throws IOException {
+		
+		String vectors_filename = "/tmp/mnist_conversion_test.metronome";
+		
+		int batchSize = 5;
+		int totalNumExamples = 10;
+		
+		
+		MnistDataSetIterator stock_fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
+		
+		DataSet stock_recordBatch = stock_fetcher.next();
+		
+		Matrix stock_input = stock_recordBatch.getFirst();
+		Matrix stock_labels = stock_recordBatch.getSecond();		
+		
+		
+		
+		MetronomeRecordFactory vector_factory = new MetronomeRecordFactory( "i:784 | o:10" );
+		
+		
+		// setup splits ala HDFS style -------------------
+		
+	    JobConf job = new JobConf(defaultConf);
+	    
+	    Path workDir = new Path( vectors_filename );
+		
+		
+	    InputSplit[] splits = generateDebugSplits(workDir, job);
+	    
+	    System.out.println( "> splits: " + splits[0].toString() );
+
+	    
+	    TextRecordParser txt_reader = new TextRecordParser();
+
+	    long len = Integer.parseInt(splits[0].toString().split(":")[2]
+	        .split("\\+")[1]);
+
+	    txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);		
+		
+				
+
+	    
+		MnistHDFSDataSetIterator hdfs_fetcher = new MnistHDFSDataSetIterator( batchSize, totalNumExamples, txt_reader );
+		DataSet hdfs_recordBatch = hdfs_fetcher.next();
+		
+		Matrix hdfs_input = hdfs_recordBatch.getFirst();
+		Matrix hdfs_labels = hdfs_recordBatch.getSecond();		
+		
+		// setup splits ala HDFS style -------------------
+		
+		
+		// now download the binary data if needed 
+		
+		MNIST_DatasetUtils util = new MNIST_DatasetUtils();
+		util.convertFromBinaryFormatToMetronome( 5, vectors_filename );
+		
+		
+		assertEquals( hdfs_input.numCols(), stock_input.numCols() );
+		assertEquals( hdfs_input.numRows(), stock_input.numRows() );
+		
+		assertEquals( hdfs_labels.numCols(), stock_labels.numCols() );
+		assertEquals( hdfs_labels.numRows(), stock_labels.numRows() );
+		
+		System.out.println( "Stock and HDFS datasets match in columns and rows..." );
+		
+		
+		System.out.println( "Stock Input: " );
+		MatrixUtils.debug_print(stock_labels);
+		
+		System.out.println( "HDFS Input: " );
+		MatrixUtils.debug_print(hdfs_labels);
+			
+		assertEquals( true, MatrixUtils.elementwiseSame(stock_input, hdfs_input) );
+		
+		
+		assertEquals( true, MatrixUtils.elementwiseSame(stock_labels, hdfs_labels) );
+		
+		/*
+		
+		
+		for ( int x = 0; x < batchSize; x++ ) {
+			
+			
+			
+			this.metronomeVectorMatchesMatrixEntry(metronome_vec, input.viewRow(x) );
+			
+		}
+		
+		*/
+		
 	}
 	
 	
