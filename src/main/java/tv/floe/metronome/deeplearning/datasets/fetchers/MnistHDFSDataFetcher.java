@@ -29,12 +29,6 @@ import tv.floe.metronome.types.Pair;
  * 
  * 
  * TODO:
- * - need to setup the Metronome vectorizer to parse the line into a vector
- * 		- replaces the functionality of the MnistManager
- * 
- * - need to collect and cache the lines from the data block locally
- * - need to setup a mechanism to batch out records from the cache into a vectorized format
- * 		- 
  * 
  * 
  * Down the Road
@@ -51,7 +45,7 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 	 */
 	private static final long serialVersionUID = 1L;
 	//private transient MnistManager man;
-	public final static int NUM_EXAMPLES = 60000;
+	//public final static int NUM_EXAMPLES = 60000;
 
 	int currentVectorIndex = 0;
 	
@@ -76,35 +70,16 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 
 		this.record_reader = hdfsLineParser;
 		this.vector_factory = new MetronomeRecordFactory( this.vectorSchema );
-		
-/*		
-		if (!new File("/tmp/mnist").exists()) {
-			new MnistFetcher().downloadAndUntar();
-		}
-	*/	
-		//man = new MnistManager( "/tmp/MNIST/" + MnistFetcher.trainingFilesFilename_unzipped, "/tmp/MNIST/" + MnistFetcher.trainingFileLabelsFilename_unzipped );
 		numOutcomes = 10;
-		//totalExamples = NUM_EXAMPLES;
-		//1 based cursor
 		cursor = 1;
-		//man.setCurrent(cursor);
-		//int[][] image;
-/*
-		try {
-			image = man.readImage();
-		} catch (IOException e) {
-			throw new IllegalStateException("Unable to read image");
-		}
-*/
 		inputColumns = 784; //ArrayUtils.flatten(image).length;
-
 
 	}
 
 	/**
 	 * Converts a line of Metronome record format to the Pair<Image,Label> format expected by the dataset code
 	 * 
-	 * expects the data to be in the raw state from the binary image files
+	 * data comes into the this point already normalized by the conversion to text format
 	 * 
 	 * TODO:
 	 * - look at efficiency here, prolly need to let the vector factory convert straight to Matrix recs
@@ -117,7 +92,6 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 		Vector v_in = new RandomAccessSparseVector( this.vector_factory.getFeatureVectorSize());
 		Vector v_out = new RandomAccessSparseVector( this.vector_factory.getOutputVectorSize());
 		
-		//rec_factory.vectorizeLine(record_0, v_in, v_out);
 		try {
 			this.vector_factory.vectorizeLine(line, v_in, v_out);
 		} catch (Exception e) {
@@ -127,30 +101,10 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 		
 		Matrix input = new DenseMatrix( 1, v_in.size() );
 		input.viewRow(0).assign(v_in);
-		
-/*		// normalize
-		for (int d = 0; d < input.numCols(); d++) {
 			
-			System.out.println( "val: " + input.get(0, d) );
-			
-			if (input.get(0, d) > 30) {
-				
-				input.set(0, d, 1);
-				
-			} else {
-				
-				input.set(0, d, 0);
-				
-			}
-			
-		}		
-*/		
 		Matrix label = new DenseMatrix( 1, v_out.size() );
 		label.viewRow(0).assign(v_out);
 		
-//		System.out.println( "class: " + v_out.maxValueIndex() );
-		
-		//Matrix out = createOutputVector(man.readLabel());
 		boolean found = false;
 		
 		for (int col = 0; col < label.numCols(); col++) {
@@ -205,6 +159,10 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 		//we need to ensure that we don't overshoot the number of examples total
 		List<Pair<Matrix,Matrix>> toConvert = new ArrayList<Pair<Matrix,Matrix>>();
 
+		// so  we need to fill up a batch
+		// - if we cannot fill a batch, we need to get the tail end of the records
+		// - we need to come up w some way to bound the max number of records a worker touches
+		
 		for (int i = 0; i < numExamples; i++, cursor++ ) {
 			
 			if (false == this.record_reader.hasMoreRecords()) {
@@ -233,6 +191,14 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 	@Override
 	public void reset() {
 		cursor = 1;
+		this.record_reader.reset();
 	}
+	
+	@Override
+	public boolean hasMore() {
+		//return cursor < totalExamples;
+		return this.record_reader.hasMoreRecords();
+	}
+	
 
 }
