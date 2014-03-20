@@ -2,6 +2,7 @@ package tv.floe.metronome.deeplearning.dbn.iterativereduce;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.time.StopWatch;
@@ -12,6 +13,8 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 
+import tv.floe.metronome.deeplearning.datasets.DataSet;
+import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistHDFSDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
 import tv.floe.metronome.io.records.CachedVectorReader;
 
@@ -63,6 +66,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	
 	RandomGenerator rng = new MersenneTwister(123);
 	
+	MnistHDFSDataSetIterator hdfs_fetcher = null; //new MnistHDFSDataSetIterator( batchSize, totalNumExamples, txt_reader );
+	
 	/**
 	 * generates the local DBN parameter vector
 	 *  
@@ -111,7 +116,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	}
 	
 	/**
-	 * Run a training pass on the DBN
+	 * Run a training pass of a single batch of input records on the DBN
 	 * 
 	 */
 	@Override
@@ -122,23 +127,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		// mini-batches through dataset
 //		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
-//		DataSet first = fetcher.next();
-		
-//		int[] filter = { 0, 1, 2 };
-//		DataSet recordBatch = this.filterDataset( filter, 30 );
-		
-		
-		//int numIns = first.getFirst().numCols();
-		//int numLabels = first.getSecond().numCols();
-		
-//		int numIns = recordBatch.getFirst().numCols();
-//		int numLabels = recordBatch.getSecond().numCols();
-
-//		int n_layers = hiddenLayerSizes.length;
-		
-		
-
-		
+		DataSet hdfs_recordBatch = this.hdfs_fetcher.next();
+				
 		int recordsProcessed = 0;
 		
 		StopWatch watch = new StopWatch();
@@ -146,16 +136,18 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		StopWatch batchWatch = new StopWatch();
 		
-		
+		if (hdfs_recordBatch.getFirst().numRows() > 0) {
 //		do  {
-			
-			recordsProcessed += batchSize;
+		
+			// calc stats on number records processed
+			recordsProcessed += hdfs_recordBatch.getFirst().numRows();
 			
 			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			
 			batchWatch.reset();
 			batchWatch.start();
 //			dbn.preTrain( recordBatch.getFirst(), 1, learningRate, preTrainEpochs);
+			this.dbn.preTrain( hdfs_recordBatch.getFirst(), 1, this.learningRate, this.preTrainEpochs);
 			batchWatch.stop();
 			
 			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
@@ -169,18 +161,17 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			
 		} while (fetcher.hasNext());
 */
-		
-		
-		
-		
-		// TODO: finish this
+		} // if
+
+		// this is a clunky way to do this. dont judge me, working fast here.
 		DBNParameterVector dbn_update = new DBNParameterVector();
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		this.dbn.write(out);
+		dbn_update.dbn_payload = out.toByteArray();
 		
 		DBNParameterVectorUpdateable updateable = new DBNParameterVectorUpdateable();
 		updateable.param_msg = dbn_update;
-		
-		
-		
 		
 		return updateable;
 	}
@@ -204,10 +195,17 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	 * 
 	 */
 	@Override
-	public void setRecordParser(RecordParser arg0) {
+	public void setRecordParser(RecordParser lineParser) {
 
 //		this.lineParser = (TextRecordParser) rp;
 //		this.cachedVecReader = new CachedVectorReader(lineParser, rec_factory);
+		
+		try {
+			this.hdfs_fetcher = new MnistHDFSDataSetIterator( batchSize, totalNumExamples, (TextRecordParser)lineParser );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
