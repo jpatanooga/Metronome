@@ -128,8 +128,10 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 		Matrix input = new DenseMatrix( 1, v_in.size() );
 		input.viewRow(0).assign(v_in);
 		
-		// normalize
+/*		// normalize
 		for (int d = 0; d < input.numCols(); d++) {
+			
+			System.out.println( "val: " + input.get(0, d) );
 			
 			if (input.get(0, d) > 30) {
 				
@@ -142,9 +144,11 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 			}
 			
 		}		
-		
+*/		
 		Matrix label = new DenseMatrix( 1, v_out.size() );
 		label.viewRow(0).assign(v_out);
+		
+//		System.out.println( "class: " + v_out.maxValueIndex() );
 		
 		//Matrix out = createOutputVector(man.readLabel());
 		boolean found = false;
