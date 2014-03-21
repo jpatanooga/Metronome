@@ -44,8 +44,9 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	TextRecordParser lineParser = new TextRecordParser();
 	CachedVectorReader cachedVecReader = null; //new CachedVectorReader(lineParser, rec_factory); 
 
-	private boolean IterationComplete = false;
-	private int CurrentIteration = 0;
+	private boolean epochComplete = false;
+	private int currentEpoch = 0;
+	private int currentIteration = 0;
 	
 
 	// TODO: setup vars from conf
@@ -53,7 +54,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	double learningRate = 0.01;
 	int preTrainEpochs = 100;
 	int fineTuneEpochs = 100;
-	int totalNumExamples = 20;	
+	int totalTrainingDatasetSize = 20;	
 	
 	int batchSize = 1;
 	boolean showNetworkStats = true;
@@ -107,16 +108,26 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 	}	
 	
-	
+	/**
+	 * Need to think hard about how we define a "pass through the dataset"
+	 * - old definition: "iteration"
+	 * - new definition: "epoch"
+	 * 
+	 */
 	@Override
 	public boolean IncrementIteration() {
-		this.CurrentIteration++;
+		
+		this.currentIteration++;
+		//this.currentEpoch++;
 
 		return false;
 	}
 	
 	/**
 	 * Run a training pass of a single batch of input records on the DBN
+	 * 
+	 * TODO:
+	 * - handle the cases where we need to reset the record reader to do another pass
 	 * 
 	 */
 	@Override
@@ -197,11 +208,9 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	@Override
 	public void setRecordParser(RecordParser lineParser) {
 
-//		this.lineParser = (TextRecordParser) rp;
-//		this.cachedVecReader = new CachedVectorReader(lineParser, rec_factory);
-		
 		try {
-			this.hdfs_fetcher = new MnistHDFSDataSetIterator( batchSize, totalNumExamples, (TextRecordParser)lineParser );
+			// Q: is totalTrainingDatasetSize actually used anymore?
+			this.hdfs_fetcher = new MnistHDFSDataSetIterator( this.batchSize, this.totalTrainingDatasetSize, (TextRecordParser)lineParser );
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
