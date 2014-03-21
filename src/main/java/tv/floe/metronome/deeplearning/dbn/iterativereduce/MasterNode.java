@@ -21,6 +21,13 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	boolean hasHitThreshold = false;
 	protected Configuration conf = null;
 	
+	double learningRate = 0.01;
+	int batchSize = 1;
+	int numIns = 784;
+	int numLabels = 10;
+	int[] hiddenLayerSizes = null;
+	int n_layers = 1;
+	
 
 	@Override
 	public void complete(DataOutputStream arg0) throws IOException {
@@ -86,15 +93,12 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		
 	    for (DBNParameterVectorUpdateable nn_worker : workerUpdates) {
 
+
 //	    	accumNet.AccumulateWorkerNetwork(nn_worker.networkUpdate.network);
 //	    	avg_rmse += nn_worker.networkUpdate.RMSE;
 	    	
 	    }
 	    
-//	    avg_rmse = avg_rmse / workerUpdates.size();
-//	    BackPropogationLearningAlgorithm bp = ((BackPropogationLearningAlgorithm)this.master_nn.getLearningRule());
-//	    bp.getMetrics().setLastRMSE(avg_rmse);
-	 
 	    // TODO: examine termination conditions
 	    
 /*	    
@@ -125,13 +129,6 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		}
 */	    
 	    
-//	    this.master_nn.copyWeightsAndConf(accumNet);
-		
-//	    NeuralNetworkWeightsDelta nnwd = new NeuralNetworkWeightsDelta();
-//	    nnwd.network = this.master_nn;
-	    
-//	    return_msg.set(nnwd);
-	
 		DBNParameterVector dbn_update = new DBNParameterVector();
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -141,8 +138,6 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		//DBNParameterVectorUpdateable updateable = new DBNParameterVectorUpdateable();
 		masterReturnMsg.param_msg = dbn_update;
 	    
-	    
-		
 	    // THIS NEEDS TO BE DONE, probably automated!
 	    workerUpdates.clear();
 	    masterUpdates.clear();		
@@ -164,15 +159,37 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	@Override
 	public void setup(Configuration c) {
 	
-		
+		String useRegularization = "false";
 	
 	    this.conf = c;
 	    
 	    try {
 	
-	    	// this is the target to get the avg rmse under for testing purposes
-//	    	this.trainingErrorThreshold = Double.parseDouble(this.conf.get(
-//			          "tv.floe.metronome.neuralnetwork.conf.TrainingErrorThreshold", "0.2"));
+		      this.learningRate = Double.parseDouble(this.conf.get(
+			          "tv.floe.metronome.dbn.conf.LearningRate", "0.001"));
+		      
+		      this.batchSize = this.conf.getInt("tv.floe.metronome.dbn.conf.batchSize",  1);
+		      
+		      this.numIns = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberInputs", 784);
+		      
+		      this.numLabels = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberLabels", 10 );
+		      
+		      //500, 250, 100
+		      String hiddenLayerConfSizes = this.conf.get( "tv.floe.metronome.dbn.conf.hiddenLayerSizes" );
+		      
+		      String[] layerSizes = hiddenLayerConfSizes.split(",");
+		      this.hiddenLayerSizes = new int[ layerSizes.length ];
+		      for ( int x = 0; x < layerSizes.length; x++ ) {
+		    	  this.hiddenLayerSizes[ x ] = Integer.parseInt( layerSizes[ x ] );
+		      }
+		      
+
+		
+			    useRegularization = this.conf.get("tv.floe.metronome.dbn.conf.useRegularization");
+		
+			
+				
+				this.n_layers = hiddenLayerSizes.length;
 	      
 	
 	    } catch (Exception e) {
