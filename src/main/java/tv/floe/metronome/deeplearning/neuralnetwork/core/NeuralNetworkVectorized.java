@@ -86,7 +86,7 @@ public interface NeuralNetworkVectorized {
 	 * @param batchSize the batch size (number of training examples)
 	 * to average by
 	 */
-	//void merge(NeuralNetwork network,int batchSize);	
+	public void merge(NeuralNetworkVectorized network,int batchSize);	
 	
 	
 }
