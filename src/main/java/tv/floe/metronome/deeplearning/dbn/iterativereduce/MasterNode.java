@@ -6,21 +6,22 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.util.ToolRunner;
 
-import tv.floe.metronome.classification.neuralnetworks.iterativereduce.NetworkAccumulator;
-import tv.floe.metronome.classification.neuralnetworks.iterativereduce.NetworkWeightsUpdateable;
-import tv.floe.metronome.classification.neuralnetworks.iterativereduce.NeuralNetworkWeightsDelta;
-import tv.floe.metronome.classification.neuralnetworks.learning.BackPropogationLearningAlgorithm;
-import tv.floe.metronome.classification.neuralnetworks.networks.MultiLayerPerceptronNetwork;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
 
 import com.cloudera.iterativereduce.ComputableMaster;
+import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
 
 
 public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable> {
 
 	DeepBeliefNetwork dbn_averaged_master = null;
+	double trainingErrorThreshold = 0;
+	boolean hasHitThreshold = false;
+	protected Configuration conf = null;
 	
+
 	@Override
 	public void complete(DataOutputStream arg0) throws IOException {
 		// TODO Auto-generated method stub
@@ -153,14 +154,47 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 
 	@Override
 	public DBNParameterVectorUpdateable getResults() {
-		// TODO Auto-generated method stub
+		System.out.println("Master >>> getResults() - null!!!");
 		return null;
 	}
 
+	/**
+	 * TODO: finish this up!
+	 */
 	@Override
-	public void setup(Configuration arg0) {
-		// TODO Auto-generated method stub
+	public void setup(Configuration c) {
+	
+		
+	
+	    this.conf = c;
+	    
+	    try {
+	
+	    	// this is the target to get the avg rmse under for testing purposes
+//	    	this.trainingErrorThreshold = Double.parseDouble(this.conf.get(
+//			          "tv.floe.metronome.neuralnetwork.conf.TrainingErrorThreshold", "0.2"));
+	      
+	
+	    } catch (Exception e) {
+	      // TODO Auto-generated catch block
+	      e.printStackTrace();
+	      System.out.println(">> Error loading conf!");
+	    }
+	    
+	    System.out.println( "-----------------------------------------" );
+	    System.out.println( "# Master Conf #" );
+	    //System.out.println( "Number Iterations: " + this.NumberIterations );
+	    System.out.println( "-----------------------------------------\n\n" );
+	    		
 		
 	}
+
+  public static void main(String[] args) throws Exception {
+	    MasterNode pmn = new MasterNode();
+	    ApplicationMaster< DBNParameterVectorUpdateable > am = new ApplicationMaster< DBNParameterVectorUpdateable >(
+	        pmn, DBNParameterVectorUpdateable.class);
+	    
+	    ToolRunner.run(am, args);
+  }
 
 }
