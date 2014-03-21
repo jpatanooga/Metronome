@@ -525,6 +525,33 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		
 	}
 	
+	/**
+	 * Performs a (parameter average) network merge in the form of
+	 * a += b - a / n
+	 * where a is a matrix here
+	 * b is a matrix on the incoming network
+	 * and n is the batch size
+	 * @param network the network to merge with
+	 * @param batchSize the batch size (number of training examples)
+	 * to average by
+	 */	
+	@Override
+	public void merge(NeuralNetworkVectorized network,int batchSize) {
+
+		//			W.addi(network.getW().mini(W).div(batchSize));
+		
+		MatrixUtils.addi( this.connectionWeights, ( network.getConnectionWeights().minus( this.connectionWeights ).divide(batchSize) ) );
+		
+//			hBias.addi(network.gethBias().subi(hBias).divi(batchSize));
+
+		MatrixUtils.addi( this.hiddenBiasNeurons, ( network.getHiddenBias().minus( this.hiddenBiasNeurons ).divide( batchSize ) ) );
+		
+		//			vBias.addi(network.getvBias().subi(vBias).divi(batchSize));
+
+		MatrixUtils.addi( this.visibleBiasNeurons, ( network.getVisibleBias().minus( this.visibleBiasNeurons ).divide( batchSize ) ) );
+		
+	}
+	
 	public void jostleWeighMatrix() {
 		/*
 		 * Initialize based on the number of visible units..
