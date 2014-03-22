@@ -84,8 +84,8 @@ public class TestDBNLogisticRegression {
 		assertEquals( logRegression.nIn, logRegression_deser.nIn );
 		assertEquals( logRegression.nOut, logRegression_deser.nOut );
 
-		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.input, logRegression_deser.input ) );
-		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.labels, logRegression_deser.labels ) );
+//		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.input, logRegression_deser.input ) );
+//		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.labels, logRegression_deser.labels ) );
 		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.connectionWeights, logRegression_deser.connectionWeights ) );
 		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.biasTerms, logRegression_deser.biasTerms ) );
 		
