@@ -1,6 +1,7 @@
 package tv.floe.metronome.deeplearning.dbn;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +28,7 @@ import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
 import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
+import tv.floe.metronome.math.MatrixUtils;
 
 /**
  * Base draft of a Deep Belief Network based on RBMs
@@ -345,9 +348,14 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 * Used in parameter averaging
 	 * 
 	 * @param os the output stream to write to
+	 * @throws IOException 
 	 */
-	public void serializeParameters(OutputStream os) {
+/*	public void serializeParameters(OutputStream os) throws IOException {
 
+		//DataOutput do = DataOutputStream(os);
+		DataOutput d = new DataOutputStream(os);
+		d.writeInt(numberLayers);
+		
 	    // write in hidden layers
 	    for ( int x = 0; x < this.numberLayers; x++ ) {
 
@@ -366,15 +374,18 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	    		    
 
 	}		
+*/
 	
 	/**
 	 * Load parameter values from the byte stream 
 	 * 
 	 */
-	public void loadParameterValues(InputStream is) {
+/*	public void loadParameterValues(InputStream is) {
 		try {
 
 			DataInput di = new DataInputStream(is);
+			
+			this.numberLayers = di.readInt();
 			
 		    this.hiddenLayers = new HiddenLayer[ this.numberLayers ];
 		    // write in hidden layers
@@ -405,7 +416,86 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		}
 
 	}		
+*/
 
+	/**
+	 * Builds a DBN's weights from a serialized IR worker representation
+	 * - ONLY to be used in support of parameter averaging
+	 * 
+	 * @param payload
+	 * @return
+	 */
+/*	public void loadDBNFromWorkerMsg(byte[] payload) {
+		
+		ByteArrayInputStream b = new ByteArrayInputStream( payload );
+
+		this.loadParameterValues(b);
+		
+		
+	}
+*/	
+	/**
+	 * Computes an average parameter value from N worker updates
+	 * - the produced vectors are meant to be sent back to workers
+	 * 
+	 * Assumptions
+	 * 
+	 * TODO:
+	 * - we need to look at variations where this master copy DBN is still "usable"
+	 * 
+	 * @param workerDBNs
+	 */
+	public void computeAverageDBNParameterVector( ArrayList<DeepBeliefNetwork> workerDBNParameterVectors ) {
+		
+		// 1. setup the local DBN to match
+		// - right now we assume the DBNs match
+		
+
+		// 2. now take a look at each pre train layer
+		
+		for ( int worker = 0; worker < workerDBNParameterVectors.size(); worker++ ) {
+			
+			// sum/look at the pretrain layers
+		    for ( int layer = 0; layer < this.numberLayers; layer++ ) {
+	
+		    	MatrixUtils.addi( this.preTrainingLayers[ layer ].getConnectionWeights(), workerDBNParameterVectors.get(worker).preTrainingLayers[ layer ].getConnectionWeights() );
+		    	MatrixUtils.addi( this.preTrainingLayers[ layer ].getHiddenBias(), workerDBNParameterVectors.get(worker).preTrainingLayers[ layer ].getHiddenBias() );
+		    	MatrixUtils.addi( this.preTrainingLayers[ layer ].getVisibleBias(), workerDBNParameterVectors.get(worker).preTrainingLayers[ layer ].getVisibleBias() );
+		    	
+		    }
+		    
+		    // sum/look at the logistic layer
+		    
+		    MatrixUtils.addi( this.logisticRegressionLayer.connectionWeights, workerDBNParameterVectors.get(worker).logisticRegressionLayer.connectionWeights );
+		    MatrixUtils.addi( this.logisticRegressionLayer.biasTerms, workerDBNParameterVectors.get(worker).logisticRegressionLayer.biasTerms );
+		    		    
+		}
+		
+		// 3. compute averages for both pretrain, then update the hidden layer
+		
+		for ( int layer = 0; layer < this.numberLayers; layer++ ) {
+			
+			MatrixUtils.divi( this.preTrainingLayers[ layer ].getConnectionWeights(), workerDBNParameterVectors.size() );
+			MatrixUtils.divi( this.preTrainingLayers[ layer ].getHiddenBias(), workerDBNParameterVectors.size() );
+			MatrixUtils.divi( this.preTrainingLayers[ layer ].getVisibleBias(), workerDBNParameterVectors.size() );
+			
+			// now update the hidden layer
+			
+			//tied weights: must be updated at the same time
+			this.hiddenLayers[ layer ].biasTerms = this.preTrainingLayers[ layer ].getHiddenBias();
+			this.hiddenLayers[ layer ].connectionWeights = this.preTrainingLayers[ layer ].getConnectionWeights();
+			
+			
+		}
+		
+		// 4. compute averages for logistic layer
+		
+		MatrixUtils.divi( this.logisticRegressionLayer.connectionWeights, workerDBNParameterVectors.size() );
+		MatrixUtils.divi( this.logisticRegressionLayer.biasTerms, workerDBNParameterVectors.size() );
+	
+		
+	}
+	
 	
 	
 	

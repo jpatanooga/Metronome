@@ -171,10 +171,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 			} else {
 				
 				input_size = this.hiddenLayerSizes[ i - 1 ];
-				//layer_input = sigmoidLayers[i - 1].sample_h_given_v();
 				layer_input = this.hiddenLayers[i - 1].sampleHiddenGivenLastVisible();
 				// construct sigmoid_layer
-				//this.sigmoidLayers[i] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], null, null, rng,layer_input);
 				this.hiddenLayers[ i ] = new HiddenLayer(input_size, this.hiddenLayerSizes[i], this.randomGenerator);
 				this.hiddenLayers[ i ].setInput( layer_input );
 				
