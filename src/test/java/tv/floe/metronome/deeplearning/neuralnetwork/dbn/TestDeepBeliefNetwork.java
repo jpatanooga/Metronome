@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -378,16 +379,22 @@ public class TestDeepBeliefNetwork {
 		// save / write the model
 		
 		FileOutputStream oFileOutStream = new FileOutputStream( tmpFilename, false);
-		dbn.serializeParameters( oFileOutStream );
+		//dbn.serializeParameters( oFileOutStream );
+		dbn.write(oFileOutStream);
 		
 		// read / load the model
 		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
 		
 		
 		DeepBeliefNetwork dbn_deserialize = new DeepBeliefNetwork(1, hiddenLayerSizes, 1, hiddenLayerSizes.length, rng ); //, Matrix input, Matrix labels);
-		dbn_deserialize.loadParameterValues( oFileInputStream );
+		//dbn_deserialize.loadParameterValues( oFileInputStream );
+		dbn_deserialize.load(oFileInputStream);
 		
+		int[] hiddenLayerSizesTmp = new int[] {1};
 		
+		// now setup a DBN based on a clone operation via initBasedOn()
+		DeepBeliefNetwork dbn_merge_load = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
+		dbn_merge_load.initBasedOn(dbn_deserialize);
 		
 		
 		//assertEquals( dbn.inputNeuronCount, dbn_deserialize.inputNeuronCount );
@@ -396,7 +403,10 @@ public class TestDeepBeliefNetwork {
 		// check logistic layer
 		
 		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.connectionWeights, dbn_deserialize.logisticRegressionLayer.connectionWeights ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.connectionWeights, dbn_merge_load.logisticRegressionLayer.connectionWeights ) );
+		
 		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.biasTerms, dbn_deserialize.logisticRegressionLayer.biasTerms ) );
+		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.biasTerms, dbn_merge_load.logisticRegressionLayer.biasTerms ) );
 
 		
 		// check hidden layers
@@ -405,6 +415,10 @@ public class TestDeepBeliefNetwork {
 			assertEquals( true, MatrixUtils.elementwiseSame(dbn.hiddenLayers[i].biasTerms, dbn_deserialize.hiddenLayers[i].biasTerms ) );
 			assertEquals( true, MatrixUtils.elementwiseSame(dbn.hiddenLayers[i].connectionWeights, dbn_deserialize.hiddenLayers[i].connectionWeights ) );
 
+			assertEquals( dbn.hiddenLayers[i].biasTerms.numCols(), dbn_merge_load.hiddenLayers[i].biasTerms.numCols() );
+			assertEquals( dbn.hiddenLayers[i].connectionWeights.numCols(), dbn_merge_load.hiddenLayers[i].connectionWeights.numCols() );
+			
+			
 		}
 		
 		// check RBMs
@@ -414,9 +428,68 @@ public class TestDeepBeliefNetwork {
 			assertEquals( true, MatrixUtils.elementwiseSame(dbn.preTrainingLayers[i].getHiddenBias(), dbn_deserialize.preTrainingLayers[i].getHiddenBias() ) );
 			assertEquals( true, MatrixUtils.elementwiseSame(dbn.preTrainingLayers[i].getVisibleBias(), dbn_deserialize.preTrainingLayers[i].getVisibleBias() ) );
 
+			assertEquals( dbn.preTrainingLayers[i].getConnectionWeights().numCols(), dbn_merge_load.preTrainingLayers[i].getConnectionWeights().numCols() );
+			
+			for ( int row = 0; row < dbn.preTrainingLayers[i].getConnectionWeights().numRows(); row++ ) {
+
+				for ( int col = 0; col < dbn.preTrainingLayers[i].getConnectionWeights().numCols(); col++ ) {
+				
+					assertEquals( 0.0, dbn_merge_load.preTrainingLayers[i].getConnectionWeights().get( row, col), 0.0 );
+					
+				}
+				
+			}
+			
+			assertEquals( dbn.preTrainingLayers[i].getHiddenBias().numCols(), dbn_merge_load.preTrainingLayers[i].getHiddenBias().numCols() );
+
+			for ( int row = 0; row < dbn.preTrainingLayers[i].getHiddenBias().numRows(); row++ ) {
+
+				for ( int col = 0; col < dbn.preTrainingLayers[i].getHiddenBias().numCols(); col++ ) {
+
+					assertEquals( 0.0, dbn_merge_load.preTrainingLayers[i].getHiddenBias().get( row, col), 0.0 );
+					
+				}
+				
+			}
+			
+			assertEquals( dbn.preTrainingLayers[i].getVisibleBias().numCols(), dbn_merge_load.preTrainingLayers[i].getVisibleBias().numCols() );
+			
+			for ( int row = 0; row < dbn.preTrainingLayers[i].getVisibleBias().numRows(); row++ ) {
+
+				for ( int col = 0; col < dbn.preTrainingLayers[i].getVisibleBias().numCols(); col++ ) {
+
+					assertEquals( 0.0, dbn_merge_load.preTrainingLayers[i].getVisibleBias().get( row, col), 0.0 );
+					
+				}
+				
+			}
+			
 		}
 		
-	}		
+	}	
+	
+	
+	@Test
+	public void testParameterAveragingCode() {
+		
+
+		RandomGenerator rng = new MersenneTwister(123);
+
+		double preTrainLr = 0.001;
+		int preTrainEpochs = 100;
+		int k = 1;
+		int nIns = 2,nOuts = 2;
+		int[] hiddenLayerSizes = new int[] {2,2,2};
+		double fineTuneLr = 0.001;
+		int fineTuneEpochs = 100;
+		
+		DeepBeliefNetwork dbn_A = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng );
+		
+		DeepBeliefNetwork dbn_B = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng );
+		
+		
+		
+	}
 	
 	
 }
