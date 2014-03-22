@@ -196,6 +196,18 @@ public class HiddenLayer implements Serializable {
 		return layer;
 	}
 	
+	/**
+	 * Used solely in support of clearing weights for collecting worker weights in 
+	 * parameter averaging scenarios
+	 * 
+	 */
+	public void clearWeights() {
+		
+		this.biasTerms.assign(0.0);
+		this.connectionWeights.assign(0.0);
+		
+	}
+	
 	
 	/**
 	 * Serializes this to the output stream.
