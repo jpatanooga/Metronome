@@ -488,15 +488,16 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 
 	}
 	
+	@Override
 	public void clearWeights() {
 		
-		this.connectionWeights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons );// Matrix.zeros(nVisible,nHidden);
+	//	this.connectionWeights = new DenseMatrix( this.numberVisibleNeurons, this.numberHiddenNeurons );// Matrix.zeros(nVisible,nHidden);
 		this.connectionWeights.assign(0.0);
 		
-		this.hiddenBiasNeurons = new DenseMatrix(1, this.numberHiddenNeurons);// Matrix.zeros(nHidden);
+	//	this.hiddenBiasNeurons = new DenseMatrix(1, this.numberHiddenNeurons);// Matrix.zeros(nHidden);
 		this.hiddenBiasNeurons.assign(0.0);
 		
-		this.visibleBiasNeurons = new DenseMatrix(1, this.numberVisibleNeurons); // Matrix.zeros(nVisible);
+	//	this.visibleBiasNeurons = new DenseMatrix(1, this.numberVisibleNeurons); // Matrix.zeros(nVisible);
 		this.visibleBiasNeurons.assign(0.0);
 		
 		
