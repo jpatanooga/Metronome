@@ -108,6 +108,14 @@ public class LogisticRegression implements Serializable {
 		//b.addi(l.b.subi(b).div(batchSize));
 		this.biasTerms.plus(l.biasTerms.minus(this.biasTerms).divide(batchSize));
 	}
+	
+	public void clearWeights() {
+		
+		this.connectionWeights.assign( 0.0 );
+		
+		this.biasTerms.assign( 0.0 );
+		
+	}
 
 	/**
 	 * Objective function:  minimize negative log likelihood
