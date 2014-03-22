@@ -88,5 +88,7 @@ public interface NeuralNetworkVectorized {
 	 */
 	public void merge(NeuralNetworkVectorized network,int batchSize);	
 	
+	public void clearWeights();
+	
 	
 }
