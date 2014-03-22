@@ -258,11 +258,15 @@ public class LogisticRegression implements Serializable {
 		reg.biasTerms = biasTerms.clone();
 		reg.connectionWeights = connectionWeights.clone();
 		reg.l2 = this.l2;
-		reg.labels = this.labels.clone();
+
+//		reg.labels = this.labels.clone();
+		
 		reg.nIn = this.nIn;
 		reg.nOut = this.nOut;
 		reg.useRegularization = this.useRegularization;
-		reg.input = this.input.clone();
+
+//		reg.input = this.input.clone();
+		
 		return reg;
 	}	
 	
@@ -280,8 +284,9 @@ public class LogisticRegression implements Serializable {
 		    
 		    d.writeDouble( this.l2 );
 			
-		    MatrixWritable.writeMatrix(d, this.input );
-		    MatrixWritable.writeMatrix(d, this.labels );			
+//		    MatrixWritable.writeMatrix(d, this.input );
+//		    MatrixWritable.writeMatrix(d, this.labels );			
+
 		    MatrixWritable.writeMatrix(d, this.connectionWeights );
 		    MatrixWritable.writeMatrix(d, this.biasTerms );
 		    
@@ -308,8 +313,9 @@ public class LogisticRegression implements Serializable {
 			
 			this.l2 = di.readDouble();
 
-			this.input = MatrixWritable.readMatrix( di );
-			this.labels = MatrixWritable.readMatrix( di );
+//			this.input = MatrixWritable.readMatrix( di );
+//			this.labels = MatrixWritable.readMatrix( di );
+
 			this.connectionWeights = MatrixWritable.readMatrix( di );
 			this.biasTerms = MatrixWritable.readMatrix( di );
 			
