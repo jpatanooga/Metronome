@@ -56,6 +56,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 	public transient NeuralNetworkOptimizer optimizer;
 	public double[] debugWeightAddsBuffer = null; // only set when we want to check things
 	
+	public RestrictedBoltzmannMachine() { }
 
 	public RestrictedBoltzmannMachine(int nVisible, int nHidden, Matrix weights, Matrix hBias, Matrix vBias, RandomGenerator rng) {
 		super(nVisible, nHidden, weights, hBias, vBias, rng);
