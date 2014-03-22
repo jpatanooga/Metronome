@@ -645,6 +645,29 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 
 	}	
+	
+	public void initBasedOn(BaseMultiLayerNeuralNetworkVectorized network) {
+		
+		this.update(network);
+		
+		// now clear all connections.
+		
+
+		for (int i = 0; i < preTrainingLayers.length; i++) {
+			
+			this.preTrainingLayers[i].clearWeights();
+			
+		}
+
+		this.logisticRegressionLayer.clearWeights();
+				
+		for (int i = 0; i < hiddenLayers.length; i++) {
+			
+			this.hiddenLayers[ i ].clearWeights();
+			
+		}		
+		
+	}
 
 
 	/**
