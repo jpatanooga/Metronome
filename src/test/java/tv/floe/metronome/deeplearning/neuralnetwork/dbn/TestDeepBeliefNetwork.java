@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -396,6 +397,8 @@ public class TestDeepBeliefNetwork {
 		DeepBeliefNetwork dbn_merge_load = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
 		dbn_merge_load.initBasedOn(dbn_deserialize);
 		
+		DeepBeliefNetwork dbn_merge_load_2 = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
+		dbn_merge_load_2.initBasedOn( dbn );
 		
 		//assertEquals( dbn.inputNeuronCount, dbn_deserialize.inputNeuronCount );
 		//assertEquals( dbn.l2, dbn_deserialize.l2, 0.0 );
@@ -479,15 +482,85 @@ public class TestDeepBeliefNetwork {
 		int preTrainEpochs = 100;
 		int k = 1;
 		int nIns = 2,nOuts = 2;
-		int[] hiddenLayerSizes = new int[] {2,2,2};
+		int[] hiddenLayerSizes = new int[] {2,2};
 		double fineTuneLr = 0.001;
 		int fineTuneEpochs = 100;
 		
-		DeepBeliefNetwork dbn_A = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng );
+		DeepBeliefNetwork dbn_A = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng, x_xor_Matrix, y_xor_Matrix );
 		
-		DeepBeliefNetwork dbn_B = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng );
+		// setup layer 0
+		dbn_A.preTrainingLayers[ 0 ].getConnectionWeights().set(0, 0, 1.0);
+		dbn_A.preTrainingLayers[ 0 ].getConnectionWeights().set(0, 1, 1.0);
+		dbn_A.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 0, 1.0);
+		dbn_A.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 1, 1.0);
+		
+		// setup layer 1
+		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 0, 1.0);
+		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 1, 1.0);
+		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(1, 0, 1.0);
+		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(1, 1, 1.0);
+		
+		// setup log layer
+		dbn_A.logisticRegressionLayer.connectionWeights.set(0, 0, 1.0);
+		dbn_A.logisticRegressionLayer.connectionWeights.set(0, 1, 1.0);
+		dbn_A.logisticRegressionLayer.connectionWeights.set(1, 0, 1.0);
+		dbn_A.logisticRegressionLayer.connectionWeights.set(1, 1, 1.0);
+		
+		// MatrixUtils.debug_print( dbn_A.preTrainingLayers[ 0 ].getConnectionWeights() );
+
+		
+		DeepBeliefNetwork dbn_B = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng, x_xor_Matrix, y_xor_Matrix );
+
+		dbn_B.preTrainingLayers[ 0 ].getConnectionWeights().set(0, 0, 2.0);
+		dbn_B.preTrainingLayers[ 0 ].getConnectionWeights().set(0, 1, 1.0);
+		dbn_B.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 0, 3.0);
+		dbn_B.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 1, 4.0);
+
+		dbn_B.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 0, 2.0);
+		dbn_B.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 1, 1.0);
+		dbn_B.preTrainingLayers[ 1 ].getConnectionWeights().set(1, 0, 3.0);
+		dbn_B.preTrainingLayers[ 1 ].getConnectionWeights().set(1, 1, 4.0);
+		
+		dbn_B.logisticRegressionLayer.connectionWeights.set(0, 0, 1.0);
+		dbn_B.logisticRegressionLayer.connectionWeights.set(0, 1, 2.0);
+		dbn_B.logisticRegressionLayer.connectionWeights.set(1, 0, 3.0);
+		dbn_B.logisticRegressionLayer.connectionWeights.set(1, 1, 4.0);
 		
 		
+		// MatrixUtils.debug_print( dbn_B.preTrainingLayers[ 0 ].getConnectionWeights() );
+		
+		int[] hiddenLayerSizesTmp = new int[] {1};
+		
+		// now setup a DBN based on a clone operation via initBasedOn()
+//		DeepBeliefNetwork dbn_merge_load = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null);
+		
+		// this only works if the workers have been initialized on data
+		DeepBeliefNetwork dbn_master = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null);
+		dbn_master.initBasedOn(dbn_A);
+		
+		
+		ArrayList<DeepBeliefNetwork> workers = new ArrayList<DeepBeliefNetwork>();
+		workers.add(dbn_A);
+		workers.add(dbn_B);
+		
+		dbn_master.computeAverageDBNParameterVector(workers);
+		
+		assertEquals( 1.5, dbn_master.preTrainingLayers[ 0 ].getConnectionWeights().get(0, 0), 0.0 );
+		assertEquals( 1.0, dbn_master.preTrainingLayers[ 0 ].getConnectionWeights().get(0, 1), 0.0 );
+		assertEquals( 2.0, dbn_master.preTrainingLayers[ 0 ].getConnectionWeights().get(1, 0), 0.0 );
+		assertEquals( 2.5, dbn_master.preTrainingLayers[ 0 ].getConnectionWeights().get(1, 1), 0.0 );
+		
+		assertEquals( 1.5, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(0, 0), 0.0 );
+		assertEquals( 1.0, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(0, 1), 0.0 );
+		assertEquals( 2.0, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(1, 0), 0.0 );
+		assertEquals( 2.5, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(1, 1), 0.0 );
+		
+		// dbn_B.logisticRegressionLayer.connectionWeights
+		
+		assertEquals( 1.0, dbn_master.logisticRegressionLayer.connectionWeights.get(0, 0), 0.0 );		
+		assertEquals( 1.5, dbn_master.logisticRegressionLayer.connectionWeights.get(0, 1), 0.0 );
+		assertEquals( 2.0, dbn_master.logisticRegressionLayer.connectionWeights.get(1, 0), 0.0 );
+		assertEquals( 2.5, dbn_master.logisticRegressionLayer.connectionWeights.get(1, 1), 0.0 );
 		
 	}
 	

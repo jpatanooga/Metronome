@@ -451,12 +451,18 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		// - right now we assume the DBNs match
 		
 
+//		MatrixUtils.debug_print( workerDBNParameterVectors.get(0).preTrainingLayers[ 0 ].getConnectionWeights() );
+//		MatrixUtils.debug_print( workerDBNParameterVectors.get(1).preTrainingLayers[ 0 ].getConnectionWeights() );
+		//MatrixUtils.debug_print( this.preTrainingLayers[ 0 ].getConnectionWeights() );
+		
 		// 2. now take a look at each pre train layer
 		
 		for ( int worker = 0; worker < workerDBNParameterVectors.size(); worker++ ) {
 			
 			// sum/look at the pretrain layers
 		    for ( int layer = 0; layer < this.numberLayers; layer++ ) {
+		    	
+		    	
 	
 		    	MatrixUtils.addi( this.preTrainingLayers[ layer ].getConnectionWeights(), workerDBNParameterVectors.get(worker).preTrainingLayers[ layer ].getConnectionWeights() );
 		    	MatrixUtils.addi( this.preTrainingLayers[ layer ].getHiddenBias(), workerDBNParameterVectors.get(worker).preTrainingLayers[ layer ].getHiddenBias() );
@@ -470,6 +476,9 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		    MatrixUtils.addi( this.logisticRegressionLayer.biasTerms, workerDBNParameterVectors.get(worker).logisticRegressionLayer.biasTerms );
 		    		    
 		}
+		
+//		System.out.println( "Pre Train Layer Debug (pre divide)" );
+//		MatrixUtils.debug_print( this.preTrainingLayers[ 0 ].getConnectionWeights() );
 		
 		// 3. compute averages for both pretrain, then update the hidden layer
 		
@@ -488,6 +497,9 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			
 		}
 		
+//		System.out.println( "Pre Train Layer Debug (post divide)" );
+//		MatrixUtils.debug_print( this.preTrainingLayers[ 0 ].getConnectionWeights() );
+
 		// 4. compute averages for logistic layer
 		
 		MatrixUtils.divi( this.logisticRegressionLayer.connectionWeights, workerDBNParameterVectors.size() );
