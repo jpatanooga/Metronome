@@ -11,9 +11,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
-import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
-import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
-import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 
 import com.cloudera.iterativereduce.ComputableMaster;
 import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
@@ -57,46 +54,8 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		
 		DBNParameterVectorUpdateable firstWorkerMsg = workerUpdates.iterator().next();
 
-		if (null == firstWorkerMsg) {
-			
-			System.out.println("Can't seem to get the first network weights updateable");
-			
-		} else {
-			
-			if (null == this.dbn_averaged_master) {
-				
-				System.out.println("Building base master MLP network");
-				//this.master_nn = new MultiLayerPerceptronNetwork();
-				
-				// TODO: init dbn_averaged_master
-				
-		        try {
-					//this.master_nn.buildFromConf(first.networkUpdate.network.getConfig());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		        
-			}
-			
-		}	
-		
-		
-		
-		try {
-			//accumNet = NetworkAccumulator.buildAveragingNetworkFromConf(first.networkUpdate.network.getConfig());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-/*		
-		if (null == accumNet) {
-			System.out.println("Master: Network Accumulator is null! [Error]");
-			return null;
-		}
-*/
-
 		int[] hiddenLayerSizesTmp = new int[] {1};
+		
 		ArrayList<DeepBeliefNetwork> workerDBNs = new ArrayList<DeepBeliefNetwork>();
 		
 	    for (DBNParameterVectorUpdateable dbn_worker : workerUpdates) {
@@ -114,15 +73,14 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 			}
 			
 			workerDBNs.add(dbn_worker_deser);
-	    	
-//	    	dbn_worker.param_msg.dbn_payload
-
-//	    	accumNet.AccumulateWorkerNetwork(nn_worker.networkUpdate.network);
-//	    	avg_rmse += nn_worker.networkUpdate.RMSE;
-	    	
+	    		    	
 	    }
 	    
+	    // init master w dummy params
+	    this.dbn_averaged_master = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null);
+	    
 	    this.dbn_averaged_master.initBasedOn( workerDBNs.get( 0 ) );
+	    this.dbn_averaged_master.computeAverageDBNParameterVector(workerDBNs);
 	    
 	    // TODO: examine termination conditions
 	    
@@ -144,15 +102,7 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	    	
 	    }
 */	    	
-	    
-	    // TODO: compute average of weights
-/*	    try {
-			accumNet.AverageNetworkWeights();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-*/	    
+
 	    
 		DBNParameterVector dbn_update = new DBNParameterVector();
 		
@@ -172,54 +122,16 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		return masterReturnMsg;
 	}
 	
-	/**
-	 * TODO
-	 * - deserialize each message into a DBN
-	 * - sum up each matrix and divide by the total message count
-	 * 
-	 * @param workerDBNs
-	 * @return
-	 */
-	public DeepBeliefNetwork computeAveragedParameters( Collection<DBNParameterVectorUpdateable> workerDBNs ) {
-/*		
-	    this.hiddenLayers = new HiddenLayer[ this.numberLayers ];
-	    // write in hidden layers
-	    for ( int x = 0; x < this.numberLayers; x++ ) {
-
-	    	this.hiddenLayers[ x ] = new HiddenLayer( 1, 1, null); 
-	    	this.hiddenLayers[ x ].load( is );
-	    	
-	    	
-	    }
-	    
-	    
-	    // this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
-	    this.logisticRegressionLayer = new LogisticRegression();
-	    this.logisticRegressionLayer.load(is);
-	    
-	    this.preTrainingLayers = new RestrictedBoltzmannMachine[ this.numberLayers ];
-	    for ( int x = 0; x < this.numberLayers; x++ ) {
-
-	    	this.preTrainingLayers[ x ] = new RestrictedBoltzmannMachine(1, 1, null);
-	    	((RestrictedBoltzmannMachine)this.preTrainingLayers[ x ]).load(is);
-	    	//this.preTrainingLayers[ x ] = rbm;
-	    	
-	    }
-*/
-		return null;
-	}
-	
 
 
 	@Override
 	public DBNParameterVectorUpdateable getResults() {
+		
 		System.out.println("Master >>> getResults() - null!!!");
 		return null;
+		
 	}
 
-	/**
-	 * TODO: finish this up!
-	 */
 	@Override
 	public void setup(Configuration c) {
 	
