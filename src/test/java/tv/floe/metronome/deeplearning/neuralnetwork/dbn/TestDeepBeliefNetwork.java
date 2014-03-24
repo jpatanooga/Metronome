@@ -595,6 +595,12 @@ public class TestDeepBeliefNetwork {
 		assertEquals( 15.0, dbn_master.preTrainingLayers[ 0 ].getVisibleBias().get(0, 0), 0.0 );
 		assertEquals( 16.0, dbn_master.preTrainingLayers[ 0 ].getVisibleBias().get(0, 1), 0.0 );
 		
+		// now make sure the stock hidden weights are the same as the pre-train layer
+		
+		assertEquals( true, MatrixUtils.elementwiseSame( dbn_master.preTrainingLayers[ 0 ].getConnectionWeights(), dbn_master.hiddenLayers[ 0 ].connectionWeights ) );
+		// hidden bias == bias ?
+		assertEquals( true, MatrixUtils.elementwiseSame( dbn_master.preTrainingLayers[ 0 ].getHiddenBias(), dbn_master.hiddenLayers[ 0 ].biasTerms ) );
+
 		
 		assertEquals( 1.5, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(0, 0), 0.0 );
 		assertEquals( 1.0, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(0, 1), 0.0 );
