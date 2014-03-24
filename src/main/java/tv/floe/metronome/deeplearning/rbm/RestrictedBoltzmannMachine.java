@@ -124,7 +124,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		//this.visibleBiasNeurons = new DenseMatrix( this.numberVisibleNeurons, 1 );
 		this.visibleBiasNeurons.assign(0.0);
 
-		System.out.println("Creating RBM: visible: " + this.numberVisibleNeurons + ", hidden: " + this.numberHiddenNeurons );
+		//System.out.println("Creating RBM: visible: " + this.numberVisibleNeurons + ", hidden: " + this.numberHiddenNeurons );
 		
 		
 	}
@@ -605,7 +605,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		    MatrixWritable.writeMatrix(d, this.hiddenBiasNeurons );
 		    MatrixWritable.writeMatrix(d, this.visibleBiasNeurons );
 		    MatrixWritable.writeMatrix(d, this.connectionWeights );
-		    MatrixWritable.writeMatrix(d, this.trainingDataset );	
+//		    MatrixWritable.writeMatrix(d, this.trainingDataset );	
 		    		    
 		    oos.writeObject( this.randNumGenerator );
 
@@ -649,7 +649,7 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		    this.hiddenBiasNeurons = MatrixWritable.readMatrix( di );
 		    this.visibleBiasNeurons = MatrixWritable.readMatrix( di );
 		    this.connectionWeights = MatrixWritable.readMatrix( di );
-		    this.trainingDataset = MatrixWritable.readMatrix( di );	
+//		    this.trainingDataset = MatrixWritable.readMatrix( di );	
 		    		    
 		    this.randNumGenerator = (RandomGenerator) ois.readObject();
 
