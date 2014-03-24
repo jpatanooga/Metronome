@@ -1,14 +1,19 @@
 package tv.floe.metronome.deeplearning.dbn.iterativereduce;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
+import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
+import tv.floe.metronome.deeplearning.rbm.RestrictedBoltzmannMachine;
 
 import com.cloudera.iterativereduce.ComputableMaster;
 import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
@@ -90,14 +95,34 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 			return null;
 		}
 */
-		
-	    for (DBNParameterVectorUpdateable nn_worker : workerUpdates) {
 
+		int[] hiddenLayerSizesTmp = new int[] {1};
+		ArrayList<DeepBeliefNetwork> workerDBNs = new ArrayList<DeepBeliefNetwork>();
+		
+	    for (DBNParameterVectorUpdateable dbn_worker : workerUpdates) {
+
+	    	ByteArrayInputStream baInputStream = new ByteArrayInputStream( dbn_worker.param_msg.dbn_payload );
+	    	
+			DeepBeliefNetwork dbn_worker_deser = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
+			dbn_worker_deser.load( baInputStream );
+			
+			try {
+				baInputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			workerDBNs.add(dbn_worker_deser);
+	    	
+//	    	dbn_worker.param_msg.dbn_payload
 
 //	    	accumNet.AccumulateWorkerNetwork(nn_worker.networkUpdate.network);
 //	    	avg_rmse += nn_worker.networkUpdate.RMSE;
 	    	
 	    }
+	    
+	    this.dbn_averaged_master.initBasedOn( workerDBNs.get( 0 ) );
 	    
 	    // TODO: examine termination conditions
 	    
@@ -146,6 +171,45 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		
 		return masterReturnMsg;
 	}
+	
+	/**
+	 * TODO
+	 * - deserialize each message into a DBN
+	 * - sum up each matrix and divide by the total message count
+	 * 
+	 * @param workerDBNs
+	 * @return
+	 */
+	public DeepBeliefNetwork computeAveragedParameters( Collection<DBNParameterVectorUpdateable> workerDBNs ) {
+/*		
+	    this.hiddenLayers = new HiddenLayer[ this.numberLayers ];
+	    // write in hidden layers
+	    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+	    	this.hiddenLayers[ x ] = new HiddenLayer( 1, 1, null); 
+	    	this.hiddenLayers[ x ].load( is );
+	    	
+	    	
+	    }
+	    
+	    
+	    // this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
+	    this.logisticRegressionLayer = new LogisticRegression();
+	    this.logisticRegressionLayer.load(is);
+	    
+	    this.preTrainingLayers = new RestrictedBoltzmannMachine[ this.numberLayers ];
+	    for ( int x = 0; x < this.numberLayers; x++ ) {
+
+	    	this.preTrainingLayers[ x ] = new RestrictedBoltzmannMachine(1, 1, null);
+	    	((RestrictedBoltzmannMachine)this.preTrainingLayers[ x ]).load(is);
+	    	//this.preTrainingLayers[ x ] = rbm;
+	    	
+	    }
+*/
+		return null;
+	}
+	
+
 
 	@Override
 	public DBNParameterVectorUpdateable getResults() {
