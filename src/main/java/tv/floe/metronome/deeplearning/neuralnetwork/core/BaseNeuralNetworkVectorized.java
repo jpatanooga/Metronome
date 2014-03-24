@@ -256,7 +256,7 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			ret.setnHidden(getnHidden());
 			ret.setnVisible(getnVisible());
 			//ret.setW(W.dup());
-			ret.setConnectionWeights( this.connectionWeights.transpose() );
+			ret.setConnectionWeights( this.connectionWeights.clone() );
 			ret.setRng(getRng());
 
 			return ret;
