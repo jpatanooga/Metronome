@@ -1,4 +1,4 @@
-package tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist;
+package tv.floe.metronome.datasets;
 
 //import net.vivin.digit.DigitImage;    
 import java.io.BufferedReader;

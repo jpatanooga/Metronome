@@ -30,7 +30,7 @@ import com.cloudera.iterativereduce.io.TextRecordParser;
 
 
 
-import tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist.MNIST_DatasetUtils;
+import tv.floe.metronome.datasets.MNIST_DatasetUtils;
 import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.fetchers.MnistHDFSDataFetcher;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;

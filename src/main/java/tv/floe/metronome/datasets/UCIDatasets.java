@@ -9,7 +9,6 @@ import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
-import tv.floe.metronome.classification.neuralnetworks.iterativereduce.mnist.MNIST_DatasetUtils;
 import tv.floe.metronome.io.records.MetronomeRecordFactory;
 import tv.floe.metronome.types.Pair;
 
