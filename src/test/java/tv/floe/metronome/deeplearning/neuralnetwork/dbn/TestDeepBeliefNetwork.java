@@ -494,11 +494,24 @@ public class TestDeepBeliefNetwork {
 		dbn_A.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 0, 1.0);
 		dbn_A.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 1, 1.0);
 		
+		// Layer 0: hidden bias
+		
+		dbn_A.preTrainingLayers[ 0 ].getHiddenBias().set( 0, 0, 15.0 );
+		dbn_A.preTrainingLayers[ 0 ].getHiddenBias().set( 0, 1, 16.0 );
+				
+		// Layer 0: visible bias
+
+		dbn_A.preTrainingLayers[ 0 ].getVisibleBias().set( 0, 0, 25.0 );
+		dbn_A.preTrainingLayers[ 0 ].getVisibleBias().set( 0, 1, 26.0 );
+		
+		
 		// setup layer 1
 		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 0, 1.0);
 		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 1, 1.0);
 		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(1, 0, 1.0);
 		dbn_A.preTrainingLayers[ 1 ].getConnectionWeights().set(1, 1, 1.0);
+
+		
 		
 		// setup log layer
 		dbn_A.logisticRegressionLayer.connectionWeights.set(0, 0, 1.0);
@@ -506,8 +519,15 @@ public class TestDeepBeliefNetwork {
 		dbn_A.logisticRegressionLayer.connectionWeights.set(1, 0, 1.0);
 		dbn_A.logisticRegressionLayer.connectionWeights.set(1, 1, 1.0);
 		
-		// MatrixUtils.debug_print( dbn_A.preTrainingLayers[ 0 ].getConnectionWeights() );
+		MatrixUtils.debug_print( dbn_A.logisticRegressionLayer.biasTerms );
 
+		// set up bias terms
+		
+		dbn_A.logisticRegressionLayer.biasTerms.set( 0, 0, 35.0 );
+		dbn_A.logisticRegressionLayer.biasTerms.set( 0, 1, 36.0 );
+		
+		
+		
 		
 		DeepBeliefNetwork dbn_B = new DeepBeliefNetwork(nIns, hiddenLayerSizes, nOuts, hiddenLayerSizes.length, rng, x_xor_Matrix, y_xor_Matrix );
 
@@ -516,6 +536,18 @@ public class TestDeepBeliefNetwork {
 		dbn_B.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 0, 3.0);
 		dbn_B.preTrainingLayers[ 0 ].getConnectionWeights().set(1, 1, 4.0);
 
+		// Layer 0: hidden bias
+		
+		dbn_B.preTrainingLayers[ 0 ].getHiddenBias().set( 0, 0, 5.0 );
+		dbn_B.preTrainingLayers[ 0 ].getHiddenBias().set( 0, 1, 6.0 );
+				
+		// Layer 0: visible bias
+
+		dbn_B.preTrainingLayers[ 0 ].getVisibleBias().set( 0, 0, 5.0 );
+		dbn_B.preTrainingLayers[ 0 ].getVisibleBias().set( 0, 1, 6.0 );
+
+		// layer 2
+		
 		dbn_B.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 0, 2.0);
 		dbn_B.preTrainingLayers[ 1 ].getConnectionWeights().set(0, 1, 1.0);
 		dbn_B.preTrainingLayers[ 1 ].getConnectionWeights().set(1, 0, 3.0);
@@ -525,6 +557,9 @@ public class TestDeepBeliefNetwork {
 		dbn_B.logisticRegressionLayer.connectionWeights.set(0, 1, 2.0);
 		dbn_B.logisticRegressionLayer.connectionWeights.set(1, 0, 3.0);
 		dbn_B.logisticRegressionLayer.connectionWeights.set(1, 1, 4.0);
+		
+		dbn_B.logisticRegressionLayer.biasTerms.set( 0, 0, 5.0 );
+		dbn_B.logisticRegressionLayer.biasTerms.set( 0, 1, 6.0 );
 		
 		
 		// MatrixUtils.debug_print( dbn_B.preTrainingLayers[ 0 ].getConnectionWeights() );
@@ -549,18 +584,35 @@ public class TestDeepBeliefNetwork {
 		assertEquals( 1.0, dbn_master.preTrainingLayers[ 0 ].getConnectionWeights().get(0, 1), 0.0 );
 		assertEquals( 2.0, dbn_master.preTrainingLayers[ 0 ].getConnectionWeights().get(1, 0), 0.0 );
 		assertEquals( 2.5, dbn_master.preTrainingLayers[ 0 ].getConnectionWeights().get(1, 1), 0.0 );
+
+		// check hidden bias averaged weights
+		
+		assertEquals( 10.0, dbn_master.preTrainingLayers[ 0 ].getHiddenBias().get(0, 0), 0.0 );
+		assertEquals( 11.0, dbn_master.preTrainingLayers[ 0 ].getHiddenBias().get(0, 1), 0.0 );
+
+		// check visible bias averaged weights
+		
+		assertEquals( 15.0, dbn_master.preTrainingLayers[ 0 ].getVisibleBias().get(0, 0), 0.0 );
+		assertEquals( 16.0, dbn_master.preTrainingLayers[ 0 ].getVisibleBias().get(0, 1), 0.0 );
+		
 		
 		assertEquals( 1.5, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(0, 0), 0.0 );
 		assertEquals( 1.0, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(0, 1), 0.0 );
 		assertEquals( 2.0, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(1, 0), 0.0 );
 		assertEquals( 2.5, dbn_master.preTrainingLayers[ 1 ].getConnectionWeights().get(1, 1), 0.0 );
 		
-		// dbn_B.logisticRegressionLayer.connectionWeights
 		
 		assertEquals( 1.0, dbn_master.logisticRegressionLayer.connectionWeights.get(0, 0), 0.0 );		
 		assertEquals( 1.5, dbn_master.logisticRegressionLayer.connectionWeights.get(0, 1), 0.0 );
 		assertEquals( 2.0, dbn_master.logisticRegressionLayer.connectionWeights.get(1, 0), 0.0 );
 		assertEquals( 2.5, dbn_master.logisticRegressionLayer.connectionWeights.get(1, 1), 0.0 );
+
+		assertEquals( 20.0, dbn_master.logisticRegressionLayer.biasTerms.get(0, 0), 0.0 );
+		assertEquals( 21.0, dbn_master.logisticRegressionLayer.biasTerms.get(0, 1), 0.0 );
+
+		// TODO: check the hidden layers ---- 
+		
+		
 		
 	}
 	
