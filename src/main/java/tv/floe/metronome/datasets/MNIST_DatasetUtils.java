@@ -15,11 +15,16 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+
+import tv.floe.metronome.deeplearning.datasets.DataSet;
+import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
 
 /**
  * Original work: 
@@ -475,6 +480,136 @@ public class MNIST_DatasetUtils {
     
     
     
+    public void convertAndFilterMetronomeMNISTDatasetByLabel( int rowCountLimit, int[] classIndexes, String fileOut ) throws IOException {
+    	
+		Map<Integer, Integer> filter = new HashMap<Integer, Integer>();
+		for (int x = 0; x < classIndexes.length; x++ ) {
+			
+			filter.put(classIndexes[x], 1);
+			
+		}
+
+		
+
+    	downloadAndUntar();
+    	
+  	int max = 0;
+  	
+  	System.out.println("> Scanning MNIST Files....");
+  	System.out.println("> Labels: " + labelFileName);
+  	System.out.println("> Images: " + imageFileName);
+  	
+
+  	BufferedWriter buffWriter = new BufferedWriter( new FileWriter( fileOut ) );
+  	
+      ByteArrayOutputStream labelBuffer = new ByteArrayOutputStream();
+      ByteArrayOutputStream imageBuffer = new ByteArrayOutputStream();
+
+      InputStream labelInputStream = new FileInputStream(labelFileName); //this.getClass().getResourceAsStream(labelFileName);
+      InputStream imageInputStream = new FileInputStream(imageFileName); //this.getClass().getResourceAsStream(imageFileName);
+
+      int read;
+      byte[] buffer = new byte[16384];
+
+      while((read = labelInputStream.read(buffer, 0, buffer.length)) != -1) {
+         labelBuffer.write(buffer, 0, read);
+      }
+
+      labelBuffer.flush();
+
+      while((read = imageInputStream.read(buffer, 0, buffer.length)) != -1) {
+          imageBuffer.write(buffer, 0, read);
+      }
+
+      imageBuffer.flush();
+
+      byte[] labelBytes = labelBuffer.toByteArray();
+      byte[] imageBytes = imageBuffer.toByteArray();
+
+      byte[] labelMagic = Arrays.copyOfRange(labelBytes, 0, OFFSET_SIZE);
+      byte[] imageMagic = Arrays.copyOfRange(imageBytes, 0, OFFSET_SIZE);
+
+      if(ByteBuffer.wrap(labelMagic).getInt() != LABEL_MAGIC)  {
+          throw new IOException("Bad magic number in label file!");
+      }
+
+      if(ByteBuffer.wrap(imageMagic).getInt() != IMAGE_MAGIC) {
+          throw new IOException("Bad magic number in image file!");
+      }
+
+      int numberOfLabels = ByteBuffer.wrap(Arrays.copyOfRange(labelBytes, NUMBER_ITEMS_OFFSET, NUMBER_ITEMS_OFFSET + ITEMS_SIZE)).getInt();
+      int numberOfImages = ByteBuffer.wrap(Arrays.copyOfRange(imageBytes, NUMBER_ITEMS_OFFSET, NUMBER_ITEMS_OFFSET + ITEMS_SIZE)).getInt();
+
+      if(numberOfImages != numberOfLabels) {
+          throw new IOException("The number of labels and images do not match!");
+      }
+
+      int numRows = ByteBuffer.wrap(Arrays.copyOfRange(imageBytes, NUMBER_OF_ROWS_OFFSET, NUMBER_OF_ROWS_OFFSET + ROWS_SIZE)).getInt();
+      int numCols = ByteBuffer.wrap(Arrays.copyOfRange(imageBytes, NUMBER_OF_COLUMNS_OFFSET, NUMBER_OF_COLUMNS_OFFSET + COLUMNS_SIZE)).getInt();
+
+      if(numRows != ROWS && numRows != COLUMNS) {
+          throw new IOException("Bad image. Rows and columns do not equal " + ROWS + "x" + COLUMNS);
+      }
+      
+//		BufferedWriter bw = new BufferedWriter(new FileWriter(metronomeFormattedMNISTFile));
+      
+      int matrixRowCount = numberOfImages;
+      if (numberOfImages > rowCountLimit) {
+    	  matrixRowCount = rowCountLimit;
+      }
+      
+      
+      
+      // ------ cut here -------
+      
+      
+      
+      //this.imageData = new DenseMatrix( matrixRowCount, 784 );
+      
+      //this.labelData = new DenseMatrix( matrixRowCount, 10 );
+
+      int filteredImagesFound = 0;
+      
+      for (int i = 0; i < numberOfImages; i++) {
+
+    	  int label = labelBytes[OFFSET_SIZE + ITEMS_SIZE + i];
+          byte[] imageDataAsBytes = Arrays.copyOfRange(imageBytes, (i * IMAGE_SIZE) + IMAGE_OFFSET, (i * IMAGE_SIZE) + IMAGE_OFFSET + IMAGE_SIZE);
+
+          //System.out.print(".");
+//			String formatted_line = formatMNISTHandwritingColumnToMetronomeRecord(imageData, label, 255);
+//			bw.write(formatted_line);
+          
+  		if (imageDataAsBytes.length != 784) {
+			System.out.println("Invalid image data!!!!!");
+		}
+  		
+		
+		if ( filter.containsKey( label )) {
+
+	  		
+	  		double[] binary_image = binaryNormalizeInputArray(imageDataAsBytes);
+	
+	  		buffWriter.write( this.formatMNISTHandwritingColumnToMetronomeRecord(binary_image, label) );
+
+	  		filteredImagesFound++;
+	  		
+		}
+		
+		if (filteredImagesFound >= matrixRowCount) {
+			break;
+		}
+          
+      }
+      
+      System.out.println("> Finished extracting from: " + imageFileName);
+      System.out.println("> Filtered Images Converted: " + filteredImagesFound);
+      
+      buffWriter.close();		
+		
+		
+    	
+    	
+    }
     
     
     
@@ -689,8 +824,9 @@ public class MNIST_DatasetUtils {
 		
 		MNIST_DatasetUtils util = new MNIST_DatasetUtils( "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFileLabelsFilename_unzipped, "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFilesFilename_unzipped );
 		//util.scanIDXFiles();
-		
-		util.convertFromBinaryFormatToMetronome(5, "/tmp/mnist_conversion_test.metronome");
+		int[] filter = { 0, 1 };
+		//util.convertFromBinaryFormatToMetronome(5, "/tmp/mnist_conversion_test.metronome");
+		util.convertAndFilterMetronomeMNISTDatasetByLabel(20, filter, "/tmp/mnist_filtered_conversion_test.metronome");
 		
 		
 	}
