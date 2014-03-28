@@ -120,6 +120,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			this.inputTrainingData = trainingRecords;
 		}
 		
+		System.out.println( this.generateNetworkStateReport() );
+		
 		Matrix layerInput = null;
 		
 		for (int i = 0; i < this.numberLayers; i++) {
@@ -457,11 +459,15 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 		// 2. now take a look at each pre train layer
 		
+		//MatrixUtils.debug_print_matrix_stats(this.preTrainingLayers[ layer ].getConnectionWeights(), "layer " + layer + " stats");
+		
 		for ( int worker = 0; worker < workerDBNParameterVectors.size(); worker++ ) {
 			
 			// sum/look at the pretrain layers
 		    for ( int layer = 0; layer < this.numberLayers; layer++ ) {
 		    	
+		    //	MatrixUtils.debug_print_matrix_stats(this.preTrainingLayers[ layer ].getConnectionWeights(), "this.layer " + layer + " stats");
+		    //	MatrixUtils.debug_print_matrix_stats( workerDBNParameterVectors.get(worker).preTrainingLayers[ layer ].getConnectionWeights(), "worker " + worker + " layer " + layer + " stats");
 		    	
 	
 		    	MatrixUtils.addi( this.preTrainingLayers[ layer ].getConnectionWeights(), workerDBNParameterVectors.get(worker).preTrainingLayers[ layer ].getConnectionWeights() );

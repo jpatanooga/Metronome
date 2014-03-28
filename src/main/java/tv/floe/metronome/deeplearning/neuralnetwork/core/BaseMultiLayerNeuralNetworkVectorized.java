@@ -804,6 +804,29 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		
 	}
 	
+	public String generateNetworkStateReport() {
+		
+		String out = "";
+		
+		out += "Number of Hidden / RBM Layers: " + this.numberLayers + "\n";
+		out += "inputNeuronCount: " + this.inputNeuronCount + "\n";
+		out += "l2: " + this.l2 + "\n";
+		out += "learningRateUpdate: " + this.learningRateUpdate + "\n";
+		out += "momentum: " + this.momentum + "\n";
+		out += "outputNeuronCount: " + this.outputNeuronCount + "\n";
+		out += "sparsity: " + this.sparsity + "\n";
+		out += "this.hiddenLayers.length: " + this.hiddenLayers.length + "\n";
+		out += "this.logisticRegressionLayer.l2: " + this.logisticRegressionLayer.l2 + "\n";
+		out += "this.logisticRegressionLayer.nIn: " + this.logisticRegressionLayer.nIn + "\n";
+		out += "this.logisticRegressionLayer.nOut: " + this.logisticRegressionLayer.nOut + "\n";
+		out += "this.logisticRegressionLayer.useRegularization: " + this.logisticRegressionLayer.useRegularization + "\n";
+		out += "this.useRegularization: " + this.useRegularization + "\n";
+		//out += "this.useRegularization: " + this. + "\n";
+		
+		return out;
+		
+	}
+	
 	/**
 	 * Merges this network with the other one.
 	 * This is a weight averaging with the update of:
