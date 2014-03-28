@@ -16,6 +16,8 @@ import org.apache.hadoop.util.ToolRunner;
 import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistHDFSDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.deeplearning.dbn.model.evaluation.ModelTester;
+import tv.floe.metronome.deeplearning.neuralnetwork.dbn.dataset.mnist.Test_DBN_Mnist_Dataset;
 import tv.floe.metronome.io.records.CachedVectorReader;
 
 import com.cloudera.iterativereduce.ComputableWorker;
@@ -135,11 +137,26 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		// TODO: setup a cached vector system from hdfs for batches
 						
+		System.out.println("Worker > Compute()");
+		
+		int[] filter = { 0, 1 };
+		DataSet local_recordBatch = null;
+		try {
+			local_recordBatch = Test_DBN_Mnist_Dataset.filterDataset( filter, 20 );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// mini-batches through dataset
 //		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
+		//DataSet hdfs_recordBatch = local_recordBatch; //this.hdfs_fetcher.next();
 		DataSet hdfs_recordBatch = this.hdfs_fetcher.next();
 				
+		System.out.println("Injecting the local original filtered Dataset!");
+		
+		
+		
 		int recordsProcessed = 0;
 		
 		StopWatch watch = new StopWatch();
@@ -147,12 +164,15 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		StopWatch batchWatch = new StopWatch();
 		
-		if (hdfs_recordBatch.getFirst().numRows() > 0) {
+		
+		
+//		if (hdfs_recordBatch.getFirst().numRows() > 0) {
 //		do  {
 		
 			// calc stats on number records processed
 			recordsProcessed += hdfs_recordBatch.getFirst().numRows();
 			
+			System.out.println( "PreTrain: Batch Size: " + hdfs_recordBatch.getFirst().numRows() );
 			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			
 			batchWatch.reset();
@@ -165,6 +185,11 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 			//System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
 
+			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
+			
+			
+			dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );			
+			
 /*			
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
@@ -172,7 +197,18 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			
 		} while (fetcher.hasNext());
 */
-		} // if
+//		} // if
+		
+		watch.stop();
+		
+		try {
+			System.out.println(" ----------- Worker model Eval ---------- ");
+			ModelTester.evaluateModel( hdfs_recordBatch.getFirst(), hdfs_recordBatch.getSecond(), dbn);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 
 		// this is a clunky way to do this. dont judge me, working fast here.
 		DBNParameterVector dbn_update = new DBNParameterVector();
@@ -225,7 +261,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	@Override
 	public void setup(Configuration c) {
 		
-		
+		System.out.println("Worker > Conf");
 
 
 
@@ -239,13 +275,21 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 //	    this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
 	      
 	      this.learningRate = Double.parseDouble(this.conf.get(
-		          "tv.floe.metronome.dbn.conf.LearningRate", "0.001"));
+		          "tv.floe.metronome.dbn.conf.LearningRate", "0.01"));
+	      
+	      System.out.println("Worker > Conf > lr: " + this.learningRate );
 	      
 	      this.batchSize = this.conf.getInt("tv.floe.metronome.dbn.conf.batchSize",  1);
 	      
+	      System.out.println("Worker > Conf > batchsize: " + this.batchSize );
+	      
 	      this.numIns = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberInputs", 784);
 	      
+	      System.out.println("Worker > Conf > numIns: " + this.numIns );
+	      
 	      this.numLabels = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberLabels", 10 );
+	      
+	      System.out.println("Worker > Conf > numLabels: " + this.numLabels );
 	      
 	      //500, 250, 100
 	      String hiddenLayerConfSizes = this.conf.get( "tv.floe.metronome.dbn.conf.hiddenLayerSizes" );
@@ -253,7 +297,11 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	      String[] layerSizes = hiddenLayerConfSizes.split(",");
 	      this.hiddenLayerSizes = new int[ layerSizes.length ];
 	      for ( int x = 0; x < layerSizes.length; x++ ) {
+	    	  
 	    	  this.hiddenLayerSizes[ x ] = Integer.parseInt( layerSizes[ x ] );
+	    	  
+	    	  System.out.println("Worker > Conf > this.hiddenLayerSizes[ " + x + " ]: " + this.hiddenLayerSizes[ x ] );
+	    	  
 	      }
 	      
 
@@ -267,8 +315,12 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			
 			this.dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
 	
+			// default it to off
+			this.dbn.useRegularization = false;
+			
 			if (useRegularization != null && useRegularization.equals("true")) {
 		    	this.dbn.useRegularization = true;
+		    	System.out.println(">>> Turning regularization ON!");
 		    }
 			
 			this.dbn.setSparsity( Double.parseDouble( this.conf.get( "tv.floe.metronome.dbn.conf.sparsity", "0.01") ) );
@@ -280,7 +332,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	      // TODO Auto-generated catch block
 	      e.printStackTrace();
 	    }
-	    		
+	   		
 
 	
 		

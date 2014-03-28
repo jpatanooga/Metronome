@@ -2,12 +2,106 @@ package tv.floe.metronome.deeplearning.dbn.iterativereduce;
 
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.TextInputFormat;
 import org.junit.Test;
 
+import com.cloudera.iterativereduce.io.TextRecordParser;
+
 import tv.floe.metronome.irunit.IRUnitDriver;
+import tv.floe.metronome.deeplearning.datasets.DataSet;
+import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistHDFSDataSetIterator;
+import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.deeplearning.dbn.iterativereduce.*;
+import tv.floe.metronome.deeplearning.dbn.model.evaluation.ModelTester;
 
 public class Test_DBN_IR_MNIST {
 
+
+
+	  private static JobConf defaultConf = new JobConf();
+	  private static FileSystem localFs = null; 
+	  static {
+	    try {
+	      defaultConf.set("fs.defaultFS", "file:///");
+	      localFs = FileSystem.getLocal(defaultConf);
+	    } catch (IOException e) {
+	      throw new RuntimeException("init failure", e);
+	    }
+	  }
+	
+	
+	private InputSplit[] generateDebugSplits(Path input_path, JobConf job) {
+
+		long block_size = localFs.getDefaultBlockSize();
+
+		System.out.println("default block size: " + (block_size / 1024 / 1024)
+				+ "MB");
+
+		// ---- set where we'll read the input files from -------------
+		FileInputFormat.setInputPaths(job, input_path);
+
+		// try splitting the file in a variety of sizes
+		TextInputFormat format = new TextInputFormat();
+		format.configure(job);
+
+		int numSplits = 1;
+
+		InputSplit[] splits = null;
+
+		try {
+			splits = format.getSplits(job, numSplits);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return splits;
+
+	}		
+	
+	public DataSet setupHDFSDataset( String vectors_filename ) throws IOException {
+		
+		
+		int batchSize = 20;
+		int totalNumExamples = 20;
+
+		// setup splits ala HDFS style -------------------
+		
+	    JobConf job = new JobConf(defaultConf);
+	    
+	    Path workDir = new Path( vectors_filename );
+		
+		
+	    InputSplit[] splits = generateDebugSplits(workDir, job);
+	    
+	    System.out.println( "> splits: " + splits[0].toString() );
+
+	    
+	    TextRecordParser txt_reader = new TextRecordParser();
+
+	    long len = Integer.parseInt(splits[0].toString().split(":")[2]
+	        .split("\\+")[1]);
+
+	    txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);		
+		
+				
+
+	    
+		MnistHDFSDataSetIterator hdfs_fetcher = new MnistHDFSDataSetIterator( batchSize, totalNumExamples, txt_reader );
+		DataSet hdfs_recordBatch = hdfs_fetcher.next();
+		
+		return hdfs_recordBatch;
+	}
+	
+	
 	@Test
 	public void testIR() throws Exception {
 		
@@ -20,5 +114,42 @@ public class Test_DBN_IR_MNIST {
 		
 		
 	}
+
+	
+	@Test
+	public void testIR_DBN_MNIST_TwoLabels() throws Exception {
+		
+		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_labels.properties");
+		polr_ir.Setup();
+
+		polr_ir.SimulateRun();
+
+		
+		
+		
+	}
+	
+	@Test
+	public void evaluateIR_DBN_TwoLabelModel() throws IOException {
+		
+		String tmpFilename = "/tmp/MNIST/dbn.mnist.twolabels.dl_model";
+		String testVectors = "/tmp/mnist_filtered_conversion_test.metronome";
+		int[] hiddenLayerSizes = new int[] {2,2,2};
+		
+		
+		
+		FileInputStream oFileInputStream = new FileInputStream( tmpFilename );
+		
+		
+		DeepBeliefNetwork dbn_deserialize = new DeepBeliefNetwork(1, hiddenLayerSizes, 1, hiddenLayerSizes.length, null ); //, Matrix input, Matrix labels);
+		dbn_deserialize.load(oFileInputStream);
+		
+		DataSet testBatch = this.setupHDFSDataset(testVectors);
+		
+		ModelTester.evaluateModel( testBatch.getFirst(), testBatch.getSecond(), dbn_deserialize);
+		
+		
+	}
+	
 	
 }
