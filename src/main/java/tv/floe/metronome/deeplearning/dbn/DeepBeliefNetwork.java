@@ -120,7 +120,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			this.inputTrainingData = trainingRecords;
 		}
 		
-		System.out.println( this.generateNetworkStateReport() );
+		//System.out.println( this.generateNetworkStateReport() );
 		
 		Matrix layerInput = null;
 		
