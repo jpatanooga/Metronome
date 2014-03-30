@@ -150,11 +150,12 @@ public class Test_DBN_IR_MNIST {
 	public void testIR_DBN_MNIST_TwoWorker_TwoLabels() throws Exception {
 
 		// setup the two input files
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.properties";
 		
 		
 		// run the simulator
 		
-		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.properties");
+		IRUnitDriver polr_ir = new IRUnitDriver( yarn_props_file );
 		polr_ir.Setup();
 
 		polr_ir.SimulateRun();
@@ -164,6 +165,8 @@ public class Test_DBN_IR_MNIST {
 		// - read the saved model location from the yarn props file
 		// - read the input test vectors
 		
+		ModelTester.evaluateModel( yarn_props_file, 20, 20 );
+		
 		
 		
 	}
@@ -171,8 +174,8 @@ public class Test_DBN_IR_MNIST {
 	
 	
 	@Test
-	public void evaluateIR_DBN_TwoLabel_ScoreSavedModel() throws IOException {
-		
+	public void evaluateIR_DBN_TwoLabel_ScoreSavedModel() throws Exception {
+/*		
 		String tmpFilename = "/tmp/MNIST/dbn.mnist.twolabels.dl_model";
 		String testVectors = "/tmp/mnist_filtered_conversion_test.metronome";
 		int[] hiddenLayerSizes = new int[] {2,2,2};
@@ -188,6 +191,11 @@ public class Test_DBN_IR_MNIST {
 		DataSet testBatch = this.setupHDFSDataset(testVectors);
 		
 		ModelTester.evaluateModel( testBatch.getFirst(), testBatch.getSecond(), dbn_deserialize);
+		*/
+		
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.properties";
+		
+		ModelTester.evaluateModel( yarn_props_file, 20, 20 );
 		
 		
 	}

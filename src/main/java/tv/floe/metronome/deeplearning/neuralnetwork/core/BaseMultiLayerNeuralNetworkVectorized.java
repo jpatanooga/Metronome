@@ -151,7 +151,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		Matrix layer_input = input;
 		int input_size;
 
-		System.out.println("initializeLayers --------");
+		//System.out.println("initializeLayers --------");
 		
 		// construct multi-layer
 		for (int i = 0; i < this.numberLayers; i++) {
@@ -178,11 +178,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				
 			}
 			
-			System.out.println("Layer [" + i + "] "  );
+		//	System.out.println("Layer [" + i + "] "  );
 			
-			System.out.println("\tCreated Hidden Layer [" + i + "]: Neuron Count: " + this.hiddenLayerSizes[i] );
+		//	System.out.println("\tCreated Hidden Layer [" + i + "]: Neuron Count: " + this.hiddenLayerSizes[i] );
 			
-			System.out.println("\tCreated RBM PreTrain Layer [" + i + "]: Num Visible: " + input_size + ", Num Hidden: " + this.hiddenLayerSizes[i] );
+		//	System.out.println("\tCreated RBM PreTrain Layer [" + i + "]: Num Visible: " + input_size + ", Num Hidden: " + this.hiddenLayerSizes[i] );
 
 			// construct DL appropriate class for pre training layer
 			this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
@@ -192,8 +192,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 		this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
-		System.out.println( "Finished layer init ------  " );
-		System.out.println( "DBN Network Stats:\n" + this.generateNetworkSizeReport() );
+	//	System.out.println( "Finished layer init ------  " );
+	//	System.out.println( "DBN Network Stats:\n" + this.generateNetworkSizeReport() );
 		
 	}
 	

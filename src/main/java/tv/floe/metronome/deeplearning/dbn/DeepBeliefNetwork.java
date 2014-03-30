@@ -116,7 +116,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 			this.inputTrainingData = trainingRecords;
 			initializeLayers(trainingRecords);
 		} else {
-			System.out.println( "PreTrain > Setting Input..." );
+			//System.out.println( "PreTrain > Setting Input..." );
 			this.inputTrainingData = trainingRecords;
 		}
 		

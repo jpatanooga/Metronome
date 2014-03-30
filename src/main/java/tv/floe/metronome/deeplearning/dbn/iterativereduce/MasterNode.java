@@ -31,11 +31,21 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	int n_layers = 1;
 	
 
+	/**
+	 * Q: "is compute() called before complete() is called in last epoch?"
+	 * 
+	 * 
+	 */
 	@Override
-	public void complete(DataOutputStream arg0) throws IOException {
+	public void complete(DataOutputStream osStream) throws IOException {
 		// TODO Auto-generated method stub
 		
 		System.out.println( "IR DBN Master Node: Complete!" );
+		
+		// ds.write(this.master_nn.Serialize());
+		
+		this.dbn_averaged_master.write( osStream );
+		
 		
 	}
 
@@ -81,6 +91,8 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	    
 	    this.dbn_averaged_master.initBasedOn( workerDBNs.get( 0 ) );
 	    this.dbn_averaged_master.computeAverageDBNParameterVector(workerDBNs);
+	    
+	    System.out.println("Master > Parameter Averaged! -------- ");
 	    
 	    // TODO: examine termination conditions
 	    

@@ -151,9 +151,13 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		// mini-batches through dataset
 //		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
 		//DataSet hdfs_recordBatch = local_recordBatch; //this.hdfs_fetcher.next();
+		if (false == this.hdfs_fetcher.hasNext()) {
+			this.hdfs_fetcher.reset();
+		}
+		
 		DataSet hdfs_recordBatch = this.hdfs_fetcher.next();
 				
-		System.out.println("Injecting the local original filtered Dataset!");
+		//System.out.println("Injecting the local original filtered Dataset!");
 		
 		
 		
@@ -172,7 +176,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			// calc stats on number records processed
 			recordsProcessed += hdfs_recordBatch.getFirst().numRows();
 			
-			System.out.println( "PreTrain: Batch Size: " + hdfs_recordBatch.getFirst().numRows() );
+			//System.out.println( "PreTrain: Batch Size: " + hdfs_recordBatch.getFirst().numRows() );
 			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			
 			batchWatch.reset();
@@ -200,7 +204,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 //		} // if
 		
 		watch.stop();
-		
+/*		
 		try {
 			System.out.println(" ----------- Worker model Eval ---------- ");
 			ModelTester.evaluateModel( hdfs_recordBatch.getFirst(), hdfs_recordBatch.getSecond(), dbn);
@@ -208,7 +212,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+*/		
 
 		// this is a clunky way to do this. dont judge me, working fast here.
 		DBNParameterVector dbn_update = new DBNParameterVector();
@@ -261,7 +265,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	@Override
 	public void setup(Configuration c) {
 		
-		System.out.println("Worker > Conf");
+	//	System.out.println("Worker > Conf");
 
 
 
@@ -277,19 +281,19 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	      this.learningRate = Double.parseDouble(this.conf.get(
 		          "tv.floe.metronome.dbn.conf.LearningRate", "0.01"));
 	      
-	      System.out.println("Worker > Conf > lr: " + this.learningRate );
+	 //     System.out.println("Worker > Conf > lr: " + this.learningRate );
 	      
 	      this.batchSize = this.conf.getInt("tv.floe.metronome.dbn.conf.batchSize",  1);
 	      
-	      System.out.println("Worker > Conf > batchsize: " + this.batchSize );
+	 //     System.out.println("Worker > Conf > batchsize: " + this.batchSize );
 	      
 	      this.numIns = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberInputs", 784);
 	      
-	      System.out.println("Worker > Conf > numIns: " + this.numIns );
+	  //    System.out.println("Worker > Conf > numIns: " + this.numIns );
 	      
 	      this.numLabels = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberLabels", 10 );
 	      
-	      System.out.println("Worker > Conf > numLabels: " + this.numLabels );
+	 //     System.out.println("Worker > Conf > numLabels: " + this.numLabels );
 	      
 	      //500, 250, 100
 	      String hiddenLayerConfSizes = this.conf.get( "tv.floe.metronome.dbn.conf.hiddenLayerSizes" );
@@ -300,7 +304,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	    	  
 	    	  this.hiddenLayerSizes[ x ] = Integer.parseInt( layerSizes[ x ] );
 	    	  
-	    	  System.out.println("Worker > Conf > this.hiddenLayerSizes[ " + x + " ]: " + this.hiddenLayerSizes[ x ] );
+	 //   	  System.out.println("Worker > Conf > this.hiddenLayerSizes[ " + x + " ]: " + this.hiddenLayerSizes[ x ] );
 	    	  
 	      }
 	      
@@ -320,7 +324,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			
 			if (useRegularization != null && useRegularization.equals("true")) {
 		    	this.dbn.useRegularization = true;
-		    	System.out.println(">>> Turning regularization ON!");
+		    //	System.out.println(">>> Turning regularization ON!");
 		    }
 			
 			this.dbn.setSparsity( Double.parseDouble( this.conf.get( "tv.floe.metronome.dbn.conf.sparsity", "0.01") ) );
