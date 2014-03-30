@@ -1,11 +1,22 @@
 package tv.floe.metronome.eval;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
 import java.util.Set;
 
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 
+import com.cloudera.iterativereduce.io.TextRecordParser;
+
 import tv.floe.metronome.berkley.Counter;
+import tv.floe.metronome.deeplearning.datasets.DataSet;
+import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistHDFSDataSetIterator;
 import tv.floe.metronome.math.MatrixUtils;
 
 public class Evaluation {
@@ -15,6 +26,13 @@ public class Evaluation {
 	private double falseNegatives;
 	private ConfusionMatrix<Integer> confusion = new ConfusionMatrix<Integer>();
 
+	
+	
+	
+	
+	
+	
+	
 	
 	private int iamax(Vector vec) {
 		
@@ -35,6 +53,8 @@ public class Evaluation {
 		return index;
 		
 	}
+	
+
 	
 	/**
 	 * Collects statistics on the real outcomes vs the 

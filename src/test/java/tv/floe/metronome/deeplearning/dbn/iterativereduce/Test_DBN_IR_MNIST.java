@@ -117,20 +117,61 @@ public class Test_DBN_IR_MNIST {
 
 	
 	@Test
-	public void testIR_DBN_MNIST_TwoLabels() throws Exception {
+	public void testIR_DBN_MNIST_OneWorker_TwoLabels() throws Exception {
 		
-		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_labels.properties");
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_labels.properties";
+		
+		IRUnitDriver polr_ir = new IRUnitDriver( yarn_props_file );
 		polr_ir.Setup();
 
 		polr_ir.SimulateRun();
 
+		ModelTester.evaluateModel( yarn_props_file, 20, 20 );
 		
+		
+	}
+
+	/**
+	 * only used in development testing
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void eval_IR_DBN_MNIST_OneWorker_TwoLabels() throws Exception {
+
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_labels.properties";
+		
+		ModelTester.evaluateModel( yarn_props_file, 20, 20 );
 		
 		
 	}
 	
 	@Test
-	public void evaluateIR_DBN_TwoLabelModel() throws IOException {
+	public void testIR_DBN_MNIST_TwoWorker_TwoLabels() throws Exception {
+
+		// setup the two input files
+		
+		
+		// run the simulator
+		
+		IRUnitDriver polr_ir = new IRUnitDriver("src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.properties");
+		polr_ir.Setup();
+
+		polr_ir.SimulateRun();
+
+		
+		// evaluate the saved model
+		// - read the saved model location from the yarn props file
+		// - read the input test vectors
+		
+		
+		
+	}
+	
+	
+	
+	@Test
+	public void evaluateIR_DBN_TwoLabel_ScoreSavedModel() throws IOException {
 		
 		String tmpFilename = "/tmp/MNIST/dbn.mnist.twolabels.dl_model";
 		String testVectors = "/tmp/mnist_filtered_conversion_test.metronome";
