@@ -2,8 +2,6 @@ package tv.floe.metronome.deeplearning.neuralnetwork.core.learning;
 
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
-
-import tv.floe.metronome.math.MathUtils;
 import tv.floe.metronome.math.MatrixUtils;
 
 /**
@@ -15,32 +13,46 @@ import tv.floe.metronome.math.MatrixUtils;
  */
 public class AdagradLearningRate {
 
-	private double gamma = 10; // default for gamma (this is the numerator)
+//	private double gamma = 10; // default for gamma (this is the numerator)
 	//private double squaredGradientSum = 0;
-	public Matrix squaredGradientSums;
-	public Matrix connectionLearningRates;
+//	public Matrix squaredGradientSums;
+//	public Matrix connectionLearningRates;
+	
+	private double masterStepSize = 1e-3; // default for masterStepSize (this is the numerator)
+	//private double squaredGradientSum = 0;
+	public Matrix historicalGradient;
+	public Matrix adjustedGradient;
+	public double fudgeFactor = 0.000001;
+	public Matrix gradient;
+	public int rows;
+	public int cols;
+	private boolean first = true;
+
+	public double autoCorrect = 0.95;	
 	
 	public AdagradLearningRate( int rows, int cols, double gamma) {
 		
-		this.connectionLearningRates = new DenseMatrix(rows, cols);
-		this.connectionLearningRates.assign(0.0);
+		this.rows = rows;
+		this.cols = cols;
 		
-		this.squaredGradientSums = new DenseMatrix(rows, cols);
-		this.squaredGradientSums.assign(0.0);
+		this.adjustedGradient = new DenseMatrix(rows, cols);
+		this.adjustedGradient.assign( 0.0 );
 
-		this.gamma = gamma;
+		this.historicalGradient = new DenseMatrix(rows, cols);
+		this.historicalGradient.assign( 0.0 );
+
+		this.masterStepSize = gamma;
+
 
 	}
 	
-//	public AdagradLearningRate(double gamma) {
-//	}
+	public AdagradLearningRate( int rows, int cols) {
+		
+		this( rows, cols, 0.01 );
+
+	}
 	
-	/**
-	 * square gradient, then add to ongoing sum
-	 * 
-	 * @param gradient
-	 */
-	public void addLastIterationGradient(Matrix gradient) {
+/*	public void addLastIterationGradient(Matrix gradient) {
 		
 		//this.squaredGradientSum += gradient * gradient;
 		Matrix gradientsSquared = MatrixUtils.pow(gradient, 2);
@@ -51,8 +63,8 @@ public class AdagradLearningRate {
 		MatrixUtils.debug_print(squaredGradientSums);
 		
 	}
-	
-	
+*/	
+/*	
 	public double getLearningRate(int row, int col) {
 		
 		double squaredGradientSum = this.squaredGradientSums.get(row, col);
@@ -65,7 +77,8 @@ public class AdagradLearningRate {
 		
 		
 	}
-
+*/
+/*	
 	public Matrix getLearningRates() {
 		
 		for ( int r = 0; r < this.squaredGradientSums.numRows(); r++ ) {
@@ -89,6 +102,38 @@ public class AdagradLearningRate {
 		
 		
 	}
+*/
 	
+
+
+	public Matrix getLearningRates(Matrix gradient) {
+		
+		this.gradient = gradient;
+		
+		//Matrix gradientsSquared = MatrixFunctions.pow(gradient, 2);
+		Matrix gradientsSquared = MatrixUtils.pow( gradient, 2 );
+		
+		if (first) {
+			
+			this.historicalGradient = gradientsSquared;
+			first = false;
+			
+		} else {
+			
+			// this.historicalGradient = historicalGradient.add(gradientsSquared);
+			this.historicalGradient = this.historicalGradient.plus( gradientsSquared );
+			
+		}
+
+//		Matrix gAdd = MatrixFunctions.sqrt(historicalGradient).add(fudgeFactor);
+		Matrix gAdd = MatrixUtils.sqrt( historicalGradient ).plus( fudgeFactor );
+		//this.adjustedGradient = gradient.div(gAdd);
+		this.adjustedGradient = MatrixUtils.div(gradient, gAdd);
+		
+		//this.adjustedGradient.muli(masterStepSize).negi();
+		this.adjustedGradient = MatrixUtils.neg( this.adjustedGradient.times(masterStepSize) ); 
+		
+		return adjustedGradient;
+	}	
 	
 }
