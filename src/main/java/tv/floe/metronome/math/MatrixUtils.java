@@ -452,6 +452,29 @@ public class MatrixUtils {
 		return ret;
 	}
 
+	/**
+	 * Applies Math.sqrt() function to each element of the vector,
+	 * returning the new Matrix with the sqrt'd values
+	 * 
+	 * @param m
+	 */
+	public static Matrix sqrt(Matrix m) {
+
+		Matrix ret = m.like();		
+		
+		for (int r = 0; r < m.numRows(); r++) {
+			
+			for ( int c = 0; c < m.numCols(); c++ ) {
+
+			//	ret.set(r, c, (double) Math.exp( m.get(r, c) ) );
+				ret.set(r, c, (double) Math.sqrt( m.get(r, c) ) );
+
+			}
+			
+		}
+
+		return ret;
+	}
 
 
 	/**

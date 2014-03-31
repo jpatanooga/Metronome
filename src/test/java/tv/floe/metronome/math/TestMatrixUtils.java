@@ -612,7 +612,28 @@ public class TestMatrixUtils {
 		
 		
 	}
-			
+	
+	
+	@Test
+	public void testMatrixSqrt() {
+
+		
+		
+		Matrix m0 = new DenseMatrix(1, 2);
+		m0.setQuick(0, 0, 9);
+		m0.setQuick(0, 1, 16);
+		
+		Matrix mRet = MatrixUtils.sqrt( m0 );
+
+		assertEquals(Math.sqrt(9.0), mRet.get(0, 0), 0.0);
+		assertEquals(Math.sqrt(16.0), mRet.get(0, 1), 0.0);
+		
+		assertEquals( 9.0, m0.get(0, 0), 0.0);
+		assertEquals( 16.0, m0.get(0, 1), 0.0);
+		
+		
+	}	
+	
 	@Test
 	public void testMatrixSigmoid() {
 
