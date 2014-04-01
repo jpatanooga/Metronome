@@ -87,6 +87,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	//visible bias transforms for initialization
 	private Map<Integer,MatrixTransform> visibleBiasTransforms = new HashMap<Integer,MatrixTransform>();
 		
+	private boolean useAdaGrad = false;
+
 	
 	/**
 	 * CTOR
@@ -207,7 +209,51 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		
 		return visibleBiasTransforms;
 		
-	}	
+	}
+	
+	/**
+	 * Resets adagrad with the given learning rate.
+	 * This is used for switching from the pretrain to finetune phase.
+	 * @param lr the new master learning rate to use
+	 */
+/*	public void resetAdaGrad(double lr) {
+		
+		for (int i = 0; i < this.numberLayers; i++)	 {
+			//layers[i].resetAdaGrad(lr);
+			//this.preTrainingLayers
+		}
+
+		//logLayer.resetAdaGrad(lr);
+	}
+*/	
+	/**
+	 * Returns the -fanIn to fanIn
+	 * coefficient used for initializing the
+	 * weights.
+	 * The default is 1 / nIns
+	 * @return the fan in coefficient
+	 */
+/*	public double fanIn() {
+		if(this.in < 0)
+			return 1.0 / nIns;
+		return fanIn;
+	}
+*/	
+	
+	public double getReconstructionCrossEntropy() {
+		
+		double sum = 0;
+		
+		for(int i = 0; i < this.numberLayers; i++) {
+		
+			sum += this.preTrainingLayers[i].getReConstructionCrossEntropy();
+		
+		}
+
+		sum /= (double) this.numberLayers;
+		return sum;
+	}
+	
 	
 
 	public List<Matrix> feedForward() {
