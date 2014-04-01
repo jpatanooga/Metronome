@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
+import tv.floe.metronome.deeplearning.neuralnetwork.optimize.LogisticRegressionOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 
 
@@ -32,7 +33,9 @@ public class LogisticRegression implements Serializable {
 	public boolean useRegularization = true;
 	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 
+	private boolean useAdaGrad = false;
 	private AdagradLearningRate adaLearningRates = null;
+	private boolean firstTimeThrough = true;
 	
 	// used for Serde
 	public LogisticRegression() {}
@@ -49,7 +52,7 @@ public class LogisticRegression implements Serializable {
 		this.biasTerms = new DenseMatrix(1, nOut); //Matrix.zeros(nOut);
 		this.biasTerms.assign(0.0);
 		
-		this.adaLearningRates = new AdagradLearningRate( nIn, nOut, 10);
+		this.adaLearningRates = new AdagradLearningRate( nIn, nOut );
 		
 	}
 
@@ -77,7 +80,16 @@ public class LogisticRegression implements Serializable {
 		train(x,labels,lr);
 
 	}
-
+/*	
+	public void resetAdaGrad(double lr) {
+		if(!firstTimeThrough) {
+			this.adaGrad = new AdaGrad(nIn,nOut,lr);
+			firstTimeThrough = false;
+		}
+	}
+*/	
+	
+/*
 	public void trainWithAdagrad(Matrix x, Matrix y) {
 		
 		MatrixUtils.ensureValidOutcomeMatrix(y);
@@ -98,7 +110,20 @@ public class LogisticRegression implements Serializable {
 		//b.addi(gradient.getbGradient());
 		this.biasTerms = this.biasTerms.plus(gradient.getbGradient());
 	}
+*/	
 	
+	/**
+	 * Run conjugate gradient
+	 * @param learningRate the learning rate to train with
+	 * @param numEpochs the number of epochs
+	 */
+/*	public  void trainTillConvergence(double learningRate, int numEpochs) {
+		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer(this, learningRate);
+		VectorizedNonZeroStoppingConjugateGradient g = new VectorizedNonZeroStoppingConjugateGradient(opt);
+		g.optimize(numEpochs);
+
+	}
+*/	
 	
 	public void merge(LogisticRegression l,int batchSize) {
 		
@@ -191,12 +216,23 @@ public class LogisticRegression implements Serializable {
 		//Matrix dy = labels.sub(p_y_given_x);
 		Matrix dy = labels.minus(p_y_given_x);
 		
-		if (useRegularization) {
-			dy.divide( this.input.numRows() );
-		}
+		// weight decay
+		dy.divide( this.input.numRows() );
+		
 		
 		//Matrix wGradient = input.transpose().mmul(dy).mul(lr);
-		Matrix wGradient = input.transpose().times( dy ).times( lr );
+		Matrix wGradient = input.transpose().times( dy ); //.times( lr );
+		if ( this.useAdaGrad ) {
+			
+			// wGradient.muli(adaGrad.getLearningRates(wGradient));
+			wGradient = wGradient.times( this.adaLearningRates.getLearningRates(wGradient));
+			
+		} else {
+			
+			// wGradient.muli(lr);
+			wGradient = wGradient.times(lr);
+			
+		}
 		
 		Matrix bGradient = dy;
 		
@@ -204,7 +240,7 @@ public class LogisticRegression implements Serializable {
 		
 		
 	}
-	
+/*	
 	public LogisticRegressionGradient getGradientWithAdagrad() {
 		
 		//Matrix p_y_given_x = sigmoid(input.mmul(W).addRowVector(b));
@@ -231,7 +267,7 @@ public class LogisticRegression implements Serializable {
 		
 		
 	}	
-
+*/
 
 
 	/**
