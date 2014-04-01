@@ -6,6 +6,8 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
+import tv.floe.metronome.math.MatrixUtils;
+
 
 public class TestAdagrad {
 
@@ -19,11 +21,18 @@ public class TestAdagrad {
 		gradient1.set( 0, 0, 1.0);
 		
 		Matrix gradient2 = new DenseMatrix(1, 1);
-		gradient2.set( 0, 0, 2.0);
+		gradient2.set( 0, 0, 0.0);
 
 		
-		AdagradLearningRate ada = new AdagradLearningRate(1, 1, 10);
+		AdagradLearningRate ada = new AdagradLearningRate(1, 1);
+		Matrix out = ada.getLearningRates(gradient0);
 		
+//		MatrixUtils.debug_print( gradient0 );
+//		MatrixUtils.debug_print( out );
+		
+		assertEquals( 0.01, out.get(0, 0), 0.0);
+		
+		/*
 		//ada.computeGradients();
 		assertEquals(10, ada.getLearningRate(0, 0), 0.0 );
 		//assertEquals(10, ada., 0.0 );
@@ -42,6 +51,7 @@ public class TestAdagrad {
 		
 		Matrix lrs = ada.getLearningRates();
 		assertEquals(4.082, lrs.get(0, 0), 0.001 );
+		*/
 		
 	}
 	
