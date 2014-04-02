@@ -13,6 +13,8 @@ import java.io.Serializable;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.MatrixWritable;
 
+import tv.floe.metronome.math.MatrixUtils;
+
 
 public class NeuralNetworkGradient {
 
@@ -123,5 +125,36 @@ public class NeuralNetworkGradient {
 		}
 
 	}		
+	
+	
+	/**
+	 * Adds the given gradient and this one together
+	 * @param gradient the gradient to add
+	 */
+	public void add(NeuralNetworkGradient gradient) {
+		
+		//wGradient.addi(gradient.getwGradient());
+		MatrixUtils.addi( this.wGradient, gradient.getwGradient() );
+		//vBiasGradient.addi(gradient.getvBiasGradient());
+		MatrixUtils.addi( this.vBiasGradient, gradient.getvBiasGradient() );
+		//hBiasGradient.addi(gradient.gethBiasGradient());
+		MatrixUtils.addi( this.hBiasGradient, gradient.gethBiasGradient() );
+	}
+	
+	/**
+	 * Divides the gradients by the given number
+	 * @param num the number to divie by
+	 */
+	public void div(int num) {
+		
+		//wGradient.divi(num);
+		MatrixUtils.divi(this.wGradient, num );
+		
+		//vBiasGradient.divi(num);
+		MatrixUtils.divi(this.vBiasGradient, num );
+		
+		//hBiasGradient.divi(num);
+		MatrixUtils.divi(this.hBiasGradient, num );
+	}	
 	
 }
