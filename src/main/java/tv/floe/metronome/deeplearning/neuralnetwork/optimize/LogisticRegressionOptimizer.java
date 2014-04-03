@@ -3,7 +3,7 @@ package tv.floe.metronome.deeplearning.neuralnetwork.optimize;
 import java.io.Serializable;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
-import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegressionGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.LogisticRegressionGradient;
 import tv.floe.metronome.math.MatrixUtils;
 
 import cc.mallet.optimize.Optimizable;
