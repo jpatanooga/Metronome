@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.LogisticRegressionOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 
@@ -240,34 +241,7 @@ public class LogisticRegression implements Serializable {
 		
 		
 	}
-/*	
-	public LogisticRegressionGradient getGradientWithAdagrad() {
-		
-		//Matrix p_y_given_x = sigmoid(input.mmul(W).addRowVector(b));
-		Matrix p_y_given_x = MatrixUtils.sigmoid( MatrixUtils.addRowVector( input.times( this.connectionWeights ), this.biasTerms.viewRow(0) ) );
-		
-		//Matrix dy = labels.sub(p_y_given_x);
-		Matrix dy = labels.minus(p_y_given_x);
-		
-		if (useRegularization) {
-			dy.divide( this.input.numRows() );
-		}
-		
-		System.out.println( "lr-debug: " + this.adaLearningRates.getLearningRates().get(0, 0) );
-		
-		//Matrix wGradient = input.transpose().mmul(dy).mul(lr);
-		//Matrix wGradient = input.transpose().times( dy ).times( lr );
-		Matrix wGradient = MatrixUtils.elementWiseMultiplication( input.transpose().times( dy ), this.adaLearningRates.getLearningRates() );
-		
-		this.adaLearningRates.addLastIterationGradient(wGradient);
-		
-		Matrix bGradient = dy;
-		
-		return new LogisticRegressionGradient( wGradient, bGradient );
-		
-		
-	}	
-*/
+
 
 
 	/**
