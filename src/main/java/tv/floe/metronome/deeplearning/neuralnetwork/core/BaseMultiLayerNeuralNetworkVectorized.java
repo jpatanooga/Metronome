@@ -304,7 +304,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	 * @param activations
 	 * @param deltaRet
 	 */
-	private void computeDeltas(List<Matrix> activations,List<Pair<Matrix,Matrix>> deltaRet) {
+	private void computeDeltas(List<Pair<Matrix,Matrix>> deltaRet) {
 		
 		Matrix[] gradients = new Matrix[ this.numberLayers + 2 ];
 		Matrix[] deltas = new Matrix[ this.numberLayers + 2 ];
@@ -313,16 +313,13 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		//- y - h
 		Matrix delta = null;
 
+		List<Matrix> activations = this.feedForward();
 
 		/*
 		 * Precompute activations and z's (pre activation network outputs)
 		 */
 		List<Matrix> weights = new ArrayList<Matrix>();
-/*		
-		for (int j = 0; j < layers.length; j++) {
-			weights.add(layers[j].getW());
-		}
-*/
+
 		for (int j = 0; j < this.preTrainingLayers.length; j++) {
 			
 			weights.add( this.preTrainingLayers[j].getConnectionWeights() );
@@ -331,6 +328,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		
 		weights.add( this.logisticRegressionLayer.connectionWeights );
 
+/*		
 		List<Matrix> zs = new ArrayList<Matrix>();
 		
 		zs.add( this.inputTrainingData );
@@ -347,51 +345,56 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				
 			}
 
-			//zs.add(MatrixUtil.sigmoid(layers[i].getInput().mmul(weights.get(i)).addRowVector(layers[i].gethBias())));
-			//zs.add(MatrixUtils.sigmoid( this.preTrainingLayers[ i ].getInput().times( weights.get( i ) ).addRowVector( this.preTrainingLayers[i].getHiddenBias() )));
 			zs.add(MatrixUtils.sigmoid( MatrixUtils.addRowVector( this.preTrainingLayers[ i ].getInput().times( weights.get( i ) ),  this.preTrainingLayers[i].getHiddenBias().viewRow(0) )));
 			
 		}
 		
-		//zs.add(logLayer.input.mmul(logLayer.W).addRowVector(logLayer.b));
-		//zs.add( this.logisticRegressionLayer.input.times( this.logisticRegressionLayer.connectionWeights ).addRowVector( this.logisticRegressionLayer.biasTerms ));
 		zs.add( MatrixUtils.addRowVector( this.logisticRegressionLayer.input.times( this.logisticRegressionLayer.connectionWeights ), this.logisticRegressionLayer.biasTerms.viewRow(0) ) );
-
+*/
+		
+		Matrix labels = this.outputTrainingLabels;
+		
 		//errors
 		for (int i = this.numberLayers + 1; i >= 0; i--) {
 			
+			// output layer
 			if (i >= this.numberLayers + 1) {
 				
-				Matrix z = zs.get(i);
+				Matrix z = activations.get(i); 
+				
 				//- y - h
-				//delta = labels.sub(activations.get(i)).neg();
-				delta = MatrixUtils.neg( this.outputTrainingLabels.minus( activations.get( i ) ) );
+				delta = MatrixUtils.neg( labels.minus( z ) );
 
 				//(- y - h) .* f'(z^l) where l is the output layer
-				//Matrix initialDelta = delta.times( derivative.applyDerivative( z ) );
 				Matrix initialDelta = MatrixUtils.elementWiseMultiplication( delta, derivative.applyDerivative( z ) );
 				deltas[ i ] = initialDelta;
 
 			} else {
 				
+				//derivative i + 1; aka gradient for bias
+				
 				delta = deltas[ i + 1 ];
 				Matrix w = weights.get( i ).transpose();
-				Matrix z = zs.get( i );
-				Matrix a = activations.get( i + 1 );
+				Matrix z = activations.get( i ); //zs.get( i );
+				Matrix a = activations.get( i );
 				//W^t * error^l + 1
 
 				Matrix error = delta.times( w );
 				deltas[ i ] = error;
 
-//				MatrixUtils.debug_print_matrix_stats(error, "error matrix");
-//				MatrixUtils.debug_print_matrix_stats(z, "z matrix");
-				
-				//error = error.times(derivative.applyDerivative(z));
 				error = MatrixUtils.elementWiseMultiplication( error, derivative.applyDerivative(z) );
 
 				deltas[ i ] = error;
-//				gradients[ i ] = a.transpose().times(error).transpose().div( this.inputTrainingData.numRows() );
-				gradients[ i ] = a.transpose().times(error).transpose().divide( this.inputTrainingData.numRows() );
+				
+				//calculate gradient for layer
+				Matrix lastLayerDelta = deltas[i + 1].transpose();
+				Matrix newGradient = lastLayerDelta.times(a);
+				
+
+				//gradients[ i ] = a.transpose().times(error).transpose().divide( this.inputTrainingData.numRows() );
+				// gradients[i] = newGradient.div(getInput().rows);
+				gradients[ i ] = newGradient.divide( this.inputTrainingData.numRows() );
+				
 			}
 
 		}
