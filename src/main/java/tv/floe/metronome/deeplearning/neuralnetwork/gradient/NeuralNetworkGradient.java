@@ -1,4 +1,4 @@
-package tv.floe.metronome.deeplearning.neuralnetwork.core;
+package tv.floe.metronome.deeplearning.neuralnetwork.gradient;
 
 import java.io.DataInput;
 import java.io.DataInputStream;

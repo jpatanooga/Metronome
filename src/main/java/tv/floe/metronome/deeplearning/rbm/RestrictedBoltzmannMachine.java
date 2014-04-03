@@ -21,7 +21,7 @@ import org.apache.mahout.math.MatrixWritable;
 
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
-import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimizer;
 import tv.floe.metronome.math.MatrixUtils;

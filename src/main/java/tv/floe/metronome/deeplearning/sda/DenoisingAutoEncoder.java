@@ -3,7 +3,7 @@ package tv.floe.metronome.deeplearning.sda;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
-import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 
 public class DenoisingAutoEncoder extends BaseNeuralNetworkVectorized {
 

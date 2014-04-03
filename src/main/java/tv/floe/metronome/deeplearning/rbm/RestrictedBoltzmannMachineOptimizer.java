@@ -3,7 +3,7 @@ package tv.floe.metronome.deeplearning.rbm;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVectorized;
-import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimizer;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;

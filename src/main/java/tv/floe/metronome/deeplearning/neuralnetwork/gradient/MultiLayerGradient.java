@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 
 
 

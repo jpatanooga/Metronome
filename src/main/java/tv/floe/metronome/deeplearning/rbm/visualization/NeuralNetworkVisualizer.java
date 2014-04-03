@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Resources;
 
-import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 import tv.floe.metronome.math.MatrixUtils;
 
 

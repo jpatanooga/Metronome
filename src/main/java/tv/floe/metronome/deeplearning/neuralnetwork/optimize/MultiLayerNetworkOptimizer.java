@@ -141,7 +141,7 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		
 
 	}
-	
+/*	
 	public void optimizeWSGD(Matrix labels, double learningRate, int epochs) {
 		
 		System.out.println( "Using SGD Optimizer for Logistic Layer" );
@@ -159,11 +159,6 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		network.logisticRegressionLayer.labels = labels;
 
 		
-/*		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( network.logisticRegressionLayer, learningRate );
-		CustomConjugateGradient g = new CustomConjugateGradient(opt);
-		g.optimize();
-		//System.out.println("using LogisticRegressionOptimizer and CustomConjugateGradient !!!");
-*/
 		
 		for (int i = 0; i < 10000; i++) {
 			
@@ -175,7 +170,8 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 		network.backProp(learningRate, epochs);
 		
 
-	}	
+	}
+	*/	
 	
 	
 	@Override
