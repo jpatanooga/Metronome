@@ -30,8 +30,12 @@ import org.slf4j.LoggerFactory;
 
 
 
+import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.deeplearning.math.transforms.MatrixTransform;
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.LogisticRegressionGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.MultiLayerGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.MultiLayerNetworkOptimizer;
 import tv.floe.metronome.deeplearning.neuralnetwork.serde.Persistable;
@@ -76,6 +80,14 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	private double momentum = 0.1;
 	//don't use sparsity by default
 	private double sparsity = 0;
+	
+	//optional: used in normalizing input. This is used in saving the model for prediction purposes in normalizing incoming data
+	private Matrix columnSums = null;
+	//subtract input by column means for zero mean
+	private Matrix  columnMeans = null;
+	//divide by the std deviation
+	private Matrix columnStds = null;
+	private boolean initCalled = false;
 	
 	
 	public MultiLayerNetworkOptimizer optimizer;
@@ -447,6 +459,104 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 
 	}	
+	
+	/**
+	 * Do a back prop iteration.
+	 * This involves computing the activations, tracking the last layers weights
+	 * to revert to in case of convergence, the learning rate being used to train 
+	 * and the current epoch
+	 * @param lastEntropy the last error to be had on the previous epoch
+	 * @param revert the best network so far
+	 * @param lr the learning rate to use for training
+	 * @param epoch the epoch to use
+	 * @return whether the training should converge or not
+	 */
+	protected void backPropStep(BaseMultiLayerNeuralNetworkVectorized revert, double lr, int epoch) {
+		//feedforward to compute activations
+		//initial error
+
+
+		//precompute deltas
+		List<Pair<Matrix,Matrix>> deltas = new ArrayList<Pair<Matrix,Matrix>>();
+		//compute derivatives and gradients given activations
+		computeDeltas(deltas);
+
+
+		for (int l = 0; l < this.numberLayers; l++) {
+			
+			Matrix add = deltas.get(l).getFirst().div(input.rows);
+			//get the gradient
+			if(isUseAdaGrad())
+				add.muli(this.getLayers()[l].getAdaGrad().getLearningRates(add));
+
+			else
+				add.muli(lr);
+
+			add.divi(input.rows);
+
+
+			//l2
+			if(useRegularization) {
+				add.muli(this.getLayers()[l].getW().mul(l2));
+			}
+
+			//update W
+			this.getLayers()[l].getW().addi(add);
+			this.getSigmoidLayers()[l].setW(layers[l].getW());
+
+
+			//update hidden bias
+			DoubleMatrix deltaColumnSums = deltas.get(l + 1).getSecond().columnSums();
+			deltaColumnSums.divi(input.rows);
+
+			getLayers()[l].gethBias().addi(deltaColumnSums.mul(lr));
+			getSigmoidLayers()[l].setB(getLayers()[l].gethBias());
+		}
+
+
+		getLogLayer().getW().addi(deltas.get(nLayers).getFirst());
+
+
+	}	
+	
+	/**
+	 * Gets the multi layer gradient for this network.
+	 * This includes calculating the gradients for each layer
+	 * @param params the params to pass (k, corruption level,...)
+	 * @param lr the learning rate to use for logistic regression
+	 * @return the multi layer gradient for the whole network
+	 */
+	public MultiLayerGradient getGradient(Object[] params) {
+		
+		List<NeuralNetworkGradient> gradient = new ArrayList<NeuralNetworkGradient>();
+		for (NeuralNetworkVectorized network : this.preTrainingLayers) {
+			
+			gradient.add( network.getGradient(params) );
+			
+		}
+
+		double lr = 0.01;
+		
+		if (params.length >= 2) {
+			lr = (Double) params[1];
+		}
+
+		this.feedForward(input);
+		//LogisticRegressionGradient g2 = logLayer.getGradient(lr);
+		LogisticRegressionGradient g2 = this.logisticRegressionLayer.getGradient(lr);
+
+
+		MultiLayerGradient ret =  new MultiLayerGradient(gradient,g2);
+/*
+		if(multiLayerGradientListeners != null && !multiLayerGradientListeners.isEmpty()) {
+			for(MultiLayerGradientListener listener : multiLayerGradientListeners) {
+				listener.onMultiLayerGradient(ret);
+			}
+		}
+*/
+		return ret;
+	}	
+	
 	
 	/**
 	 * Creates a layer depending on the index.
