@@ -3,6 +3,7 @@ package tv.floe.metronome.deeplearning.neuralnetwork.core;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 
 
@@ -91,6 +92,10 @@ public interface NeuralNetworkVectorized {
 	public void merge(NeuralNetworkVectorized network,int batchSize);	
 	
 	public void clearWeights();
+	
+	public AdagradLearningRate getAdaGrad();
+	public void setAdaGrad(AdagradLearningRate adaGrad);
+	
 	
 	
 }
