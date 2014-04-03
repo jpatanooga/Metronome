@@ -13,7 +13,6 @@ import org.junit.Test;
 import tv.floe.metronome.classification.neuralnetworks.iterativereduce.iris.IrisDatasetUtils;
 import tv.floe.metronome.datasets.UCIDatasets;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegression;
-import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
 import tv.floe.metronome.eval.Evaluation;
 import tv.floe.metronome.math.MatrixUtils;
