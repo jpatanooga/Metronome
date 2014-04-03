@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import tv.floe.metronome.deeplearning.neuralnetwork.core.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
 
 
@@ -46,7 +45,7 @@ public class MultiLayerGradient {
 			
 	}
 	
-/*	
+/*
 	@Override
 	public MultiLayerGradient clone() {
 		return org.apache.commons.lang3.SerializationUtils.clone(this);
