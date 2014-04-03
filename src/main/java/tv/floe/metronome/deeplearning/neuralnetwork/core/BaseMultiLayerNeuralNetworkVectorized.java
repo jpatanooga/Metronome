@@ -268,6 +268,12 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	
 	
 
+	/**
+	 * Compute Activations
+	 * - TODO: considering adding a param to take on inputs
+	 * 
+	 * @return
+	 */
 	public List<Matrix> feedForward() {
 		
 		if (this.inputTrainingData == null) {
@@ -541,8 +547,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 			lr = (Double) params[1];
 		}
 
-		this.feedForward(input);
-		//LogisticRegressionGradient g2 = logLayer.getGradient(lr);
+		this.feedForward();
 		LogisticRegressionGradient g2 = this.logisticRegressionLayer.getGradient(lr);
 
 
