@@ -1,4 +1,4 @@
-package tv.floe.metronome.deeplearning.neuralnetwork.core;
+package tv.floe.metronome.deeplearning.neuralnetwork.gradient;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -12,7 +12,6 @@ import java.io.Serializable;
 
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.MatrixWritable;
-
 import tv.floe.metronome.math.MatrixUtils;
 
 
@@ -113,6 +112,29 @@ public class LogisticRegressionGradient implements Serializable {
 			throw new RuntimeException(e);
 		}
 
-	}		
+	}	
+	
+	/**
+	 * Divies the gradient by the given number (used in averaging)
+	 * @param num the number to divide by
+	 */
+	public void div(int num) {
+
+		MatrixUtils.divi( this.wGradient, num );
+		MatrixUtils.divi( this.bGradient, num );
+		
+	}
+	
+	/**
+	 * Sums this gradient with the given one
+	 * @param gradient the gradient to add
+	 */
+	public void add(LogisticRegressionGradient gradient) {
+		
+		//wGradient.addi(gradient.getwGradient());
+		MatrixUtils.addi( this.wGradient, gradient.getwGradient() );
+		//bGradient.addi(gradient.getbGradient());
+		MatrixUtils.addi( this.bGradient, gradient.getbGradient() );
+	}	
 	
 }
