@@ -7,7 +7,7 @@ import org.apache.mahout.math.Matrix;
 import org.junit.Test;
 
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistDataSetIterator;
-import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkGradient;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.rbm.visualization.NeuralNetworkVisualizer;
 
 
