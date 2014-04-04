@@ -1159,6 +1159,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		this.forceNumEpochs = forceNumEpochs;
 	}
 	
+	public boolean isShouldBackProp() {
+		return shouldBackProp;
+	}
+	
+	
 	
 
 	
