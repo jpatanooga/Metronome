@@ -493,37 +493,57 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 		for (int l = 0; l < this.numberLayers; l++) {
 			
-			Matrix add = deltas.get(l).getFirst().div(input.rows);
+			Matrix add = deltas.get(l).getFirst().divide( this.inputTrainingData.numRows() );
+
 			//get the gradient
-			if(isUseAdaGrad())
-				add.muli(this.getLayers()[l].getAdaGrad().getLearningRates(add));
+			if (this.useAdaGrad ) {
+								
+				add = add.times( this.preTrainingLayers[ l ].getAdaGrad().getLearningRates(add) );
 
-			else
-				add.muli(lr);
+			} else {
+				
+				//add.muli(lr);
+				add = add.times( lr );
+				
+			}
 
-			add.divi(input.rows);
+			//add.divi(input.rows);
+			MatrixUtils.divi( add , this.inputTrainingData.numRows() );
 
 
 			//l2
-			if(useRegularization) {
-				add.muli(this.getLayers()[l].getW().mul(l2));
+			if (this.useRegularization) {
+				
+			//	add.muli(this.getLayers()[l].getW().mul(l2));
+				add = add.times( this.preTrainingLayers[ l ].getConnectionWeights().times( l2 ) );
+				
 			}
 
-			//update W
-			this.getLayers()[l].getW().addi(add);
-			this.getSigmoidLayers()[l].setW(layers[l].getW());
+			// -------- update W
+		//	this.getLayers()[l].getW().addi(add);
+			MatrixUtils.addi( this.preTrainingLayers[ l ].getConnectionWeights(), add );
+			
+		//	this.getSigmoidLayers()[l].setW(layers[l].getW());
+			this.hiddenLayers[ l ].setWeights( this.preTrainingLayers[ l ].getConnectionWeights() );
 
 
-			//update hidden bias
-			DoubleMatrix deltaColumnSums = deltas.get(l + 1).getSecond().columnSums();
-			deltaColumnSums.divi(input.rows);
+			// ---------- update hidden bias
+		//	DoubleMatrix deltaColumnSums = deltas.get(l + 1).getSecond().columnSums();
+			Matrix deltaColumnSums = MatrixUtils.columnSums( deltas.get( l + 1 ).getSecond() );
 
-			getLayers()[l].gethBias().addi(deltaColumnSums.mul(lr));
-			getSigmoidLayers()[l].setB(getLayers()[l].gethBias());
+		//	deltaColumnSums.divi(input.rows);
+			MatrixUtils.divi( deltaColumnSums, this.inputTrainingData.numRows() );
+
+		//	getLayers()[l].gethBias().addi(deltaColumnSums.mul(lr));
+			MatrixUtils.addi( this.preTrainingLayers[ l ].getHiddenBias(), deltaColumnSums.times( lr ) );
+		//	getSigmoidLayers()[l].setB(getLayers()[l].gethBias());
+			this.hiddenLayers[ l ].biasTerms = this.preTrainingLayers[ l ].getHiddenBias();
+
 		}
 
 
-		getLogLayer().getW().addi(deltas.get(nLayers).getFirst());
+	//	getLogLayer().getW().addi(deltas.get(nLayers).getFirst());
+		MatrixUtils.addi( this.logisticRegressionLayer.connectionWeights, deltas.get( numberLayers ).getFirst() );
 
 
 	}	
