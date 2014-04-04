@@ -8,6 +8,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.math.MatrixUtils;
 
@@ -51,6 +52,8 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	public double fanIn = -1;
 	public boolean useRegularization = true;
 	
+	
+	private AdagradLearningRate wAdagrad = null; 
 	
 	// default CTOR
 	public BaseNeuralNetworkVectorized() {
@@ -102,6 +105,9 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		} else {	
 			this.connectionWeights = weights;
 		}
+		
+
+		this.wAdagrad = new AdagradLearningRate( this.connectionWeights.numRows(), this.connectionWeights.numCols() );
 
 
 		if (hBias == null) { 
@@ -239,6 +245,9 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			ret.setConnectionWeights( this.connectionWeights.transpose() );
 			ret.setRng(getRng());
 
+			// ret.setAdaGrad(wAdaGrad);
+			ret.setAdaGrad( this.wAdagrad );
+			
 			return ret;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -258,6 +267,7 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			//ret.setW(W.dup());
 			ret.setConnectionWeights( this.connectionWeights.clone() );
 			ret.setRng(getRng());
+			ret.setAdaGrad(getAdaGrad().clone());
 
 			return ret;
 		} catch (Exception e) {
@@ -453,6 +463,9 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			}
 
 		}
+		
+		this.wAdagrad = new AdagradLearningRate( this.connectionWeights.numRows(), this.connectionWeights.numCols() );
+
 
 		//if(this.hBias == null) {
 		if ( this.hiddenBiasNeurons == null) {
@@ -500,6 +513,8 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	//	this.visibleBiasNeurons = new DenseMatrix(1, this.numberVisibleNeurons); // Matrix.zeros(nVisible);
 		this.visibleBiasNeurons.assign(0.0);
 		
+		this.wAdagrad = new AdagradLearningRate( this.connectionWeights.numRows(), this.connectionWeights.numCols() );
+
 		
 	}
 
@@ -600,6 +615,16 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 
 
 	}	
+	
+	@Override
+	public AdagradLearningRate getAdaGrad() {
+		return this.wAdagrad;
+	}
+	@Override
+	public void setAdaGrad(AdagradLearningRate adaGrad) {
+		this.wAdagrad = adaGrad;
+	}
+	
 	
 	
 }
