@@ -429,7 +429,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		
 		//sgd style; only train a certain number of epochs
 		
-		if (forceNumEpochs) {
+		if (this.forceNumEpochs) {
 			
 			for (int i = 0; i < epochs; i++) {
 				
@@ -445,23 +445,35 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 			int count = 0;
 			int numOver = 0;
 			int tolerance = 3;
-			while(train) {
+			
+			while (train) {
+				
 				count++;
-				backPropStep(revert,lr,count);
+				backPropStep( revert, lr, count );
 
-				Double entropy = this.negativeLogLikelihood();
-				if(lastEntropy == null || entropy < lastEntropy) {
+				double entropy = this.negativeLogLikelihood();
+				
+				// lastEntropy == null ||
+				
+				if ( entropy < lastEntropy) {
+					
 					lastEntropy = entropy;
 					log.info("New negative log likelihood " + lastEntropy);
-				}
-				else if(entropy >= lastEntropy) {
+					
+				} else if (entropy >= lastEntropy) {
+					
 					update(revert);
 					numOver++;
-					if(numOver >= tolerance)
+					
+					if (numOver >= tolerance) {
 						train = false;
-				}
-				else if(entropy == lastEntropy)
+					}
+					
+				} else if (entropy == lastEntropy) {
+					
 					train = false;
+					
+				}
 
 
 			}
