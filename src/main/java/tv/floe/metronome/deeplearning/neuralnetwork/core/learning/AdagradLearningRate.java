@@ -111,6 +111,20 @@ public class AdagradLearningRate {
 		this.gradient = gradient;
 		this.adjustedGradient = MatrixUtils.sqrt(MatrixUtils.pow( gradient, 2 )).times(masterStepSize);
 		return adjustedGradient;
-	}	
+	}
+	
+	public AdagradLearningRate clone() {
+		
+		AdagradLearningRate ret = new AdagradLearningRate( this.rows, this.cols );
+		ret.adjustedGradient.assign( this.adjustedGradient );
+		ret.autoCorrect = this.autoCorrect;
+		ret.fudgeFactor = this.fudgeFactor;
+		ret.gradient.assign( this.gradient );
+		ret.historicalGradient.assign( this.historicalGradient );
+		ret.masterStepSize = this.masterStepSize;
+		
+		return ret;
+		
+	}
 
 }
