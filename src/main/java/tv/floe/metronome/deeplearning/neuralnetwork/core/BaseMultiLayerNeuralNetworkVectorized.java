@@ -100,6 +100,9 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	private Map<Integer,MatrixTransform> visibleBiasTransforms = new HashMap<Integer,MatrixTransform>();
 		
 	private boolean useAdaGrad = false;
+	private boolean shouldBackProp = true;
+	//whether to only train a certain number of epochs
+	private boolean forceNumEpochs = false;
 
 	
 	/**
@@ -418,13 +421,73 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	 */
 	public void backProp(double lr,int epochs) {
 		
+		double lastEntropy = this.negativeLogLikelihood();
+		
+		//store a copy of the network for when binary cross entropy gets
+		//worse after an iteration
+		BaseMultiLayerNeuralNetworkVectorized revert = this.clone();
+		
+		//sgd style; only train a certain number of epochs
+		
+		if (forceNumEpochs) {
+			
+			for (int i = 0; i < epochs; i++) {
+				
+				backPropStep( revert, lr, i );
+				lastEntropy = this.negativeLogLikelihood();
+				
+			}
+			
+		} else {
+			
+
+			boolean train = true;
+			int count = 0;
+			int numOver = 0;
+			int tolerance = 3;
+			while(train) {
+				count++;
+				backPropStep(revert,lr,count);
+
+				Double entropy = this.negativeLogLikelihood();
+				if(lastEntropy == null || entropy < lastEntropy) {
+					lastEntropy = entropy;
+					log.info("New negative log likelihood " + lastEntropy);
+				}
+				else if(entropy >= lastEntropy) {
+					update(revert);
+					numOver++;
+					if(numOver >= tolerance)
+						train = false;
+				}
+				else if(entropy == lastEntropy)
+					train = false;
+
+
+			}
+
+
+		}		
+		
+	}
+
+	/**
+	 * just keeping it around for now, for historical perspective
+	 * 
+	 * @param lr
+	 * @param epochs
+	 */
+	public void oldBackProp(double lr, int epochs) {
+		
+		
 		for (int i = 0; i < epochs; i++) {
 			
 			List<Matrix> activations = feedForward();
 
 			//precompute deltas
 			List<Pair<Matrix,Matrix>> deltas = new ArrayList<Pair<Matrix, Matrix>>();
-			computeDeltas(activations, deltas);
+			//computeDeltas(activations, deltas);
+			computeDeltas( deltas );
 
 
 			for (int l = 0; l < this.numberLayers; l++) {
@@ -546,6 +609,16 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		MatrixUtils.addi( this.logisticRegressionLayer.connectionWeights, deltas.get( numberLayers ).getFirst() );
 
 
+	}	
+	
+	// just a placeholder
+	@Override
+	public BaseMultiLayerNeuralNetworkVectorized clone() {
+	//	BaseMultiLayerNetwork ret = new Builder<>().withClazz(getClass()).buildEmpty();
+	
+		BaseMultiLayerNeuralNetworkVectorized ret = null;
+	//	ret.update(this);
+		return ret;
 	}	
 	
 	/**
@@ -812,6 +885,19 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		this.outputNeuronCount = network.outputNeuronCount;
 		this.randomGenerator = network.randomGenerator;
 		this.distribution = network.distribution;
+		this.useAdaGrad = network.useAdaGrad;
+		
+		this.columnMeans.assign( network.columnMeans );
+		this.columnStds.assign( network.columnStds );
+		this.columnSums.assign( network.columnSums );
+		
+		this.forceNumEpochs = network.forceNumEpochs;
+		this.l2 = network.l2;
+		this.momentum = network.momentum;
+		this.learningRateUpdate = network.learningRateUpdate;
+		this.shouldBackProp = network.shouldBackProp;
+		this.sparsity = network.sparsity;
+		
 		
 		this.hiddenLayers = new HiddenLayer[network.hiddenLayers.length];
 		
@@ -1052,6 +1138,15 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		this.logisticRegressionLayer.merge(network.logisticRegressionLayer, batchSize);
 		
 	}	
+	
+	public boolean isForceNumEpochs() {
+		return forceNumEpochs;
+	}
+	
+	public  void setForceNumEpochs(boolean forceNumEpochs) {
+		this.forceNumEpochs = forceNumEpochs;
+	}
+	
 	
 
 	
