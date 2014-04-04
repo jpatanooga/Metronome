@@ -514,6 +514,18 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 	}
 	
+	@Override
+	public DeepBeliefNetwork clone() {
+	//	BaseMultiLayerNetwork ret = new Builder<>().withClazz(getClass()).buildEmpty();
+	
+		int[] layersTmp = { 1 };
+		
+		DeepBeliefNetwork ret = new DeepBeliefNetwork(1, layersTmp, 1, 1, null);
+		ret.update(this);
+		return ret;
+	}	
+		
+	
 	
 	
 	
