@@ -195,12 +195,6 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				
 			}
 			
-		//	System.out.println("Layer [" + i + "] "  );
-			
-		//	System.out.println("\tCreated Hidden Layer [" + i + "]: Neuron Count: " + this.hiddenLayerSizes[i] );
-			
-		//	System.out.println("\tCreated RBM PreTrain Layer [" + i + "]: Num Visible: " + input_size + ", Num Hidden: " + this.hiddenLayerSizes[i] );
-
 			// construct DL appropriate class for pre training layer
 			this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
 		}
@@ -209,8 +203,6 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 		this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
-	//	System.out.println( "Finished layer init ------  " );
-	//	System.out.println( "DBN Network Stats:\n" + this.generateNetworkSizeReport() );
 		
 	}
 	
@@ -225,22 +217,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		return visibleBiasTransforms;
 		
 	}
-	
-	/**
-	 * Resets adagrad with the given learning rate.
-	 * This is used for switching from the pretrain to finetune phase.
-	 * @param lr the new master learning rate to use
-	 */
-/*	public void resetAdaGrad(double lr) {
-		
-		for (int i = 0; i < this.numberLayers; i++)	 {
-			//layers[i].resetAdaGrad(lr);
-			//this.preTrainingLayers
-		}
 
-		//logLayer.resetAdaGrad(lr);
-	}
-*/	
 	/**
 	 * Returns the -fanIn to fanIn
 	 * coefficient used for initializing the
@@ -393,9 +370,6 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				Matrix lastLayerDelta = deltas[i + 1].transpose();
 				Matrix newGradient = lastLayerDelta.times(a);
 				
-
-				//gradients[ i ] = a.transpose().times(error).transpose().divide( this.inputTrainingData.numRows() );
-				// gradients[i] = newGradient.div(getInput().rows);
 				gradients[ i ] = newGradient.divide( this.inputTrainingData.numRows() );
 				
 			}
@@ -452,9 +426,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				backPropStep( revert, lr, count );
 
 				double entropy = this.negativeLogLikelihood();
-				
-				// lastEntropy == null ||
-				
+								
 				if ( entropy < lastEntropy) {
 					
 					lastEntropy = entropy;
