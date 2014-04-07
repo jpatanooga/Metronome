@@ -6,6 +6,7 @@ import cc.mallet.optimize.OptimizationException;
 import cc.mallet.optimize.Optimizer;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.mahout.math.Matrix;
 import org.slf4j.Logger;
@@ -16,6 +17,16 @@ import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseMultiLayerNeuralNet
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.util.CustomConjugateGradient;
 import tv.floe.metronome.math.MatrixUtils;
 
+/**
+ * Optimizes the logistic layer for finetuning
+ * a multi layer network. This is meant to be used
+ * after pretraining.
+ * 
+ * Based on design by Adam Gibson
+ * 
+ * @author Josh Patterson
+ *
+ */
 
 public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,Serializable {
 
@@ -115,9 +126,9 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 	}	
 	*/
 	
-	public void optimize(Matrix labels, double learningRate, int epochs) {
+	public void optimizeOld(Matrix labels, double learningRate, int epochs) {
 		
-		System.out.println( "Using ConjugateGradient Optimizer for Logistic Layer" );
+		System.out.println( "MLNO: Using ConjugateGradient Optimizer for Logistic Layer" );
 		
 		MatrixUtils.ensureValidOutcomeMatrix(labels);
 		
@@ -172,6 +183,53 @@ public class MultiLayerNetworkOptimizer implements Optimizable.ByGradientValue,S
 
 	}
 	*/	
+	
+	public void optimize(Matrix labels, double lr, int epochs) {
+		
+		//network.getLogLayer().setLabels(labels);
+		this.network.logisticRegressionLayer.input = labels;
+		
+		List<Matrix> activations = network.feedForward();
+	
+		Matrix train = sampleHiddenGivenVisible();
+		
+		if (!network.isForceNumEpochs()) {
+			
+		//	network.getLogLayer().trainTillConvergence(train,labels,lr,epochs);
+			network.logisticRegressionLayer.trainTillConvergence(train, labels, lr, epochs);
+
+			if (network.isShouldBackProp()) {
+				
+				network.backProp(lr, epochs);
+				
+			}
+
+		} else {
+			
+			log.info("Training for " + epochs + " epochs");
+			
+			for (int i = 0; i < epochs; i++) {
+				
+			//	network.getLogLayer().train(activations.get(activations.size() - 2), labels,lr);
+				network.logisticRegressionLayer.train( activations.get(activations.size() - 2), labels,lr );
+			}
+			
+
+			if(network.isShouldBackProp())
+				network.backProp(lr, epochs);
+
+		}
+	
+
+
+	}
+
+
+
+	private Matrix sampleHiddenGivenVisible() {
+		//return network.getSigmoidLayers()[network.getnLayers() - 1].sampleHiddenGivenVisible();
+		return this.network.hiddenLayers[ this.network.numberLayers - 1].sampleHiddenGivenLastVisible();
+	}	
 	
 	
 	@Override
