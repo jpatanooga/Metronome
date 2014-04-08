@@ -871,9 +871,17 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		this.distribution = network.distribution;
 		this.useAdaGrad = network.useAdaGrad;
 		
-		this.columnMeans.assign( network.columnMeans );
-		this.columnStds.assign( network.columnStds );
-		this.columnSums.assign( network.columnSums );
+		if ( null != network.columnMeans ) {
+			this.columnMeans.assign( network.columnMeans );
+		}
+		
+		if ( null != network.columnStds ) {
+			this.columnStds.assign( network.columnStds );
+		}
+		
+		if ( null != network.columnSums ) {
+			this.columnSums.assign( network.columnSums );
+		}
 		
 		this.forceNumEpochs = network.forceNumEpochs;
 		this.l2 = network.l2;
