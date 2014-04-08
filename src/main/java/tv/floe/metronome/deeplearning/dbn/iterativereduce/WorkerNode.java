@@ -138,7 +138,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		// TODO: setup a cached vector system from hdfs for batches
 						
 		System.out.println("Worker > Compute()");
-		
+/*		
 		int[] filter = { 0, 1 };
 		DataSet local_recordBatch = null;
 		try {
@@ -147,7 +147,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+*/		
 		// mini-batches through dataset
 //		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
 		//DataSet hdfs_recordBatch = local_recordBatch; //this.hdfs_fetcher.next();
