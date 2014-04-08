@@ -440,10 +440,12 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 					if (numOver >= tolerance) {
 						train = false;
 					}
+					log.info("entropy went the wrong way! " + entropy);
 					
 				} else if (entropy == lastEntropy) {
 					
 					train = false;
+					log.info("entropy went the wrong way: didn't change!" + entropy);
 					
 				}
 
@@ -864,6 +866,9 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		
 		this.hiddenLayerSizes = network.hiddenLayerSizes;
 		this.logisticRegressionLayer = network.logisticRegressionLayer.clone();
+		this.logisticRegressionLayer.input = network.logisticRegressionLayer.input;
+		this.logisticRegressionLayer.labels = network.logisticRegressionLayer.labels;
+		
 		this.inputNeuronCount = network.inputNeuronCount;
 		this.numberLayers = network.numberLayers;
 		this.outputNeuronCount = network.outputNeuronCount;
