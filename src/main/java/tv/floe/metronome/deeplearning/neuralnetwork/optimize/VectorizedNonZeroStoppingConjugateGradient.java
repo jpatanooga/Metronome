@@ -113,7 +113,7 @@ public class VectorizedNonZeroStoppingConjugateGradient implements OptimizerMatr
 			//g = xi.dup();
 			g = xi.clone();
 			//h = xi.dup();
-			g = xi.clone();
+			h = xi.clone();
 			iterations = 0;
 		}
 
@@ -163,7 +163,8 @@ public class VectorizedNonZeroStoppingConjugateGradient implements OptimizerMatr
 			
 			
 			//dgg = xi.mul( xi.sub(g) ).sum();
-			dgg = MatrixUtils.sum( xi.times( xi.minus( g ) ) );
+			//dgg = MatrixUtils.sum( xi.times( xi.minus( g ) ) );
+			dgg = MatrixUtils.sum( MatrixUtils.elementWiseMultiplication( xi, xi.minus( g ) ) );
 			gam = dgg / gg;
 
 			
