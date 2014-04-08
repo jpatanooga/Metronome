@@ -31,5 +31,23 @@ public class MathUtils {
         
         return norm;
     }	
+	
+	/**
+	  * The Euclidean norm of the matrix as vector, also the Frobenius
+      * norm of the matrix.
+      */
+	public static double norm2(Matrix m) {
+		
+	    double norm = 0.0;
+	    
+	    for (int i = 0; i < MatrixUtils.length( m ); i++) {
+	    	
+	        norm += MatrixUtils.getElement(m, i) * MatrixUtils.getElement(m, i);
+	        
+	    }
+	    
+	    return (double) Math.sqrt(norm);
+	    
+	}	
 
 }
