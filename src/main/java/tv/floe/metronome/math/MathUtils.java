@@ -1,5 +1,7 @@
 package tv.floe.metronome.math;
 
+import org.apache.mahout.math.Matrix;
+
 public class MathUtils {
 
 	/**
@@ -16,5 +18,18 @@ public class MathUtils {
 		
 		return (val - min) / (max - min);
 	}
+	
+	public static double norm1(Matrix m) {
+		
+        double norm = 0.0;
+        
+        for (int i = 0; i < MatrixUtils.length( m ); i++) {
+            
+        	norm += Math.abs( MatrixUtils.getElement(m, i) );
+        	
+        }
+        
+        return norm;
+    }	
 
 }
