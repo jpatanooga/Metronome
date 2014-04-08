@@ -6,6 +6,7 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.function.Functions;
+import org.jblas.DoubleMatrix;
 
 
 
@@ -952,7 +953,22 @@ public class MatrixUtils {
 
 
 	}		
-	
+
+	public static boolean isNaN(Matrix test) {
+		
+		for (int i = 0; i < MatrixUtils.length( test ); i++) {
+		
+			if (Double.isNaN( MatrixUtils.getElement( test, i ) ) ) {
+				
+				return true;
+				
+			}
+			
+		}
+		
+		return false;
+		
+	}	
 	
 
 
