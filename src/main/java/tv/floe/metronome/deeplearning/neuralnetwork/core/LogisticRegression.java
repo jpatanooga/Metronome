@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.LogisticRegressionOptimizer;
+import tv.floe.metronome.deeplearning.neuralnetwork.optimize.VectorizedNonZeroStoppingConjugateGradient;
 import tv.floe.metronome.math.MatrixUtils;
 
 
@@ -113,18 +114,34 @@ public class LogisticRegression implements Serializable {
 	}
 */	
 	
+
+	/**
+	 * Run conjugate gradient with the given x and y
+	 * @param x the input to use
+	 * @param y the labels to use
+	 * @param learningRate
+	 * @param epochs
+	 */
+	public  void trainTillConvergence(Matrix x, Matrix y, double learningRate,int epochs) {
+	//	MatrixUtil.complainAboutMissMatchedMatrices(x, y);
+
+		this.input = x;
+		this.labels = y;
+		trainTillConvergence(learningRate,epochs);
+
+	}
+
 	/**
 	 * Run conjugate gradient
 	 * @param learningRate the learning rate to train with
 	 * @param numEpochs the number of epochs
 	 */
-/*	public  void trainTillConvergence(double learningRate, int numEpochs) {
+	public  void trainTillConvergence(double learningRate, int numEpochs) {
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer(this, learningRate);
 		VectorizedNonZeroStoppingConjugateGradient g = new VectorizedNonZeroStoppingConjugateGradient(opt);
 		g.optimize(numEpochs);
 
 	}
-*/	
 	
 	public void merge(LogisticRegression l,int batchSize) {
 		
