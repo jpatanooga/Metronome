@@ -67,5 +67,13 @@ public class MathUtils {
         }
         return s;
     }	
+	
+    /**
+     * Compute x^T * y (dot product)
+     */
+    public static double dot(Matrix x, Matrix y) {
+        //return rdot(x.length, x.data, 0, 1, y.data, 0, 1);
+    	return rdot( MatrixUtils.length( x ), ArrayUtils.flatten( MatrixUtils.fromMatrix( x ) ), 0, 1, ArrayUtils.flatten( MatrixUtils.fromMatrix( y ) ), 0, 1);
+    }	
 
 }
