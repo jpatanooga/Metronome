@@ -64,6 +64,22 @@ public class TestMatrixUtils {
 	}		
 	
 	@Test
+	public void testFromMatrix() {
+		
+		Matrix m = new DenseMatrix(1, 2);
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+
+
+		double[][] out = MatrixUtils.fromMatrix(m);
+		
+		assertEquals( 6.0, out[0][0], 0.0 );
+		assertEquals( 9.0, out[0][1], 0.0 );
+		
+		
+	}			
+	
+	@Test
 	public void testAbs() {
 		
 		Matrix m = new DenseMatrix(1, 2);

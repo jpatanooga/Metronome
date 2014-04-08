@@ -882,6 +882,23 @@ public class MatrixUtils {
 		return d;
 	}
 	
+	public static double[][] fromMatrix(Matrix m) {
+		
+		double[][] out = new double[ m.numRows() ][ m.numCols() ];
+		
+		for (int i = 0; i < m.numRows(); i++) {
+			
+			for (int j = 0; j < m.numCols(); j++) {
+				
+				out[ i ][ j ] = m.getQuick(i, j);
+				
+			}
+			
+		}
+		
+		return out;
+	}	
+	
 	public static void addi(Matrix m, Matrix additionMatrix) {
 		
 		for (int r = 0; r < m.numRows(); r++) {
