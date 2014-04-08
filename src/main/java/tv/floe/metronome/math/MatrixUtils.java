@@ -6,7 +6,6 @@ import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.function.Functions;
-import org.jblas.DoubleMatrix;
 
 
 

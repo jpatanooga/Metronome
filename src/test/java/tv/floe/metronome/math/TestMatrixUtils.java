@@ -40,6 +40,30 @@ public class TestMatrixUtils {
 		
 	}	
 	
+	
+	@Test
+	public void testIsNaN() {
+		
+		Matrix m = new DenseMatrix(1, 3);
+		m.setQuick(0, 0, 6);
+		m.setQuick(0, 1, 9);
+		m.setQuick(0, 2, Double.NaN );
+
+		Matrix m2 = new DenseMatrix(1, 3);
+		m2.setQuick(0, 0, 6);
+		m2.setQuick(0, 1, 9);
+		m2.setQuick(0, 2, 3 );
+
+		boolean isNaNDetected = MatrixUtils.isNaN(m);
+		boolean isNaNDetected2 = MatrixUtils.isNaN(m2);
+		
+		assertEquals( true, isNaNDetected );
+		assertEquals( false, isNaNDetected2 );
+		
+		
+	}		
+	
+	
 	@Test
 	public void testUnroll() {
 		
