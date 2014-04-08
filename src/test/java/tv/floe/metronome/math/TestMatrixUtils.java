@@ -63,6 +63,35 @@ public class TestMatrixUtils {
 		
 	}		
 	
+	@Test
+	public void testAbs() {
+		
+		Matrix m = new DenseMatrix(1, 2);
+		m.setQuick(0, 0, 0);
+		m.setQuick(0, 1, 9);
+
+		Matrix m2 = new DenseMatrix(1, 2);
+		m2.setQuick(0, 0, -6);
+		m2.setQuick(0, 1, 9);
+
+		Matrix m_out = MatrixUtils.abs(m);
+		Matrix m2_out = MatrixUtils.abs(m2);
+
+		
+		for (int r = 0; r < m_out.numRows(); r++ ) {
+			
+			for ( int c = 0; c < m_out.numCols(); c++ ) {
+				
+				assertEquals( true, ( m_out.get(r, c) >= 0 ) );
+				assertEquals( true, ( m2_out.get(r, c) >= 0 ) );
+				
+				
+			}
+			
+		}
+		
+		
+	}		
 	
 	@Test
 	public void testUnroll() {

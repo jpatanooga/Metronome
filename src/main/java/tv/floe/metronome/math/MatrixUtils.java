@@ -809,6 +809,30 @@ public class MatrixUtils {
 		
 	}
 	
+	/**
+	 * Returns a copy of this matrix where all elements are set to their absolute values.
+	 * 
+	 * @param m
+	 * @return
+	 */
+	public static Matrix abs(Matrix m) {
+		
+		Matrix out = m.like();
+		
+		for (int r = 0; r < m.numRows(); r++) {
+			
+			for ( int c = 0; c < m.numCols(); c++ ) {
+				
+				out.set(r, c, Math.abs( m.get(r, c) ) );
+
+			}
+		
+		}
+
+		return out;
+		
+	}
+	
 	public static Matrix viewRowAsMatrix(Matrix m, int rowIndex) {
 		
 		return m.viewPart( rowIndex, 1, 0, m.numCols() );		
