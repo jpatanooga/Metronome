@@ -119,7 +119,11 @@ public class AdagradLearningRate {
 		ret.adjustedGradient.assign( this.adjustedGradient );
 		ret.autoCorrect = this.autoCorrect;
 		ret.fudgeFactor = this.fudgeFactor;
-		ret.gradient.assign( this.gradient );
+		if ( null == this.gradient ) {
+			ret.gradient = null;
+		} else {
+			ret.gradient.assign( this.gradient );
+		}
 		ret.historicalGradient.assign( this.historicalGradient );
 		ret.masterStepSize = this.masterStepSize;
 		
