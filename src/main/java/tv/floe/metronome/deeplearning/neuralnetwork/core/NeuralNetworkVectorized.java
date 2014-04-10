@@ -5,6 +5,7 @@ import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
+import tv.floe.metronome.types.Pair;
 
 
 
@@ -120,7 +121,27 @@ public interface NeuralNetworkVectorized {
 	public void setVBiasAdaGrad(AdagradLearningRate adaGrad);
 	
 	
-    
+	/**
+	 * Sample hidden mean and sample
+	 * given visible
+	 * @param v the  the visible input
+	 * @return a pair with mean, sample
+	 */
+	public Pair<Matrix,Matrix> sampleHiddenGivenVisible(Matrix v);
+
+
+    public boolean isUseAdaGrad();
+	
+	public void setDropOut(double dropOut);
+	public double dropOut();
+	
+	/**
+	 * Sample visible mean and sample
+	 * given hidden
+	 * @param h the  the hidden input
+	 * @return a pair with mean, sample
+	 */
+	public Pair<Matrix,Matrix> sampleVisibleGivenHidden(Matrix h);    
 	
 	
 }
