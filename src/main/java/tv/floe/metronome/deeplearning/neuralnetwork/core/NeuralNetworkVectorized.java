@@ -2,6 +2,8 @@ package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
+import org.deeplearning4j.nn.NeuralNetwork.LossFunction;
+import org.deeplearning4j.nn.NeuralNetwork.OptimizationAlgorithm;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
@@ -31,6 +33,13 @@ public interface NeuralNetworkVectorized {
 	public static enum LossFunction {
 		SQUARED_LOSS,RECONSTRUCTION_CROSSENTROPY,NEGATIVELOGLIKELIHOOD
 	}
+	
+	public LossFunction getLossFunction();
+	public void setLossFunction(LossFunction lossFunction);
+	
+	public OptimizationAlgorithm getOptimizationAlgorithm();
+	public void setOptimizationAlgorithm(OptimizationAlgorithm optimziationAlgorithm);
+	
 	
 	public boolean normalizeByInputRows();
 	
