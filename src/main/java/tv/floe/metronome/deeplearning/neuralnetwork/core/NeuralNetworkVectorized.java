@@ -22,7 +22,19 @@ import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradie
  */
 public interface NeuralNetworkVectorized {
 
+	
+	public static enum OptimizationAlgorithm {
+		GRADIENT_DESCENT,CONJUGATE_GRADIENT
+	}
 
+	public static enum LossFunction {
+		SQUARED_LOSS,RECONSTRUCTION_CROSSENTROPY,NEGATIVELOGLIKELIHOOD
+	}
+	
+	public boolean normalizeByInputRows();
+	
+	
+	
 	public abstract int getnVisible();
 
 	public abstract void setnVisible(int nVisible);
@@ -79,6 +91,8 @@ public interface NeuralNetworkVectorized {
 	
 	public double getReConstructionCrossEntropy();	
 	public void trainTillConvergence(Matrix input, double lr, Object[] params);
+	public void train(Matrix input,double lr,Object[] params);
+	
 	/**
 	 * Performs a network merge in the form of
 	 * a += b - a / n
@@ -96,6 +110,17 @@ public interface NeuralNetworkVectorized {
 	public AdagradLearningRate getAdaGrad();
 	public void setAdaGrad(AdagradLearningRate adaGrad);
 	
+    public boolean isUseRegularization();
+
+	public AdagradLearningRate gethBiasAdaGrad();
+	public void setHbiasAdaGrad(AdagradLearningRate adaGrad);
+	
+	
+	public AdagradLearningRate getVBiasAdaGrad();
+	public void setVBiasAdaGrad(AdagradLearningRate adaGrad);
+	
+	
+    
 	
 	
 }
