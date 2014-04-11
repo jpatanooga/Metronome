@@ -182,6 +182,43 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 	}	
 	
+    /* sanity check for hidden layer and inter layer dimensions */
+    private void dimensionCheck() {
+
+        for (int i = 0; i < this.numberLayers; i++) {
+        	
+            HiddenLayer h = this.hiddenLayers[i];
+            NeuralNetworkVectorized network = this.preTrainingLayers[i];
+            
+            //h.getW().assertSameSize(network.getW());
+            MatrixUtils.assertSameLength( h.connectionWeights, network.getConnectionWeights() );
+//            h.getB().assertSameSize(network.gethBias());
+            MatrixUtils.assertSameLength( h.biasTerms, network.getHiddenBias() );
+            
+
+            if (i < this.numberLayers - 1) {
+            	
+            	
+                HiddenLayer h1 = this.hiddenLayers[ i + 1 ];
+                NeuralNetworkVectorized network1 = this.preTrainingLayers[ i + 1 ];
+                
+                if ( h1.getNeuronInputCount() != h.getNeuronInputCount() ) {
+                    throw new IllegalStateException("Invalid structure: hidden layer in for " + (i + 1) + " not equal to number of ins " + i);
+                }
+                
+                if (network.getnHidden() != network1.getnVisible()) {
+                    throw new IllegalStateException("Invalid structure: network hidden for " + (i + 1) + " not equal to number of visible " + i);
+                }
+
+            }
+        }
+
+        if ( this.hiddenLayers[ this.hiddenLayers.length - 1 ].getNeuronOutputCount() != this.logisticRegressionLayer.getnIn() ) {
+            throw new IllegalStateException("Number of outputs for final hidden layer not equal to the number of logistic input units for output layer");
+        }
+
+
+    }	
 		
 
 	/**
