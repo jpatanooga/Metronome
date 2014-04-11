@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.deeplearning.math.transforms.MatrixTransform;
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized.LossFunction;
+import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized.OptimizationAlgorithm;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.MultiLayerGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
@@ -87,7 +89,6 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	private Matrix  columnMeans = null;
 	//divide by the std deviation
 	private Matrix columnStds = null;
-	private boolean initCalled = false;
 	
 	
 	public MultiLayerNetworkOptimizer optimizer;
@@ -104,7 +105,36 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 	//whether to only train a certain number of epochs
 	private boolean forceNumEpochs = false;
 
+    private boolean initCalled = false;
+    private boolean useHiddenActivationsForwardProp = true;
 	
+    /*
+     * The delta from the previous iteration to this iteration for
+     * cross entropy must change >= this amount in order to continue.
+     */
+    public double errorTolerance = 0.0001;
+
+    /*
+     * Drop out: randomly zero examples
+     */
+    protected double dropOut = 0;
+
+    /*
+     * Normalize by input rows with gradients or not
+     */
+    protected boolean normalizeByInputRows = false;
+    
+    /**
+     * Which optimization algorithm to use: SGD or CG
+     */
+    protected OptimizationAlgorithm optimizationAlgorithm;
+    /**
+     * Which loss function to use:
+     * Squared loss, Reconstruction entropy, negative log likelihood
+     */
+    protected LossFunction lossFunction;
+    
+    
 	/**
 	 * CTOR
 	 * 
@@ -440,12 +470,12 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 					if (numOver >= tolerance) {
 						train = false;
 					}
-					log.info("entropy went the wrong way! " + entropy);
+					//log.info("entropy went the wrong way! " + entropy);
 					
 				} else if (entropy == lastEntropy) {
 					
 					train = false;
-					log.info("entropy went the wrong way: didn't change!" + entropy);
+					//log.info("entropy went the wrong way: didn't change!" + entropy);
 					
 				}
 
