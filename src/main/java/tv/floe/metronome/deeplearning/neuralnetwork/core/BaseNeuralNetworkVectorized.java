@@ -2,14 +2,14 @@ package tv.floe.metronome.deeplearning.neuralnetwork.core;
 
 
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
 import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
-import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
+import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
+import tv.floe.metronome.math.MathUtils;
 import tv.floe.metronome.math.MatrixUtils;
 
 /**
@@ -50,10 +50,27 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	public int renderWeightsEveryNumEpochs = -1;
 	
 	public double fanIn = -1;
-	public boolean useRegularization = true;
-	
+
+	protected boolean useRegularization = false;
+    protected boolean useAdaGrad = false;
 	
 	private AdagradLearningRate wAdagrad = null; 
+	private AdagradLearningRate hBiasAdaGrad = null;
+	private AdagradLearningRate vBiasAdaGrad = null;
+
+    protected boolean firstTimeThrough = false;
+    //normalize by input rows or not
+    protected boolean normalizeByInputRows = false;
+    //use only when binary hidden layers are active
+    protected boolean applySparsity = true;
+
+    protected double dropOut = 0;
+    protected Matrix doMask;
+
+    protected OptimizationAlgorithm optimizationAlgo;
+    protected LossFunction lossFunction;
+
+	
 	
 	// default CTOR
 	public BaseNeuralNetworkVectorized() {
@@ -118,6 +135,10 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		} else {
 			this.hiddenBiasNeurons = hBias;
 		}
+		
+		//         this.hBiasAdaGrad = new AdaGrad(hBias.rows,hBias.columns);
+
+		this.hBiasAdaGrad = new AdagradLearningRate( this.hiddenBiasNeurons.numRows(), this.hiddenBiasNeurons.numCols() );
 
 		if (vBias == null) { 
 			this.visibleBiasNeurons = new DenseMatrix(1, nVisible); //Matrix.zeros(nVisible);
@@ -129,6 +150,11 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		} else { 
 			this.visibleBiasNeurons = vBias;
 		}
+		
+		// this.vBiasAdaGrad = new AdaGrad(vBias.rows,vBias.columns);
+		
+		this.vBiasAdaGrad = new AdagradLearningRate( this.visibleBiasNeurons.numRows(), this.visibleBiasNeurons.numCols() );
+		
 	}	
 	
 	public BaseNeuralNetworkVectorized(Matrix input, int nVisible, int nHidden, Matrix weights, Matrix hBias, Matrix vBias, RandomGenerator rng) {
@@ -267,8 +293,19 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			//ret.setW(W.dup());
 			ret.setConnectionWeights( this.connectionWeights.clone() );
 			ret.setRng(getRng());
-			ret.setAdaGrad(getAdaGrad().clone());
+			
+			ret.setAdaGrad( getAdaGrad().clone() );
+			ret.setHbiasAdaGrad( this.gethBiasAdaGrad().clone() );
+			ret.setVBiasAdaGrad( this.getVBiasAdaGrad().clone() );
 
+            ret.setMomentum(momentum);
+            //ret.setRenderEpochs(getRenderEpochs());
+            ret.setSparsity(sparsity);
+			
+            ret.setLossFunction(lossFunction);
+            ret.setOptimizationAlgorithm(optimizationAlgo);
+            
+			
 			return ret;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -277,6 +314,48 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 
 	}
 	
+	
+    /**
+     * Applies sparsity to the passed in hbias gradient
+     * @param hBiasGradient the hbias gradient to apply to
+     * @param learningRate the learning rate used
+     */
+    protected void applySparsity(Matrix hBiasGradient, double learningRate) {
+
+        if (useAdaGrad) {
+        	
+        	//Matrix change = this.hBiasAdaGrad.getLearningRates(this.hiddenBiasNeurons).neg().mul(sparsity).mul(hBiasGradient.mul(sparsity));
+        	Matrix change = MatrixUtils.elementWiseMultiplication( MatrixUtils.neg( this.hBiasAdaGrad.getLearningRates(this.hiddenBiasNeurons) ).times(sparsity), hBiasGradient.times(sparsity));
+            // hBiasGradient.addi(change);
+            MatrixUtils.addi( hBiasGradient, change );
+            
+        } else {
+        	//Matrix change = hBiasGradient.mul(sparsity).mul(-learningRate * sparsity);
+        	Matrix change = hBiasGradient.times(sparsity).times( -learningRate * sparsity );
+            //hBiasGradient.addi(change);
+        	MatrixUtils.addi( hBiasGradient, change );
+
+        }
+        
+    }
+	
+    @Override
+    public LossFunction getLossFunction() {
+        return lossFunction;
+    }
+    @Override
+    public void setLossFunction(LossFunction lossFunction) {
+        this.lossFunction = lossFunction;
+    }
+    @Override
+    public OptimizationAlgorithm getOptimizationAlgorithm() {
+        return optimizationAlgo;
+    }
+    @Override
+    public void setOptimizationAlgorithm(
+            OptimizationAlgorithm optimizationAlgorithm) {
+        this.optimizationAlgo = optimizationAlgorithm;
+    }	
 
 	@Override
 	public double getSparsity() {
@@ -314,6 +393,193 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		this.momentum = momentum;
 		
 	}
+	
+    /**
+     * Update the gradient according to the configuration such as adagrad, momentum, and sparsity
+     * @param gradient the gradient to modify
+     * @param learningRate the learning rate for the current iteratiaon
+     */
+    protected void updateGradientAccordingToParams(NeuralNetworkGradient gradient, double learningRate) {
+        Matrix wGradient = gradient.getwGradient();
+        Matrix hBiasGradient = gradient.gethBiasGradient();
+        Matrix vBiasGradient = gradient.getvBiasGradient();
+        Matrix wLearningRates = wAdagrad.getLearningRates(wGradient);
+        
+        if (useAdaGrad) {
+            //wGradient.muli(wLearningRates);
+        	wGradient = wGradient.times( wLearningRates );
+            
+        } else {
+            //wGradient.muli(learningRate);
+        	wGradient = wGradient.times( learningRate );
+        }
+
+        if (useAdaGrad) {
+        	
+            //hBiasGradient = hBiasGradient.mul(hBiasAdaGrad.getLearningRates(hBiasGradient)).add(hBiasGradient.mul(momentum));
+        	hBiasGradient = hBiasGradient.times( hBiasAdaGrad.getLearningRates( hBiasGradient ) ).plus( hBiasGradient.times( momentum ) );
+        
+        } else {
+            
+        	//hBiasGradient = hBiasGradient.mul(learningRate).add(hBiasGradient.mul(momentum));
+        	hBiasGradient = hBiasGradient.times( learningRate ).plus( hBiasGradient.times( momentum ) );
+        	
+        }
+
+
+        if (useAdaGrad) {
+        	
+            //vBiasGradient = vBiasGradient.mul(vBiasAdaGrad.getLearningRates(vBiasGradient)).add(vBiasGradient.mul(momentum));
+        	vBiasGradient = vBiasGradient.times( vBiasAdaGrad.getLearningRates( vBiasGradient ) ).plus( vBiasGradient.times( momentum ) );
+        
+        } else {
+        
+        	//vBiasGradient = vBiasGradient.mul(learningRate).add(vBiasGradient.mul(momentum));
+        	vBiasGradient = vBiasGradient.times( learningRate ).plus( vBiasGradient.times( momentum ) );
+        	
+        }
+
+
+
+        //only do this with binary hidden layers
+        if (applySparsity) {
+            applySparsity( hBiasGradient, learningRate );
+        }
+
+        if (momentum != 0) {
+        	
+            //Matrix change = wGradient.mul(momentum).add(wGradient.mul(1 - momentum));
+        	Matrix change = wGradient.times( momentum ).plus(wGradient.times( 1 - momentum ) );
+        	
+            //wGradient.addi(change);
+        	MatrixUtils.addi( wGradient, change );
+
+        }
+
+        if (useRegularization) {
+        	
+            if (l2 > 0) {
+            	
+            	//Matrix penalized = W.mul(l2);
+            	Matrix penalized = this.connectionWeights.times( l2 );
+                //wGradient.subi(penalized);
+            	wGradient = wGradient.minus( penalized );
+
+            }
+
+        }
+
+
+        if (normalizeByInputRows) {
+        	
+            // wGradient.divi(input.rows);
+        	MatrixUtils.divi( wGradient, this.trainingDataset.numRows() );
+            //vBiasGradient.divi(input.rows);
+        	MatrixUtils.divi( vBiasGradient, this.trainingDataset.numRows() );
+            //hBiasGradient.divi(input.rows);
+        	MatrixUtils.divi( hBiasGradient, this.trainingDataset.numRows() );
+            
+        }
+
+    }
+    
+    /**
+     * Copies params from the passed in network
+     * to this one
+     * @param n the network to copy
+     */
+    public void update(BaseNeuralNetworkVectorized n) {
+    	
+        this.connectionWeights = n.connectionWeights;
+        this.normalizeByInputRows = n.normalizeByInputRows;
+        this.hiddenBiasNeurons = n.hiddenBiasNeurons;
+        this.visibleBiasNeurons = n.visibleBiasNeurons;
+        this.l2 = n.l2;
+        this.useRegularization = n.useRegularization;
+        this.momentum = n.momentum;
+        this.numberHiddenNeurons = n.numberHiddenNeurons;
+        this.numberVisibleNeurons = n.numberVisibleNeurons;
+        this.randNumGenerator = n.randNumGenerator;
+        this.sparsity = n.sparsity;
+        this.wAdagrad = n.wAdagrad;
+        this.hBiasAdaGrad = n.hBiasAdaGrad;
+        this.vBiasAdaGrad = n.vBiasAdaGrad;
+        this.optimizationAlgo = n.optimizationAlgo;
+        this.lossFunction = n.lossFunction;
+        
+    }    
+    
+    @Override
+    public double negativeLogLikelihood() {
+    	
+        Matrix z = this.reconstruct( this.trainingDataset );
+        
+        if (this.useRegularization) {
+        	
+            double reg = (2 / l2) * MatrixUtils.sum( MatrixUtils.pow(this.connectionWeights,2) );
+
+//            double ret = - input.mul(log(z)).add(
+//                    oneMinus(input).mul(log(oneMinus(z)))).
+//                    columnSums().mean() + reg;
+  
+            Matrix tmpElementwiseMul = MatrixUtils.elementWiseMultiplication( MatrixUtils.oneMinus( this.trainingDataset ), MatrixUtils.log( MatrixUtils.oneMinus( z ) ) );
+            double ret = - MatrixUtils.mean( MatrixUtils.columnSums( this.trainingDataset.times( MatrixUtils.log( z ) ).plus( tmpElementwiseMul ) ) ) + reg;
+            
+            
+            if (this.normalizeByInputRows) {
+            	
+                ret /= this.trainingDataset.numRows();
+                
+            }
+            
+            return ret;
+            
+        }
+/*
+        double likelihood =  - input.mul(log(z)).add(
+                oneMinus(input).mul(log(oneMinus(z)))).
+                columnSums().mean();
+*/
+        
+        // input.mul(log(z))
+        Matrix tmplogZTimesInput = MatrixUtils.elementWiseMultiplication( this.trainingDataset, MatrixUtils.log( z ) );
+        
+        
+        // log(oneMinus(z))
+        Matrix tmpLogOneMinus = MatrixUtils.log( MatrixUtils.oneMinus( z ) );
+
+       
+        
+        //  oneMinus(input).mul(log(oneMinus(z)))
+        Matrix tmpOneMinus = MatrixUtils.oneMinus( this.trainingDataset );
+        Matrix tmpElementwiseMul = MatrixUtils.elementWiseMultiplication( tmpOneMinus, tmpLogOneMinus );
+        
+        Matrix tmpPlusOneMinus = tmplogZTimesInput.plus( tmpElementwiseMul );
+
+        
+        double likelihood = - MatrixUtils.mean( MatrixUtils.columnSums( tmpPlusOneMinus ) );
+        
+        if (this.normalizeByInputRows) {
+           
+        	likelihood /= this.trainingDataset.numRows(); //input.rows;
+        	
+        }
+
+
+        return likelihood;
+    }    
+	
+
+    @Override
+    public void setDropOut(double dropOut) {
+        this.dropOut = dropOut;
+    }
+    
+    @Override
+    public double dropOut() {
+        return dropOut;
+    }	
+	
 
 /*	@Override
 	public void trainTillConvergence(Matrix input, double lr, Object[] params) {
@@ -367,7 +633,26 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	 */
 	public abstract void train(Matrix input, double learningRate, Object[] params);
 		
+    protected void applyDropOutIfNecessary(Matrix input) {
+        if (dropOut > 0) {
+         //   this.doMask = DoubleMatrix.rand(input.rows, this.nHidden).gt(dropOut);
+
+        	this.doMask = MathUtils.rand( this.trainingDataset.numRows(), this.numberHiddenNeurons );
+        	
+        } else {
+
+        //	this.doMask = DoubleMatrix.ones(input.rows,this.nHidden);
+        	this.doMask = MatrixUtils.ones( this.trainingDataset.numRows(), this.numberHiddenNeurons );
+        	
+        }
+    }
 	
+    @Override
+    public Matrix hBiasMean() {
+    	//Matrix hbiasMean = getInput().times( this.connectionWeights ).addRowVector( this.getHiddenBias() );
+    	Matrix hbiasMean = MatrixUtils.addRowVector( getInput().times( this.connectionWeights ), this.getHiddenBias().viewRow(0) );
+        return hbiasMean;
+    }
 	
 	
 	/**
@@ -399,11 +684,34 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		
 		if (this.useRegularization) {
 			double normalized = l + l2RegularizedCoefficient();
-			return - MatrixUtils.mean( MatrixUtils.rowSums( inner ) ) / normalized;
+			double ret = - MatrixUtils.mean( MatrixUtils.rowSums( inner ) ) / normalized;
+			
+            
+            if (this.normalizeByInputRows) {
+                ret /= this.trainingDataset.numRows();
+            }
+            return ret;
+			
+			
 		}
 		
-		return - MatrixUtils.mean( MatrixUtils.rowSums( inner ) );
+		//return - MatrixUtils.mean( MatrixUtils.rowSums( inner ) );
+		
+        double ret =  - MatrixUtils.mean( MatrixUtils.rowSums( inner ) );
+        if (this.normalizeByInputRows) {
+        	ret /= this.trainingDataset.numRows();
+        }
+
+        return ret;
+		
+		
 	}	
+	
+    @Override
+    public boolean normalizeByInputRows() {
+        return normalizeByInputRows;
+    }
+	
 	
 	@Override
 	public double l2RegularizedCoefficient() {
@@ -412,6 +720,24 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 		return ( MatrixUtils.sum( MatrixUtils.pow( this.getConnectionWeights(), 2 ) ) / 2.0 ) * l2;
 		
 	}
+
+    @Override
+    public AdagradLearningRate gethBiasAdaGrad() {
+        return hBiasAdaGrad;
+    }
+    @Override
+    public void setHbiasAdaGrad(AdagradLearningRate adaGrad) {
+        this.hBiasAdaGrad = adaGrad;
+    }
+    @Override
+    public AdagradLearningRate getVBiasAdaGrad() {
+        return this.vBiasAdaGrad;
+    }
+    @Override
+    public void setVBiasAdaGrad(AdagradLearningRate adaGrad) {
+        this.vBiasAdaGrad = adaGrad;
+    }
+	
 	
 	protected void initWeights()  {
 		
@@ -480,6 +806,9 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 			 */
 			//this.hBias.subi(4);
 		}
+		
+		this.hBiasAdaGrad = new AdagradLearningRate( this.hiddenBiasNeurons.numRows(), this.hiddenBiasNeurons.numCols() );
+		
 
 		if (this.visibleBiasNeurons == null) {
 			
@@ -495,7 +824,11 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 				this.visibleBiasNeurons.assign(0.0);
 				
 			}
+			
 		}
+		
+		this.vBiasAdaGrad = new AdagradLearningRate( this.visibleBiasNeurons.numRows(), this.visibleBiasNeurons.numCols() );
+		
 
 
 
@@ -624,6 +957,18 @@ public abstract class BaseNeuralNetworkVectorized implements NeuralNetworkVector
 	public void setAdaGrad(AdagradLearningRate adaGrad) {
 		this.wAdagrad = adaGrad;
 	}
+	
+    @Override
+    public boolean isUseAdaGrad() {
+        return this.useAdaGrad;
+    }
+
+
+    @Override
+    public boolean isUseRegularization() {
+        return this.useRegularization;
+    }
+	
 	
 	
 	
