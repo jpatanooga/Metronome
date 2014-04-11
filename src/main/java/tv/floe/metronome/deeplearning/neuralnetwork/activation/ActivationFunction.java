@@ -2,8 +2,10 @@ package tv.floe.metronome.deeplearning.neuralnetwork.activation;
 
 import org.apache.mahout.math.Matrix;
 
+import com.google.common.base.Function;
 
-public interface ActivationFunction {
+
+public interface ActivationFunction extends Function<Matrix, Matrix> {
 
 	/**
 	 * Applies the derivative of this function
