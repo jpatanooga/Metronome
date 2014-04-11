@@ -26,9 +26,12 @@ public class AdagradLearningRate {
 	public Matrix gradient;
 	public int rows;
 	public int cols;
-	private boolean first = true;
+	private int numIterations = 0;
+	private double lrDecay = 0.95;
+	private boolean decayLr;
+	private double minLearningRate = 1e-4;
 
-	public double autoCorrect = 0.95;	
+//	public double autoCorrect = 0.95;	
 
 	public AdagradLearningRate( int rows, int cols, double gamma) {
 
@@ -42,6 +45,7 @@ public class AdagradLearningRate {
 		this.historicalGradient.assign( 0.0 );
 
 		this.masterStepSize = gamma;
+		this.decayLr = false;
 
 
 	}
@@ -108,8 +112,25 @@ public class AdagradLearningRate {
 
 	public Matrix getLearningRates(Matrix gradient) {
 
-		this.gradient = gradient;
-		this.adjustedGradient = MatrixUtils.sqrt(MatrixUtils.pow( gradient, 2 )).times(masterStepSize);
+		this.gradient = gradient.clone();
+		
+		double currentLearningRate = this.masterStepSize;
+		if(decayLr && numIterations > 0) {
+			this.masterStepSize *= lrDecay;
+			if(masterStepSize < minLearningRate)
+				masterStepSize = minLearningRate;
+		}
+
+		numIterations++;
+		
+		
+		this.adjustedGradient = MatrixUtils.sqrt(MatrixUtils.pow( gradient, 2 )).times( currentLearningRate );
+		
+		//ensure no zeros
+//		this.adjustedGradient.addi(1e-6);
+		this.adjustedGradient = this.adjustedGradient.plus( 1e-6 );
+		
+		
 		return adjustedGradient;
 	}
 	
@@ -117,7 +138,8 @@ public class AdagradLearningRate {
 		
 		AdagradLearningRate ret = new AdagradLearningRate( this.rows, this.cols );
 		ret.adjustedGradient.assign( this.adjustedGradient );
-		ret.autoCorrect = this.autoCorrect;
+		//ret.autoCorrect = this.autoCorrect;
+		ret.decayLr = this.decayLr;
 		ret.fudgeFactor = this.fudgeFactor;
 		if ( null == this.gradient ) {
 			ret.gradient = null;
@@ -130,5 +152,22 @@ public class AdagradLearningRate {
 		return ret;
 		
 	}
+	
+	public  double getMasterStepSize() {
+		return masterStepSize;
+	}
+
+	public  void setMasterStepSize(double masterStepSize) {
+		this.masterStepSize = masterStepSize;
+	}
+
+	public synchronized boolean isDecayLr() {
+		return decayLr;
+	}
+
+	public synchronized void setDecayLr(boolean decayLr) {
+		this.decayLr = decayLr;
+	}
+	
 
 }
