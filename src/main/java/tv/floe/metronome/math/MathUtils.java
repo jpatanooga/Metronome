@@ -1,5 +1,6 @@
 package tv.floe.metronome.math;
 
+import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 
 public class MathUtils {
@@ -75,5 +76,22 @@ public class MathUtils {
         //return rdot(x.length, x.data, 0, 1, y.data, 0, 1);
     	return rdot( MatrixUtils.length( x ), ArrayUtils.flatten( MatrixUtils.fromMatrix( x ) ), 0, 1, ArrayUtils.flatten( MatrixUtils.fromMatrix( y ) ), 0, 1);
     }	
+    
+    public static Matrix rand(int rows, int columns) {
+        Matrix m = new DenseMatrix(rows, columns);
+
+        java.util.Random rndGen = new java.util.Random();
+        for ( int r = 0; r < m.numRows(); r++ ) {
+        	
+        	for ( int c = 0; c < m.numCols(); c++ ) {
+        		
+        		m.setQuick( r, c, rndGen.nextDouble() );
+        		
+        	}
+        	
+        }
+
+        return m;
+    }    
 
 }
