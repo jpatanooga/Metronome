@@ -219,6 +219,20 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 
     }	
+    
+    /**
+     * Synchronizes the rng, this is mean for use with scale out methods
+     */
+/*    public void synchonrizeRng() {
+        RandomGenerator rgen = new SynchronizedRandomGenerator(rng);
+        for(int i = 0; i < nLayers; i++) {
+            layers[i].setRng(rgen);
+            sigmoidLayers[i].setRng(rgen);
+        }
+
+
+    }
+*/    
 		
 
 	/**
@@ -270,6 +284,18 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
 		this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
+		if ( this.useAdaGrad ) {
+			this.logisticRegressionLayer.setUseAdaGrad(true);
+		}
+		
+		if ( this.normalizeByInputRows ) {
+			this.logisticRegressionLayer.setNormalizeByInputRows(true);
+		}
+		
+        dimensionCheck();
+        applyTransforms();
+        initCalled = true;
+		
 		
 	}
 	
@@ -328,20 +354,39 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		}
 		
 		List<Matrix> activations = new ArrayList<Matrix>();
-		Matrix input = this.inputTrainingData;
-		activations.add(input);
+		Matrix currInput = this.inputTrainingData;
+		activations.add( currInput );
 
 		for (int i = 0; i < this.numberLayers; i++) {
-			
+/*			
 			HiddenLayer layer = this.hiddenLayers[ i ];
 			//layers[i].setInput(input);
 			this.preTrainingLayers[i].setInput(input);
 			input = layer.computeOutputActivation(input);
 			activations.add(input);
+*/
+			
+            //getLayers()[i].setInput(currInput);
+			this.preTrainingLayers[i].setInput(currInput);
+            //getSigmoidLayers()[i].setInput(input);
+			HiddenLayer layer = this.hiddenLayers[ i ];
+			layer.setInput( this.inputTrainingData );
+			
+            if (useHiddenActivationsForwardProp) {
+                //currInput = getSigmoidLayers()[i].activate(currInput);
+            	currInput = layer.computeOutputActivation(currInput);
+            } else {
+                //currInput = getLayers()[i].sampleHiddenGivenVisible(currInput).getSecond();
+            	currInput = this.preTrainingLayers[ i ].sampleHiddenGivenVisible(currInput).getSecond();
+            }
+            
+            activations.add(currInput);
+			
 			
 		}
 
-		activations.add( this.logisticRegressionLayer.predict(input) );
+		this.logisticRegressionLayer.input = currInput;
+		activations.add( this.logisticRegressionLayer.predict(currInput) );
 		return activations;
 	}
 
