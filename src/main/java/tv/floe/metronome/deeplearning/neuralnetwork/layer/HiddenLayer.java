@@ -45,7 +45,9 @@ public class HiddenLayer implements Serializable {
 	 */
 	private static final long serialVersionUID = 87885295280050784L;
 	
+	// nIn
 	public int neuronCountPreviousLayer = 0;
+	// nOut
 	public int neuronCount = 0;
 	
 	public Matrix connectionWeights;
@@ -121,6 +123,23 @@ public class HiddenLayer implements Serializable {
 		this.connectionWeights = weights;
 		
 	}
+	
+	public synchronized int getNeuronInputCount() {
+		return this.neuronCountPreviousLayer;
+	}
+
+	public synchronized void setNeuronInputCount(int nIn) {
+		this.neuronCountPreviousLayer = nIn;
+	}
+
+	public synchronized int getNeuronOutputCount() {
+		return this.neuronCount;
+	}
+
+	public synchronized void setNeuronOutputCount(int nOut) {
+		this.neuronCount = nOut;
+	}
+	
 	
 	
 	
