@@ -395,4 +395,21 @@ public class LogisticRegression implements Serializable {
 	}
 	*/
 	
+	public  int getnIn() {
+		return nIn;
+	}
+
+	public  void setnIn(int nIn) {
+		this.nIn = nIn;
+	}
+
+	public  int getnOut() {
+		return nOut;
+	}
+
+	public  void setnOut(int nOut) {
+		this.nOut = nOut;
+	}
+	
+	
 }
