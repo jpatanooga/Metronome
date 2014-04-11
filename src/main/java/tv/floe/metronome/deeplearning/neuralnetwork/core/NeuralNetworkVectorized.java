@@ -151,6 +151,7 @@ public interface NeuralNetworkVectorized {
 	public Pair<Matrix,Matrix> sampleVisibleGivenHidden(Matrix h);    
 	
 	public double negativeLogLikelihood();
-	
+
+	public Matrix hBiasMean();
 	
 }
