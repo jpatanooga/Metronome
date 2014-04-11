@@ -529,6 +529,9 @@ public class LogisticRegression implements Serializable {
 		return useAdaGrad;
 	}
 
+	public  void setUseAdaGrad(boolean useAda) {
+		this.useAdaGrad = useAda;
+	}
 
 
 
