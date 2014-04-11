@@ -16,6 +16,7 @@ import org.apache.mahout.math.MatrixWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized.OptimizationAlgorithm;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.learning.AdagradLearningRate;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.LogisticRegressionGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.LogisticRegressionOptimizer;
@@ -37,7 +38,12 @@ public class LogisticRegression implements Serializable {
 
 	private boolean useAdaGrad = false;
 	private AdagradLearningRate adaLearningRates = null;
-	private boolean firstTimeThrough = true;
+	
+	private AdagradLearningRate biasAdaGrad = null;
+	private boolean firstTimeThrough = false;
+	private boolean normalizeByInputRows = false;
+	private OptimizationAlgorithm optimizationAlgorithm;
+		
 	
 	// used for Serde
 	public LogisticRegression() {}
@@ -56,6 +62,8 @@ public class LogisticRegression implements Serializable {
 		
 		this.adaLearningRates = new AdagradLearningRate( nIn, nOut );
 		
+		// biasAdaGrad = new AdaGrad(b.rows,b.columns);
+		this.biasAdaGrad = new AdagradLearningRate( this.biasTerms.numRows(), this.biasTerms.numCols() );
 	}
 
 	public LogisticRegression(Matrix input, int nIn, int nOut) {
@@ -78,6 +86,10 @@ public class LogisticRegression implements Serializable {
 
 
 	public void train(Matrix x,double lr) {
+		
+		this.adaLearningRates.setMasterStepSize( lr );
+        this.biasAdaGrad.setMasterStepSize( lr );
+		
 		
 		train(x,labels,lr);
 
@@ -121,13 +133,17 @@ public class LogisticRegression implements Serializable {
 	 * @param y the labels to use
 	 * @param learningRate
 	 * @param epochs
+	 * @throws Exception 
 	 */
-	public  void trainTillConvergence(Matrix x, Matrix y, double learningRate,int epochs) {
+	public  void trainTillConvergence(Matrix x, Matrix y, double learningRate,int epochs) throws Exception {
 	//	MatrixUtil.complainAboutMissMatchedMatrices(x, y);
 
+        this.adaLearningRates.setMasterStepSize( learningRate );
+        this.biasAdaGrad.setMasterStepSize( learningRate );
+		
 		this.input = x;
 		this.labels = y;
-		trainTillConvergence(learningRate,epochs);
+		trainTillConvergence( learningRate, epochs );
 
 	}
 
@@ -135,11 +151,36 @@ public class LogisticRegression implements Serializable {
 	 * Run conjugate gradient
 	 * @param learningRate the learning rate to train with
 	 * @param numEpochs the number of epochs
+	 * @throws Exception 
 	 */
-	public  void trainTillConvergence(double learningRate, int numEpochs) {
+	public  void trainTillConvergence(double learningRate, int numEpochs) throws Exception {
+		
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer(this, learningRate);
-		VectorizedNonZeroStoppingConjugateGradient g = new VectorizedNonZeroStoppingConjugateGradient(opt);
-		g.optimize(numEpochs);
+		
+        this.adaLearningRates.setMasterStepSize( learningRate );
+        this.biasAdaGrad.setMasterStepSize( learningRate );
+		
+		
+//		VectorizedNonZeroStoppingConjugateGradient g = new VectorizedNonZeroStoppingConjugateGradient(opt);
+//		g.optimize(numEpochs);
+        
+        if ( optimizationAlgorithm == OptimizationAlgorithm.CONJUGATE_GRADIENT ) {
+        	
+ 			VectorizedNonZeroStoppingConjugateGradient g = new VectorizedNonZeroStoppingConjugateGradient(opt);
+ 			g.setTolerance(1e-5);
+ 			g.setMaxIterations(numEpochs);
+             g.optimize(numEpochs);
+
+ 		} else {
+/*
+ 			VectorizedDeepLearningGradientAscent g = new VectorizedDeepLearningGradientAscent(opt);
+ 			g.setTolerance(1e-5);
+ 			g.optimize(numEpochs);
+*/
+ 			throw new Exception("Invalid Logistic Regression Optimization Algorithm config'd");
+ 			
+ 		}
+ 		        
 
 	}
 	
@@ -208,6 +249,10 @@ public class LogisticRegression implements Serializable {
 		//ensureValidOutcomeMatrix(y);
 		MatrixUtils.ensureValidOutcomeMatrix(y);
 		
+        this.adaLearningRates.setMasterStepSize( lr );
+        this.biasAdaGrad.setMasterStepSize( lr );
+		
+		
 		if (x.numRows() != y.numRows()) {
 			throw new IllegalArgumentException("How does this happen?");
 		}
@@ -228,14 +273,24 @@ public class LogisticRegression implements Serializable {
 
 	public LogisticRegressionGradient getGradient(double lr) {
 		
+        this.adaLearningRates.setMasterStepSize( lr );
+        this.biasAdaGrad.setMasterStepSize( lr );
+		
+		
 		//Matrix p_y_given_x = sigmoid(input.mmul(W).addRowVector(b));
 		Matrix p_y_given_x = MatrixUtils.sigmoid( MatrixUtils.addRowVector( input.times( this.connectionWeights ), this.biasTerms.viewRow(0) ) );
 		
 		//Matrix dy = labels.sub(p_y_given_x);
 		Matrix dy = labels.minus(p_y_given_x);
+
+	//		dy.divi(input.rows);
 		
-		// weight decay
-		dy.divide( this.input.numRows() );
+		if(normalizeByInputRows) {
+		
+		// 	weight decay
+			dy = dy.divide( this.input.numRows() );
+			
+		}
 		
 		
 		//Matrix wGradient = input.transpose().mmul(dy).mul(lr);
@@ -249,6 +304,34 @@ public class LogisticRegression implements Serializable {
 			
 			// wGradient.muli(lr);
 			wGradient = wGradient.times(lr);
+			
+		}
+		
+/*
+ * 
+        if(useAdaGrad)
+            dy.muli(biasAdaGrad.getLearningRates(dy));
+        else
+             dy.muli(lr);
+
+        if(normalizeByInputRows)
+            dy.divi(input.rows);
+
+ * 		
+ */
+		if (this.useAdaGrad) {
+			
+			dy = dy.times( this.biasAdaGrad.getLearningRates( dy ) );
+			
+		} else {
+			
+			dy = dy.times( lr );
+			
+		}
+		
+		if ( this.normalizeByInputRows ) {
+			
+			dy = dy.divide( this.input.numRows() );
 			
 		}
 		
@@ -410,6 +493,57 @@ public class LogisticRegression implements Serializable {
 	public  void setnOut(int nOut) {
 		this.nOut = nOut;
 	}
+	
+	public  boolean isUseRegularization() {
+		return useRegularization;
+	}
+
+	public  void setUseRegularization(boolean useRegularization) {
+		this.useRegularization = useRegularization;
+	}
+
+    public AdagradLearningRate getBiasAdaGrad() {
+        return biasAdaGrad;
+    }
+
+
+    public AdagradLearningRate getAdaGrad() {
+        return this.adaLearningRates;
+    }
+
+
+
+    public synchronized boolean isNormalizeByInputRows() {
+		return normalizeByInputRows;
+	}
+
+
+
+	public synchronized void setNormalizeByInputRows(boolean normalizeByInputRows) {
+		this.normalizeByInputRows = normalizeByInputRows;
+	}
+
+
+
+	public boolean isUseAdaGrad() {
+		return useAdaGrad;
+	}
+
+
+
+
+
+
+	public OptimizationAlgorithm getOptimizationAlgorithm() {
+		return optimizationAlgorithm;
+	}
+
+
+
+	public void setOptimizationAlgorithm(OptimizationAlgorithm optimizationAlgorithm) {
+		this.optimizationAlgorithm = optimizationAlgorithm;
+	}
+	
 	
 	
 }
