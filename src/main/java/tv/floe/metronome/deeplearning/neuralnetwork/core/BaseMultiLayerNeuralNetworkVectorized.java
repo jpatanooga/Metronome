@@ -553,40 +553,45 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		} else {
 			
 
-			boolean train = true;
-			int count = 0;
-			int numOver = 0;
-			int tolerance = 3;
+            boolean train = true;
+            int count = 0;
+            double changeTolerance = 1e-5;
+            int backPropIterations = 0;
 			
 			while (train) {
 				
+                if ( backPropIterations >= epochs ) {
+                    log.info("Backprop number of iterations max hit; convering");
+                    break;
+
+                }
+				
+				
 				count++;
 				backPropStep( revert, lr, count );
+				
+				this.logisticRegressionLayer.trainTillConvergence( lr, epochs );
 
 				double entropy = this.negativeLogLikelihood();
-								
-				if ( entropy < lastEntropy) {
-					
-					lastEntropy = entropy;
-					log.info("New negative log likelihood " + lastEntropy);
-					
-				} else if (entropy >= lastEntropy) {
-					
-					update(revert);
-					numOver++;
-					
-					if (numOver >= tolerance) {
-						train = false;
-					}
-					//log.info("entropy went the wrong way! " + entropy);
-					
-				} else if (entropy == lastEntropy) {
-					
-					train = false;
-					//log.info("entropy went the wrong way: didn't change!" + entropy);
-					
-				}
 
+                if( entropy < lastEntropy ) {
+                    double diff = Math.abs(entropy - lastEntropy);
+                    if(diff < changeTolerance) {
+                        log.info("Not enough of a change on back prop...breaking");
+                        break;
+                    }
+                    else
+                        lastEntropy = entropy;
+                    log.info("New negative log likelihood " + lastEntropy);
+                    revert = clone();
+                }
+
+                else if(entropy >= lastEntropy) {
+                    train = false;
+                }
+
+               backPropIterations++;
+				
 
 			}
 
