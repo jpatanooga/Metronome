@@ -204,8 +204,8 @@ public class TestDeepBeliefNetwork {
 		int preTrainEpochs = 1000;
 		int k = 1;
 		
-		int nIns = x_toy[0].length;
-		int nOuts = y_toy[0].length;
+		int nIns = x_toy_Matrix.columnSize();
+		int nOuts = y_toy_Matrix.columnSize();
 		
 		int[] hiddenLayerSizes = new int[] { 10, 8 };
 		double fineTuneLr = 0.0001;

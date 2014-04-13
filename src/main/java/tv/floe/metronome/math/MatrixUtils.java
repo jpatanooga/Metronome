@@ -103,6 +103,15 @@ public class MatrixUtils {
 
 	}
 
+    public static Matrix tanh(Matrix m) {
+        for(int i = 0; i < m.numRows(); i++ ) {
+            for(int j = 0; j < m.numCols(); j++) {
+                m.set(i,j,Math.tanh(m.get(i,j)));
+            }
+        }
+        return m;
+    }
+
 	public static Matrix rowMeans(Matrix m) {
 
 		Matrix ret_row_means = new DenseMatrix(m.numRows(), 1);
@@ -501,7 +510,8 @@ public class MatrixUtils {
 	/**
 	 * Creates a new matrix in which all values are equal 1.
 	 * 
-	 * @param m
+	 * @param rows the number of rows
+     * @param cols the number of columns
 	 * @return
 	 */
 	public static Matrix ones(int rows, int cols) {
@@ -532,9 +542,9 @@ public class MatrixUtils {
 	 * a matrix of p values, and a max number.
 	 * 
 	 * 
-	 * @param p the p matrix to use
-	 * @param n the n to use
-	 * @param rng the rng to use
+	 * @param pValues the p matrix to use
+	 * @param max the n to use
+	 * @param rndNumberGenerator the rng to use
 	 * @return a binomial distribution based on the one n, the passed in p values, and rng
 	 */	
 	public static Matrix genBinomialDistribution(Matrix pValues, int max, RandomGenerator rndNumberGenerator) {
@@ -561,7 +571,6 @@ public class MatrixUtils {
 	 * Based on: http://luc.devroye.org/chapter_ten.pdf
 	 * 
 	 * @param rng
-	 * @param n
 	 * @param p
 	 * @return
 	 */
@@ -897,8 +906,24 @@ public class MatrixUtils {
 		}
 		
 		return out;
-	}	
-	
+	}
+
+
+    public static void subi(Matrix m, Matrix subtractionMatrix) {
+
+        for (int r = 0; r < m.numRows(); r++) {
+
+            for ( int c = 0; c < m.numCols(); c++ ) {
+
+                m.set(r, c, m.get(r, c) - subtractionMatrix.get(r, c) );
+
+            }
+
+        }
+
+
+    }
+
 	public static void addi(Matrix m, Matrix additionMatrix) {
 		
 		for (int r = 0; r < m.numRows(); r++) {

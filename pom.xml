@@ -59,10 +59,7 @@
 							<mainClass>tv.floe.metronome.yarn.client.Client</mainClass>
 						</manifest>
 					</archive>
-					<excludes>
-						<exclude>**/*.properties</exclude>
-						<exclude>**/*.xml</exclude>
-					</excludes>
+
 				</configuration>
 				<executions>
 					<execution>

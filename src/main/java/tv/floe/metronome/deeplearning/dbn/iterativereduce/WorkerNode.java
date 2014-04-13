@@ -17,7 +17,6 @@ import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistHDFSDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
 import tv.floe.metronome.deeplearning.dbn.model.evaluation.ModelTester;
-import tv.floe.metronome.deeplearning.neuralnetwork.dbn.dataset.mnist.Test_DBN_Mnist_Dataset;
 import tv.floe.metronome.io.records.CachedVectorReader;
 
 import com.cloudera.iterativereduce.ComputableWorker;
