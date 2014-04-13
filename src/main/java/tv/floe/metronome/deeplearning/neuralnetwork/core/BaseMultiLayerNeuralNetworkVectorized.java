@@ -727,7 +727,6 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
                 MatrixUtils.divi( deltaColumnSums, this.inputTrainingData.numRows() );
 
             //	getLayers()[l].gethBias().addi(deltaColumnSums.mul(lr));
-            //TODO: SUBI
             MatrixUtils.subi( this.preTrainingLayers[ l ].getHiddenBias(), deltaColumnSums.times( lr ) );
             //	getSigmoidLayers()[l].setB(getLayers()[l].gethBias());
             this.hiddenLayers[ l ].biasTerms = this.preTrainingLayers[ l ].getHiddenBias();
