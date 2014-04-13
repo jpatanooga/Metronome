@@ -25,6 +25,7 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.MatrixWritable;
+import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import tv.floe.metronome.classification.neuralnetworks.core.NeuralNetwork;
 import tv.floe.metronome.deeplearning.math.transforms.MatrixTransform;
 import tv.floe.metronome.deeplearning.neuralnetwork.activation.ActivationFunction;
+import tv.floe.metronome.deeplearning.neuralnetwork.activation.Activations;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized.LossFunction;
 import tv.floe.metronome.deeplearning.neuralnetwork.core.NeuralNetworkVectorized.OptimizationAlgorithm;
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.LogisticRegressionGradient;
@@ -402,6 +404,8 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 		Matrix[] deltas = new Matrix[ this.numberLayers + 2 ];
 		ActivationFunction derivative = this.hiddenLayers[ 0 ].activationFunction;
 		
+		ActivationFunction softMaxDerivative = Activations.softmax();
+		
 		//- y - h
 		Matrix delta = null;
 
@@ -451,7 +455,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 			
 			// output layer
 			if (i >= this.numberLayers + 1) {
-				
+				/*
 				Matrix z = activations.get(i); 
 				
 				//- y - h
@@ -460,11 +464,21 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				//(- y - h) .* f'(z^l) where l is the output layer
 				Matrix initialDelta = MatrixUtils.elementWiseMultiplication( delta, derivative.applyDerivative( z ) );
 				deltas[ i ] = initialDelta;
-
+*/
+				
+                //-( y - h) .* f'(z^l) where l is the output layer
+                //delta = labels.sub(activations.get(i)).neg().mul(softMaxDerivative.applyDerivative(activations.get(i)));
+                Matrix tmpDelta = MatrixUtils.neg( labels.minus( activations.get( i ) ) );
+				
+                delta = MatrixUtils.elementWiseMultiplication( tmpDelta, softMaxDerivative.applyDerivative(activations.get(i)) );
+				
+				deltas[i] = delta;
+				
+				
 			} else {
 				
 				//derivative i + 1; aka gradient for bias
-				
+/*				
 				delta = deltas[ i + 1 ];
 				Matrix w = weights.get( i ).transpose();
 				Matrix z = activations.get( i ); //zs.get( i );
@@ -483,6 +497,19 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 				Matrix newGradient = lastLayerDelta.times(a);
 				
 				gradients[ i ] = newGradient.divide( this.inputTrainingData.numRows() );
+				*/
+				
+                //W^t * error^l + 1
+                Matrix tmpDeltas = deltas[ i + 1 ].times( weights.get(i).transpose() );
+                		
+                tmpDeltas = MatrixUtils.elementWiseMultiplication(tmpDeltas, derivative.applyDerivative(activations.get(i)));
+
+                deltas[ i ] = tmpDeltas;
+                		  
+                //calculate gradient for layer
+                Matrix newGradient = deltas[ i + 1 ].transpose().times( activations.get( i ) );
+                gradients[i] = newGradient;
+				
 				
 			}
 
