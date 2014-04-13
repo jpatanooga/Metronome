@@ -135,7 +135,7 @@ public class LogisticRegression implements Serializable {
 	 * @param epochs
 	 * @throws Exception 
 	 */
-	public  void trainTillConvergence(Matrix x, Matrix y, double learningRate,int epochs) throws Exception {
+	public  void trainTillConvergence(Matrix x, Matrix y, double learningRate,int epochs) {
 	//	MatrixUtil.complainAboutMissMatchedMatrices(x, y);
 
         this.adaLearningRates.setMasterStepSize( learningRate );
@@ -153,7 +153,7 @@ public class LogisticRegression implements Serializable {
 	 * @param numEpochs the number of epochs
 	 * @throws Exception 
 	 */
-	public  void trainTillConvergence(double learningRate, int numEpochs) throws Exception {
+	public  void trainTillConvergence(double learningRate, int numEpochs) {
 		
 		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer(this, learningRate);
 		
@@ -177,7 +177,9 @@ public class LogisticRegression implements Serializable {
  			g.setTolerance(1e-5);
  			g.optimize(numEpochs);
 */
- 			throw new Exception("Invalid Logistic Regression Optimization Algorithm config'd");
+ 			//throw new Exception("Invalid Logistic Regression Optimization Algorithm config'd");
+ 			
+ 			System.err.println( "Invalid Logistic Regression Optimization Algorithm config'd" );
  			
  		}
  		        
