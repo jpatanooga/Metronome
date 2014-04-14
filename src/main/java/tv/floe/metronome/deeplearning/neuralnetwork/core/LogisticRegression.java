@@ -64,6 +64,9 @@ public class LogisticRegression implements Serializable {
 		
 		// biasAdaGrad = new AdaGrad(b.rows,b.columns);
 		this.biasAdaGrad = new AdagradLearningRate( this.biasTerms.numRows(), this.biasTerms.numCols() );
+	
+		optimizationAlgorithm = OptimizationAlgorithm.CONJUGATE_GRADIENT;
+				
 	}
 
 	public LogisticRegression(Matrix input, int nIn, int nOut) {
