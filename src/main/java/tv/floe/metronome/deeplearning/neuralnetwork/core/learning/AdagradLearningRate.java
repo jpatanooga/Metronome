@@ -111,9 +111,9 @@ public class AdagradLearningRate {
 
 
 	public Matrix getLearningRates(Matrix gradient) {
-
+        Matrix gradientSquared = MatrixUtils.pow(gradient,2);
 		this.gradient = gradient.clone();
-		
+        this.historicalGradient = this.historicalGradient.plus(gradientSquared);
 		double currentLearningRate = this.masterStepSize;
 		if(decayLr && numIterations > 0) {
 			this.masterStepSize *= lrDecay;
@@ -124,8 +124,8 @@ public class AdagradLearningRate {
 		numIterations++;
 		
 		
-		this.adjustedGradient = MatrixUtils.sqrt(MatrixUtils.pow( gradient, 2 )).times( currentLearningRate );
-		
+		this.adjustedGradient = MatrixUtils.div(this.gradient,MatrixUtils.sqrt(gradientSquared.plus(fudgeFactor)));
+        this.adjustedGradient = this.adjustedGradient.times(masterStepSize);
 		//ensure no zeros
 //		this.adjustedGradient.addi(1e-6);
 		this.adjustedGradient = this.adjustedGradient.plus( 1e-6 );

@@ -774,8 +774,11 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
         int biasTermsLength = logisticRegressionLayer.biasTerms.numRows() * logisticRegressionLayer.biasTerms.numCols();
         if(biasGradientLength != biasTermsLength)
             MatrixUtils.subi(logisticRegressionLayer.biasTerms,MatrixUtils.mean(biasGradient));
-        else
-            this.logisticRegressionLayer.biasTerms = logisticRegressionLayer.biasTerms.minus(biasGradient.transpose());
+        else {
+            double mean = MatrixUtils.mean(biasGradient);
+            MatrixUtils.subi(logisticRegressionLayer.biasTerms,mean);
+
+        }
 
 
 
