@@ -133,7 +133,7 @@ public class Test_DBN_Mnist_Dataset {
 	*/
 	
 
-	private DataSet filterDataset( int[] classIndexes, int datasetSize ) throws IOException {
+	public static DataSet filterDataset( int[] classIndexes, int datasetSize ) throws IOException {
 		
 		int batchSize = 100 * datasetSize;
 		int totalNumExamples = 100 * datasetSize;
@@ -348,9 +348,10 @@ public class Test_DBN_Mnist_Dataset {
 //		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
 //		DataSet first = fetcher.next();
 		
-		int[] filter = { 0, 1, 2 };
-		DataSet recordBatch = this.filterDataset( filter, 30 );
+		int[] filter = { 0, 1 };
+		DataSet recordBatch = this.filterDataset( filter, 20 );
 		
+		MatrixUtils.debug_print(recordBatch.getSecond());
 		
 		//int numIns = first.getFirst().numCols();
 		//int numLabels = first.getSecond().numCols();
@@ -411,7 +412,12 @@ public class Test_DBN_Mnist_Dataset {
 			
 			
 			dbn.finetune( recordBatch.getSecond(), learningRate, fineTuneEpochs );
-/*			
+
+			dbn.preTrain( recordBatch.getFirst(), 1, learningRate, preTrainEpochs);
+			dbn.finetune( recordBatch.getSecond(), learningRate, fineTuneEpochs );
+			
+			
+			/*			
 			if (fetcher.hasNext()) {
 				first = fetcher.next();
 			}
