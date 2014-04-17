@@ -416,6 +416,8 @@ public class Test_DBN_Mnist_Dataset {
 			dbn.preTrain( recordBatch.getFirst(), 1, learningRate, preTrainEpochs);
 			dbn.finetune( recordBatch.getSecond(), learningRate, fineTuneEpochs );
 			
+			dbn.preTrain( recordBatch.getFirst(), 1, learningRate, preTrainEpochs);
+			dbn.finetune( recordBatch.getSecond(), learningRate, fineTuneEpochs );
 			
 			/*			
 			if (fetcher.hasNext()) {
