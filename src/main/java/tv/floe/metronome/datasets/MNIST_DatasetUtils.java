@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -485,7 +486,7 @@ public class MNIST_DatasetUtils {
 		Map<Integer, Integer> filter = new HashMap<Integer, Integer>();
 		for (int x = 0; x < classIndexes.length; x++ ) {
 			
-			filter.put(classIndexes[x], 1);
+			filter.put(classIndexes[x], 0);
 			
 		}
 
@@ -586,6 +587,8 @@ public class MNIST_DatasetUtils {
 		
 		if ( filter.containsKey( label )) {
 
+			// inc filter label counter
+			filter.put(label, filter.get( label ) + 1 );
 	  		
 	  		double[] binary_image = binaryNormalizeInputArray(imageDataAsBytes);
 	
@@ -603,6 +606,13 @@ public class MNIST_DatasetUtils {
       
       System.out.println("> Finished extracting from: " + imageFileName);
       System.out.println("> Filtered Images Converted: " + filteredImagesFound);
+      
+      Iterator it = filter.entrySet().iterator();
+      while (it.hasNext()) {
+          Map.Entry pairs = (Map.Entry)it.next();
+          System.out.println(pairs.getKey() + " = " + pairs.getValue());
+          it.remove(); // avoids a ConcurrentModificationException
+      }      
       
       buffWriter.close();		
 		
@@ -820,7 +830,7 @@ public class MNIST_DatasetUtils {
 
 		//
 		
-		//downloadAndUntar();
+		downloadAndUntar();
 		
 		MNIST_DatasetUtils util = new MNIST_DatasetUtils( "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFileLabelsFilename_unzipped, "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFilesFilename_unzipped );
 		//util.scanIDXFiles();
