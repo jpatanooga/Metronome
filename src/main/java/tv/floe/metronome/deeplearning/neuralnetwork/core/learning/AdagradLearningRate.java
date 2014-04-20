@@ -24,13 +24,7 @@ import tv.floe.metronome.math.MatrixUtils;
  */
 public class AdagradLearningRate {
 
-	//	private double gamma = 10; // default for gamma (this is the numerator)
-	//private double squaredGradientSum = 0;
-	//	public Matrix squaredGradientSums;
-	//	public Matrix connectionLearningRates;
-
 	private double masterStepSize = 1e-3; // default for masterStepSize (this is the numerator)
-	//private double squaredGradientSum = 0;
 	public Matrix historicalGradient;
 	public Matrix adjustedGradient;
 	public double fudgeFactor = 0.000001;
@@ -58,6 +52,9 @@ public class AdagradLearningRate {
 		this.masterStepSize = gamma;
 		this.decayLr = false;
 
+		// gonna default init this for serde purposes
+		this.gradient = new DenseMatrix(rows, cols);
+		this.gradient.assign( 0.0 );
 
 	}
 
@@ -66,58 +63,6 @@ public class AdagradLearningRate {
 		this( rows, cols, 0.01 );
 
 	}
-
-	/*	public void addLastIterationGradient(Matrix gradient) {
-
-		//this.squaredGradientSum += gradient * gradient;
-		Matrix gradientsSquared = MatrixUtils.pow(gradient, 2);
-
-		//this.connectionLearningRates.
-		MatrixUtils.addi(this.squaredGradientSums, gradientsSquared);
-
-		MatrixUtils.debug_print(squaredGradientSums);
-
-	}
-	 */	
-	/*	
-	public double getLearningRate(int row, int col) {
-
-		double squaredGradientSum = this.squaredGradientSums.get(row, col);
-
-		if ( squaredGradientSum > 0) {
-			return this.gamma / Math.sqrt( squaredGradientSum );
-		} else {
-			return this.gamma;
-		}
-
-
-	}
-	 */
-	/*	
-	public Matrix getLearningRates() {
-
-		for ( int r = 0; r < this.squaredGradientSums.numRows(); r++ ) {
-
-			for ( int c = 0; c < this.squaredGradientSums.numCols(); c++ ) {
-
-				double squaredGradientSum = this.squaredGradientSums.get(r, c);
-
-				if ( squaredGradientSum > 0) {
-					this.connectionLearningRates.set(r, c, this.gamma / Math.sqrt( squaredGradientSum ) );
-				} else {
-					//this.gamma;
-					this.connectionLearningRates.set(r, c, this.gamma);
-				}
-
-			}
-
-		}
-
-		return this.connectionLearningRates;
-
-
-	}
-	 */
 
 
 
