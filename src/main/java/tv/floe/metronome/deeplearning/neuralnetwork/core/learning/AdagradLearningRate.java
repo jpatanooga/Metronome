@@ -1,7 +1,18 @@
 package tv.floe.metronome.deeplearning.neuralnetwork.core.learning;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.OutputStream;
+
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
+import org.apache.mahout.math.MatrixWritable;
+
 import tv.floe.metronome.math.MatrixUtils;
 
 /**
@@ -168,6 +179,74 @@ public class AdagradLearningRate {
 	public synchronized void setDecayLr(boolean decayLr) {
 		this.decayLr = decayLr;
 	}
+	
+	
+	/**
+	 * Serializes this to the output stream.
+	 * @param os the output stream to write to
+	 */
+	public void write(OutputStream os) {
+		try {
+
+		    DataOutput d = new DataOutputStream(os);
+		    
+			d.writeDouble( masterStepSize );
+			
+			MatrixWritable.writeMatrix( d, historicalGradient );
+			MatrixWritable.writeMatrix( d, adjustedGradient );
+			
+			d.writeDouble( fudgeFactor );
+			
+			MatrixWritable.writeMatrix( d, gradient );
+			
+			d.writeInt( rows );
+			d.writeInt( cols );
+			d.writeInt( numIterations );
+			
+			d.writeDouble( lrDecay );
+			d.writeBoolean(  decayLr );
+			d.writeDouble( minLearningRate );
+		    
+		    
+		    
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
+	/**
+	 * Load (using {@link ObjectInputStream}
+	 * @param is the input stream to load from (usually a file)
+	 */
+	public void load(InputStream is) {
+		try {
+
+			DataInput di = new DataInputStream(is);
+			
+			masterStepSize = di.readDouble();
+			
+			historicalGradient = MatrixWritable.readMatrix( di );
+			adjustedGradient = MatrixWritable.readMatrix( di );
+			
+			fudgeFactor = di.readDouble();
+			
+			gradient = MatrixWritable.readMatrix( di );
+			
+			rows = di.readInt();
+			cols = di.readInt();
+			numIterations = di.readInt();
+			
+			lrDecay = di.readDouble();
+			decayLr = di.readBoolean();
+			minLearningRate = di.readDouble();			
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}	
+	
 	
 
 }
