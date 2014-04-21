@@ -408,6 +408,24 @@ public class LogisticRegression implements Serializable {
 		    d.writeBoolean( this.useRegularization );
 		    
 
+		    d.writeBoolean( this.useAdaGrad );
+		    this.adaLearningRates.write( os );
+		    this.biasAdaGrad.write( os );
+		    d.writeBoolean( this.firstTimeThrough );
+		    d.writeBoolean( this.normalizeByInputRows );
+		    
+		    // TODO: dont remember how to serde an Enum. fix. (only two options today)
+		    if (OptimizationAlgorithm.CONJUGATE_GRADIENT == this.optimizationAlgorithm) {
+		    	
+		    	d.writeInt(0);
+		    	
+		    } else {
+		    	
+		    	d.writeInt(1);
+		    	
+		    }
+		    
+		    
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -435,6 +453,32 @@ public class LogisticRegression implements Serializable {
 			this.biasTerms = MatrixWritable.readMatrix( di );
 			
 			this.useRegularization = di.readBoolean();
+			
+		    this.useAdaGrad = di.readBoolean();
+		    
+		    this.adaLearningRates.load( is );
+		    this.biasAdaGrad.load( is );
+		    
+		    this.firstTimeThrough = di.readBoolean();
+		    this.normalizeByInputRows = di.readBoolean();
+		    
+		    int optAlgoId = di.readInt();
+		    
+		    // TODO: dont remember how to serde an Enum. fix. (only two options today)
+		    //if (OptimizationAlgorithm.CONJUGATE_GRADIENT == this.optimizationAlgorithm) {
+		    if ( 0 == optAlgoId ) {
+		    	
+		    	//d.writeInt(0);
+		    	this.optimizationAlgorithm = OptimizationAlgorithm.CONJUGATE_GRADIENT;
+		    	
+		    } else {
+		    	
+		    	//d.writeInt(1);
+		    	this.optimizationAlgorithm = OptimizationAlgorithm.GRADIENT_DESCENT;
+		    	
+		    }
+			
+			
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -89,6 +89,8 @@ public class TestDBNLogisticRegression {
 		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.connectionWeights, logRegression_deser.connectionWeights ) );
 		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.biasTerms, logRegression_deser.biasTerms ) );
 		
+		assertEquals( true, MatrixUtils.elementwiseSame(logRegression.getAdaGrad().adjustedGradient, logRegression_deser.getAdaGrad().adjustedGradient ) );
+		
 		
 	}	
 }
