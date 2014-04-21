@@ -380,7 +380,18 @@ public class LogisticRegression implements Serializable {
 		reg.nOut = this.nOut;
 		reg.useRegularization = this.useRegularization;
 
-//		reg.input = this.input.clone();
+		
+	    reg.useAdaGrad = this.useAdaGrad;
+	    
+	    reg.adaLearningRates = this.adaLearningRates.clone();
+	    
+	    reg.biasAdaGrad = this.biasAdaGrad.clone();
+	    
+	    reg.firstTimeThrough = this.firstTimeThrough;
+	    reg.normalizeByInputRows = this.normalizeByInputRows;
+	    
+	    //if (OptimizationAlgorithm.CONJUGATE_GRADIENT == this.optimizationAlgorithm) {
+		reg.optimizationAlgorithm = this.optimizationAlgorithm;
 		
 		return reg;
 	}	
@@ -456,7 +467,20 @@ public class LogisticRegression implements Serializable {
 			
 		    this.useAdaGrad = di.readBoolean();
 		    
+		    if ( null == this.adaLearningRates ) {
+
+		    	this.adaLearningRates = new AdagradLearningRate( nIn, nOut );
+ 
+		    }
+
 		    this.adaLearningRates.load( is );
+		    
+		    if ( null == this.biasAdaGrad ) {
+				
+				this.biasAdaGrad = new AdagradLearningRate( this.biasTerms.numRows(), this.biasTerms.numCols() );
+		    	
+		    }
+		    
 		    this.biasAdaGrad.load( is );
 		    
 		    this.firstTimeThrough = di.readBoolean();
