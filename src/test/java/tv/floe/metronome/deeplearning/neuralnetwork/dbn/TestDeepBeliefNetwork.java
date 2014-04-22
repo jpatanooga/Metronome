@@ -200,7 +200,7 @@ public class TestDeepBeliefNetwork {
 
 		RandomGenerator rng = new MersenneTwister(123);
 
-		double preTrainLr = 0.0001;
+		double preTrainLr = 0.01;
 		int preTrainEpochs = 1000;
 		int k = 1;
 		
@@ -208,7 +208,7 @@ public class TestDeepBeliefNetwork {
 		int nOuts = y_toy_Matrix.columnSize();
 		
 		int[] hiddenLayerSizes = new int[] { 10, 8 };
-		double fineTuneLr = 0.0001;
+		double fineTuneLr = 0.01;
 		int fineTuneEpochs = 1000;
 		
 		MatrixUtils.debug_print(x_toy_Matrix);

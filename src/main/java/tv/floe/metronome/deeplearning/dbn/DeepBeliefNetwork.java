@@ -445,6 +445,8 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 	 * TODO:
 	 * - we need to look at variations where this master copy DBN is still "usable"
 	 * 
+	 * - Food for thought: do we average the parameter vectors of adagrad vars?
+	 * 
 	 * @param workerDBNs
 	 */
 	public void computeAverageDBNParameterVector( ArrayList<DeepBeliefNetwork> workerDBNParameterVectors ) {
@@ -511,6 +513,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		MatrixUtils.divi( this.logisticRegressionLayer.connectionWeights, workerDBNParameterVectors.size() );
 		MatrixUtils.divi( this.logisticRegressionLayer.biasTerms, workerDBNParameterVectors.size() );
 	
+		// TODO: do we need to parameter average the adagrad?
 		
 	}
 	
