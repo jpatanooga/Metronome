@@ -395,9 +395,11 @@ public class TestDeepBeliefNetwork {
 		
 		// now setup a DBN based on a clone operation via initBasedOn()
 		DeepBeliefNetwork dbn_merge_load = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
+		// this will clear the weights
 		dbn_merge_load.initBasedOn(dbn_deserialize);
 		
 		DeepBeliefNetwork dbn_merge_load_2 = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
+		// this will clear the weights
 		dbn_merge_load_2.initBasedOn( dbn );
 		
 		//assertEquals( dbn.inputNeuronCount, dbn_deserialize.inputNeuronCount );
@@ -406,10 +408,19 @@ public class TestDeepBeliefNetwork {
 		// check logistic layer
 		
 		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.connectionWeights, dbn_deserialize.logisticRegressionLayer.connectionWeights ) );
-		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.connectionWeights, dbn_merge_load.logisticRegressionLayer.connectionWeights ) );
+		
+		// check sizes here
+		//assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.connectionWeights, dbn_merge_load.logisticRegressionLayer.connectionWeights ) );
+		assertEquals( dbn.logisticRegressionLayer.connectionWeights.numRows(), dbn_merge_load.logisticRegressionLayer.connectionWeights.numRows() );
+		assertEquals( dbn.logisticRegressionLayer.connectionWeights.numCols(), dbn_merge_load.logisticRegressionLayer.connectionWeights.numCols() );
 		
 		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.biasTerms, dbn_deserialize.logisticRegressionLayer.biasTerms ) );
-		assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.biasTerms, dbn_merge_load.logisticRegressionLayer.biasTerms ) );
+		
+		//check sizes
+		//assertEquals( true, MatrixUtils.elementwiseSame(dbn.logisticRegressionLayer.biasTerms, dbn_merge_load.logisticRegressionLayer.biasTerms ) );
+		assertEquals( dbn.logisticRegressionLayer.biasTerms.numRows(), dbn_merge_load.logisticRegressionLayer.biasTerms.numRows() );
+		assertEquals( dbn.logisticRegressionLayer.biasTerms.numCols(), dbn_merge_load.logisticRegressionLayer.biasTerms.numCols() );
+		
 
 		
 		// check hidden layers
