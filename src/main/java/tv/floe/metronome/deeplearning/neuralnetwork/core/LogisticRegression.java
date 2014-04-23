@@ -62,7 +62,6 @@ public class LogisticRegression implements Serializable {
 		
 		this.adaLearningRates = new AdagradLearningRate( nIn, nOut );
 		
-		// biasAdaGrad = new AdaGrad(b.rows,b.columns);
 		this.biasAdaGrad = new AdagradLearningRate( this.biasTerms.numRows(), this.biasTerms.numCols() );
 	
 		optimizationAlgorithm = OptimizationAlgorithm.CONJUGATE_GRADIENT;
@@ -103,29 +102,6 @@ public class LogisticRegression implements Serializable {
 			this.adaGrad = new AdaGrad(nIn,nOut,lr);
 			firstTimeThrough = false;
 		}
-	}
-*/	
-	
-/*
-	public void trainWithAdagrad(Matrix x, Matrix y) {
-		
-		MatrixUtils.ensureValidOutcomeMatrix(y);
-		
-		if (x.numRows() != y.numRows()) {
-			throw new IllegalArgumentException("How does this happen?");
-		}
-
-		this.input = x;
-		this.labels = y;
-
-		LogisticRegressionGradient gradient = getGradientWithAdagrad();
-		System.out.println( "gradient: " + gradient.getwGradient().get(0, 0));
-
-		//W.addi(gradient.getwGradient());
-		this.connectionWeights = this.connectionWeights.plus(gradient.getwGradient());
-		
-		//b.addi(gradient.getbGradient());
-		this.biasTerms = this.biasTerms.plus(gradient.getbGradient());
 	}
 */	
 	
@@ -311,19 +287,7 @@ public class LogisticRegression implements Serializable {
 			wGradient = wGradient.times(lr);
 			
 		}
-		
-/*
- * 
-        if(useAdaGrad)
-            dy.muli(biasAdaGrad.getLearningRates(dy));
-        else
-             dy.muli(lr);
 
-        if(normalizeByInputRows)
-            dy.divi(input.rows);
-
- * 		
- */
 		if (this.useAdaGrad) {
 			
 			dy = dy.times( this.biasAdaGrad.getLearningRates( dy ) );
@@ -511,45 +475,6 @@ public class LogisticRegression implements Serializable {
 	}	
 
 
-/*
-	public static class Builder {
-		private Matrix W;
-		private LogisticRegression ret;
-		private Matrix b;
-		private int nIn;
-		private int nOut;
-		private Matrix input;
-
-
-		public Builder withWeights(Matrix W) {
-			this.W = W;
-			return this;
-		}
-
-		public Builder withBias(Matrix b) {
-			this.b = b;
-			return this;
-		}
-
-		public Builder numberOfInputs(int nIn) {
-			this.nIn = nIn;
-			return this;
-		}
-
-		public Builder numberOfOutputs(int nOut) {
-			this.nOut = nOut;
-			return this;
-		}
-
-		public LogisticRegression build() {
-			ret = new LogisticRegression(input, nIn, nOut);
-			ret.W = W;
-			ret.b = b;
-			return ret;
-		}
-
-	}
-	*/
 	
 	public  int getnIn() {
 		return nIn;
