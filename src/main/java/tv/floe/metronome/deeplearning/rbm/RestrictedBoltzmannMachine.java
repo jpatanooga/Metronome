@@ -1,8 +1,5 @@
 package tv.floe.metronome.deeplearning.rbm;
 
-import static org.deeplearning4j.util.MatrixUtil.log;
-import static org.jblas.MatrixFunctions.exp;
-
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
@@ -20,8 +17,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.MatrixWritable;
-import org.jblas.DoubleMatrix;
-import org.jblas.SimpleBlas;
 
 
 
