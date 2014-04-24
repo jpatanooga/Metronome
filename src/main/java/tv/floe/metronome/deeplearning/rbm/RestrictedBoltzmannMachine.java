@@ -1,5 +1,8 @@
 package tv.floe.metronome.deeplearning.rbm;
 
+import static org.deeplearning4j.util.MatrixUtil.log;
+import static org.jblas.MatrixFunctions.exp;
+
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
@@ -17,6 +20,8 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.MatrixWritable;
+import org.jblas.DoubleMatrix;
+import org.jblas.SimpleBlas;
 
 
 
@@ -24,6 +29,7 @@ import tv.floe.metronome.deeplearning.neuralnetwork.core.BaseNeuralNetworkVector
 import tv.floe.metronome.deeplearning.neuralnetwork.gradient.NeuralNetworkGradient;
 import tv.floe.metronome.deeplearning.neuralnetwork.layer.HiddenLayer;
 import tv.floe.metronome.deeplearning.neuralnetwork.optimize.NeuralNetworkOptimizer;
+import tv.floe.metronome.math.MathUtils;
 import tv.floe.metronome.math.MatrixUtils;
 import tv.floe.metronome.types.Pair;
 
@@ -469,9 +475,23 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 		
 		return new Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>>(visibleProbsAndSamples, hiddenProbsAndSamples);
 	}
-	
-	public void computeFreeEnergy(Matrix visibleSample) {
+
+	/**
+	 * Free energy for an RBM
+	 * Lower energy models have higher probability
+	 * of activations
+	 * @param visibleSample the sample to test on
+	 * @return the free engery for this sample
+	 */
+	public double freeEnergy(Matrix visibleSample) {
+
+		Matrix wxB = MatrixUtils.addRowVector( visibleSample.times( this.connectionWeights ), this.hiddenBiasNeurons.viewRow( 0 ) );
 		
+		double vBiasTerm = MathUtils.dot(visibleSample, this.visibleBiasNeurons);
+		
+		double hBiasTerm = MatrixUtils.sum( MatrixUtils.log( MatrixUtils.exp( wxB ).plus( 1.0 ) ) );
+		
+		return -hBiasTerm - vBiasTerm;
 		
 	}
 	
