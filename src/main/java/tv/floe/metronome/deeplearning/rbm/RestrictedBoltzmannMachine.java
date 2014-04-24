@@ -405,6 +405,10 @@ public class RestrictedBoltzmannMachine extends BaseNeuralNetworkVectorized {
 
 		Matrix hiddenBinomialSamples = MatrixUtils.genBinomialDistribution(hiddenProbs, 1, this.randNumGenerator);
 		
+		//apply dropout
+		this.applyDropOutIfNecessary( hiddenBinomialSamples );
+		
+		
 		return new Pair<Matrix, Matrix>(hiddenProbs, hiddenBinomialSamples);
 	}
 	
