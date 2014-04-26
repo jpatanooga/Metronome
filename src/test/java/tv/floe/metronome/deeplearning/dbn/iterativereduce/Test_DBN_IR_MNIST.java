@@ -110,9 +110,6 @@ public class Test_DBN_IR_MNIST {
 
 		polr_ir.SimulateRun();
 
-		//MasterNode w = (MasterNode) polr_ir.getMaster();
-		//w.dbn_averaged_master
-		
 	}
 
 	
