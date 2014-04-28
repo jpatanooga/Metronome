@@ -32,32 +32,8 @@ public class TestAdagrad {
 		AdagradLearningRate ada = new AdagradLearningRate(1, 1);
 		Matrix out = ada.getLearningRates(gradient0);
 		
-//		MatrixUtils.debug_print( gradient0 );
-//		MatrixUtils.debug_print( out );
-		
 		assertEquals( 0.01, out.get(0, 0), 0.0001);
-		
-		/*
-		//ada.computeGradients();
-		assertEquals(10, ada.getLearningRate(0, 0), 0.0 );
-		//assertEquals(10, ada., 0.0 );
-		
-		ada.addLastIterationGradient( gradient0 );
-		//ada.computeGradients();
-		assertEquals(10, ada.getLearningRate(0, 0), 0.0 );
-		
-		ada.addLastIterationGradient( gradient1 );
-		//ada.computeGradients();
-		assertEquals(7.07, ada.getLearningRate(0, 0), 0.01 );
-		
-		ada.addLastIterationGradient( gradient2 );
-		//ada.computeGradients();
-		assertEquals(4.082, ada.getLearningRate(0, 0), 0.001 );
-		
-		Matrix lrs = ada.getLearningRates();
-		assertEquals(4.082, lrs.get(0, 0), 0.001 );
-		*/
-		
+				
 	}
 	
 	
