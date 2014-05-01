@@ -30,6 +30,7 @@ MLConf 2013
 http://www.slideshare.net/jpatanooga/metronome-ml-confnov2013v20131113
 
 # Resources
+* [General guide on running yarn jobs] (https://github.com/jpatanooga/Metronome/wiki/Running-Jobs-on-YARN-Clusters)
 * [IterativeReduce Programming Model] (https://github.com/emsixteeen/IterativeReduce/wiki/Iterative-Reduce-Programming-Guide)
 * Using IRUnit - the IterativeReduce Unit Testing Framework
 * [Running parallel linear regression with IRUnit on synthetic test data](https://github.com/jpatanooga/Metronome/wiki/Running-Parallel-Linear-Regression)
