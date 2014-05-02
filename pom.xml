@@ -12,8 +12,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<hadoop.version>2.0.0-cdh4.2.0</hadoop.version>
-		<mahout.version>0.6-cdh4.0.1</mahout.version>
+		<hadoop.version>2.0.0-cdh4.6.0</hadoop.version>
+		<mahout.version>0.7-cdh4.6.0</mahout.version>
 	</properties>
 
 	<build>
@@ -103,8 +103,30 @@
 				<outputDirectory>${project.basedir}/src/main/java/</outputDirectory> <testSourceDirectory>${project.basedir}/src/test/avro/</testSourceDirectory> 
 				<testOutputDirectory>${project.basedir}/src/test/java/</testOutputDirectory> 
 				</configuration> </execution> </executions> </plugin> -->
-
-
+<!--
+      <plugin>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro-maven-plugin</artifactId>
+        <version>1.7.1</version>
+        <executions>
+          <execution>
+            <id>schemas</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>schema</goal>
+              <goal>protocol</goal>
+              <goal>idl-protocol</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+              <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+              <testSourceDirectory>${project.basedir}/src/test/avro/</testSourceDirectory>
+              <testOutputDirectory>${project.basedir}/src/test/java/</testOutputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+-->
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -199,6 +221,12 @@
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
 				</exclusion>
+
+          <exclusion>
+            <groupId>jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+          </exclusion>
+				
 			</exclusions>
 		</dependency>
 
