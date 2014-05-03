@@ -5,7 +5,8 @@ iterativereduce.jar.path=iterativereduce-0.1-SNAPSHOT.jar
 app.jar.path=Metronome-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 # Comma separated list of other JAR's required for depenedencies
-app.lib.jar.path=avro-1.7.1.jar,avro-ipc-1.7.1.jar
+#app.lib.jar.path=avro-1.7.1.jar,avro-ipc-1.7.1.jar
+app.lib.jar.path=
 
 # Input file(s) to process
 #app.input.path=src/test/resources/data/iris/threeworkers/
