@@ -27,9 +27,6 @@ import com.cloudera.iterativereduce.yarn.appworker.ApplicationWorker;
 /**
  * Base IterativeReduce worker node
  * 
- * TODO
- * - setup a base DBN instance to run locally
- * 
  * @author josh
  *
  */
@@ -41,7 +38,6 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 	DeepBeliefNetwork dbn = null;
 	
-	// TODO: need to rethink these because
 	TextRecordParser lineParser = new TextRecordParser();
 	CachedVectorReader cachedVecReader = null; //new CachedVectorReader(lineParser, rec_factory); 
 
@@ -50,7 +46,6 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	private int currentIteration = 0;
 	
 
-	// TODO: setup vars from conf
 	int[] hiddenLayerSizes = { 500, 250, 100 };
 	double learningRate = 0.01;
 	int preTrainEpochs = 100;
@@ -263,10 +258,6 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	 */
 	@Override
 	public void setup(Configuration c) {
-		
-	//	System.out.println("Worker > Conf");
-
-
 
 	    this.conf = c;
 	    
@@ -274,25 +265,14 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	    
 	    try {
 	      
-	      
-//	    this.NumberIterations = this.conf.getInt("app.iteration.count", 1);
-	      
 	      this.learningRate = Double.parseDouble(this.conf.get(
 		          "tv.floe.metronome.dbn.conf.LearningRate", "0.01"));
 	      
-	 //     System.out.println("Worker > Conf > lr: " + this.learningRate );
-	      
 	      this.batchSize = this.conf.getInt("tv.floe.metronome.dbn.conf.batchSize",  1);
-	      
-	 //     System.out.println("Worker > Conf > batchsize: " + this.batchSize );
 	      
 	      this.numIns = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberInputs", 784);
 	      
-	  //    System.out.println("Worker > Conf > numIns: " + this.numIns );
-	      
 	      this.numLabels = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberLabels", 10 );
-	      
-	 //     System.out.println("Worker > Conf > numLabels: " + this.numLabels );
 	      
 	      //500, 250, 100
 	      String hiddenLayerConfSizes = this.conf.get( "tv.floe.metronome.dbn.conf.hiddenLayerSizes" );
@@ -303,18 +283,13 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	    	  
 	    	  this.hiddenLayerSizes[ x ] = Integer.parseInt( layerSizes[ x ] );
 	    	  
-	 //   	  System.out.println("Worker > Conf > this.hiddenLayerSizes[ " + x + " ]: " + this.hiddenLayerSizes[ x ] );
-	    	  
 	      }
 	      
 
 	
 		    useRegularization = this.conf.get("tv.floe.metronome.dbn.conf.useRegularization");
-	
-		
 			
 			this.n_layers = hiddenLayerSizes.length;
-			
 			
 			this.dbn = new DeepBeliefNetwork( numIns, hiddenLayerSizes, numLabels, n_layers, rng ); //, Matrix input, Matrix labels);
 	
@@ -353,10 +328,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		ByteArrayInputStream b = new ByteArrayInputStream( master_update.dbn_payload );
 		
-		
 		// now update the local DBN worker instance
 		this.dbn.load(b);
-		
 		
 	}
 	
