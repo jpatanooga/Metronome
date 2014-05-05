@@ -38,12 +38,8 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	 */
 	@Override
 	public void complete(DataOutputStream osStream) throws IOException {
-		// TODO Auto-generated method stub
 		
 		System.out.println( "IR DBN Master Node: Complete!" );
-		
-		// ds.write(this.master_nn.Serialize());
-		
 		this.dbn_averaged_master.write( osStream );
 		
 		
@@ -94,27 +90,6 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	    
 	    System.out.println("Master > Parameter Averaged! -------- ");
 	    
-	    // TODO: examine termination conditions
-	    
-/*	    
-	    if (avg_rmse <= this.trainingErrorThreshold && !hasHitThreshold && first.networkUpdate.CurrentIteration > 10) {
-	    	
-	    	System.out.println("\nMaster hit avg rmse threshold at epoch: " + first.networkUpdate.CurrentIteration + "\n");
-	    	
-		    for (NetworkWeightsUpdateable nn_worker : workerUpdates) {
-
-		    	System.out.println("worker.rmse: " + nn_worker.networkUpdate.RMSE );
-		    }
-	    	
-	    	
-	    	this.hasHitThreshold = true;
-	    } else {
-	    	
-	    	//System.out.println("rmse debug > " + avg_rmse + " <= " + this.trainingErrorThreshold + ", iterations: " + first.networkUpdate.CurrentIteration);
-	    	
-	    }
-*/	    	
-
 	    
 		DBNParameterVector dbn_update = new DBNParameterVector();
 		
@@ -171,14 +146,8 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		    	  this.hiddenLayerSizes[ x ] = Integer.parseInt( layerSizes[ x ] );
 		      }
 		      
-
-		
 			    useRegularization = this.conf.get("tv.floe.metronome.dbn.conf.useRegularization");
-		
-			
-				
 				this.n_layers = hiddenLayerSizes.length;
-	      
 	
 	    } catch (Exception e) {
 	      // TODO Auto-generated catch block
@@ -188,7 +157,6 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	    
 	    System.out.println( "-----------------------------------------" );
 	    System.out.println( "# Master Conf #" );
-	    //System.out.println( "Number Iterations: " + this.NumberIterations );
 	    System.out.println( "-----------------------------------------\n\n" );
 	    		
 		
