@@ -146,6 +146,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 //		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
 		//DataSet hdfs_recordBatch = local_recordBatch; //this.hdfs_fetcher.next();
 		if (false == this.hdfs_fetcher.hasNext()) {
+			System.out.println( "Worker > Resetting HDFS Record Reader" );
 			this.hdfs_fetcher.reset();
 		}
 		
