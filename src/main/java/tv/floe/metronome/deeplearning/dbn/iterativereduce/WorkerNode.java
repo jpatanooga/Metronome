@@ -122,8 +122,40 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	/**
 	 * Run a training pass of a single batch of input records on the DBN
 	 * 
-	 * TODO:
-	 * - handle the cases where we need to reset the record reader to do another pass
+	 * TODO
+	 * - dileneate between pre-train and finetune pass through data
+	 * 		- how?
+	 * 
+	 * - app.iteration.count
+	 * 		- indicates how many times we're going to call the workers
+	 * 
+	 * - tv.floe.metronome.dbn.conf.batchSize=10
+	 * 		- indicates that we're going to only process 10 records in a call to a worker
+	 * 
+	 * - we could either
+	 * 
+	 * 		1. make a complete pass through the batches in a split between iterations
+	 * 
+	 * 			- tends to skew away from good solutions
+	 * 
+	 * 		2. parameter average between batches
+	 *
+	 *			-	better quality, but more network overhead
+	 *
+	 * - if we paramete avg between batches, then our passes over the dataset become
+	 * 
+	 * 		- total number of examples / batch size
+	 * 
+	 * - might be pragmatic to let a command line tool calculate iterations
+	 * 
+	 * 		- given we need to know how many fine tune passes to make as well
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * 
 	 */
 	@Override

@@ -154,11 +154,11 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	      e.printStackTrace();
 	      System.out.println(">> Error loading conf!");
 	    }
-	    
+/*	    
 	    System.out.println( "-----------------------------------------" );
 	    System.out.println( "# Master Conf #" );
 	    System.out.println( "-----------------------------------------\n\n" );
-	    		
+	*/    		
 		
 	}
 
