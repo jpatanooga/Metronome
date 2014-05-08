@@ -34,6 +34,12 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	
 	private static final Log LOG = LogFactory.getLog(WorkerNode.class);
 	
+	  private enum TrainingState {
+		    PRE_TRAIN, FINE_TUNE
+		  };
+	
+	private TrainingState currentTrainingState = TrainingState.PRE_TRAIN; // always start in PRE_TRAIN mode
+	
 	protected Configuration conf = null;	  
 
 	DeepBeliefNetwork dbn = null;
@@ -200,6 +206,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 //		if (hdfs_recordBatch.getFirst().numRows() > 0) {
 //		do  {
 		
+		if ( TrainingState.PRE_TRAIN == this.currentTrainingState ) {
+		
 			// calc stats on number records processed
 			recordsProcessed += hdfs_recordBatch.getFirst().numRows();
 			
@@ -207,19 +215,32 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			
 			batchWatch.reset();
+			
 			batchWatch.start();
-//			dbn.preTrain( recordBatch.getFirst(), 1, learningRate, preTrainEpochs);
+
 			this.dbn.preTrain( hdfs_recordBatch.getFirst(), 1, this.learningRate, this.preTrainEpochs);
+			
 			batchWatch.stop();
+			
+			
+			
 			
 			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
 
+		} else if ( TrainingState.FINE_TUNE == this.currentTrainingState) {
+			
 			//System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
 
 			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
 			
 			
 			dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );			
+			
+		} else {
+			
+			System.err.println( "We're in some impossible training state for this worker" );
+			
+		}
 			
 /*			
 			if (fetcher.hasNext()) {

@@ -1232,6 +1232,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
 
     public String generateNetworkSizeReport() {
 
+    	
         String out = "";
 
         long hiddenLayerConnectionCount = 0;
