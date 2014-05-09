@@ -44,6 +44,9 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 	DeepBeliefNetwork dbn = null;
 	
+	private boolean preTrainPhaseComplete = false;
+	private boolean fineTunePhaseComplete = false;
+	
 	TextRecordParser lineParser = new TextRecordParser();
 	CachedVectorReader cachedVecReader = null; //new CachedVectorReader(lineParser, rec_factory); 
 
@@ -85,6 +88,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 		this.dbn.write(out);
 		
+		
+		vector.preTrainPhaseComplete = this.preTrainPhaseComplete;
 		vector.dbn_payload = out.toByteArray();
 		
 		/*
@@ -374,6 +379,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	 * Collect the update from the master node and apply it to the local 
 	 * parameter vector
 	 * 
+	 * TODO: check the state changes of the incoming message!
+	 * 
 	 */
 	@Override
 	public void update(DBNParameterVectorUpdateable master_update_updateable) {
@@ -385,6 +392,15 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		// now update the local DBN worker instance
 		this.dbn.load(b);
 		
+		// TODO: check the message for a state change
+		
+		if (true == master_update.masterSignalToStartFineTunePhase) {
+			
+			this.preTrainPhaseComplete = true;
+			this.fineTunePhaseComplete = false;
+			this.currentTrainingState = TrainingState.FINE_TUNE;
+			
+		}
 	}
 	
 	
