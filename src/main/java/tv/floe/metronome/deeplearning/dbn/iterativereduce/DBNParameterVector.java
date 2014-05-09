@@ -34,35 +34,39 @@ public class DBNParameterVector {
 	public NeuralNetworkVectorized[] preTrainingLayers;
 */
 	
+	// worker sends this signal when it has finished N passes of it's split
+	// signal from worker->to->master
+	public boolean preTrainPhaseComplete = false;
+	
+	// master see's that all workers have worker.preTrainPhaseComplete == true
+	// master responds with this flag
+	// signal: master->to->worker
+	public boolean masterSignalToStartFineTunePhase = false;
+	
 	byte[] dbn_payload = null;
+	
 	
 	public byte[] Serialize() throws IOException {
 
 		// DataOutput d
-/*
+		
+		System.out.println( "DBNParamVec::Serialize()" );
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DataOutput d = new DataOutputStream(out);
 
 		// write the DBN data right into
 		// this.dbn.write(out);
 
-		// write in hidden layers
-		for (int x = 0; x < this.numberLayers; x++) {
-
-			this.hiddenLayers[x].write(os);
-
-		}
-
-		this.logisticRegressionLayer.write(os);
-
-		// DA / RBM Layers
-		for (int x = 0; x < this.numberLayers; x++) {
-
-			((RestrictedBoltzmannMachine) this.preTrainingLayers[x]).write(os);
-
-		}
-*/
-		return this.dbn_payload;
+		//return this.dbn_payload;
+		
+		d.writeBoolean( this.preTrainPhaseComplete );
+		d.writeBoolean( this.masterSignalToStartFineTunePhase );
+		d.writeInt( this.dbn_payload.length );
+		out.write( this.dbn_payload );
+		
+		
+		return out.toByteArray();
 	}
 
 	/**
@@ -74,12 +78,25 @@ public class DBNParameterVector {
 	 */
 	public void Deserialize(byte[] bytes) throws IOException {
 		// DataInput in) throws IOException {
+		
+		System.out.println( "DBNParamVec::Deserialize()" );
 
-//		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-//		DataInput in = new DataInputStream(b);
+		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+		DataInput in = new DataInputStream(b);
+		
+		// we dont update our local pre-train flag
+		//this.preTrainPhaseComplete
+		// we just advance the reader by a boolean
+		in.readBoolean();
+		this.masterSignalToStartFineTunePhase = in.readBoolean();
+		int bytesToRead = in.readInt();
+		
+		this.dbn_payload = new byte[ bytesToRead ];
+		in.readFully( this.dbn_payload, 0, bytesToRead );
+		
 
 		// this.dbn.load(b);
-		this.dbn_payload = bytes;
+		//this.dbn_payload = bytes;
 
 	}
 
