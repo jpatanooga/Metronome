@@ -50,7 +50,7 @@ public class DBNParameterVector {
 
 		// DataOutput d
 		
-		System.out.println( "DBNParamVec::Serialize()" );
+		
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DataOutput d = new DataOutputStream(out);
@@ -79,7 +79,7 @@ public class DBNParameterVector {
 	public void Deserialize(byte[] bytes) throws IOException {
 		// DataInput in) throws IOException {
 		
-		System.out.println( "DBNParamVec::Deserialize()" );
+		
 
 		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
 		DataInput in = new DataInputStream(b);
@@ -87,7 +87,7 @@ public class DBNParameterVector {
 		// we dont update our local pre-train flag
 		//this.preTrainPhaseComplete
 		// we just advance the reader by a boolean
-		in.readBoolean();
+		this.preTrainPhaseComplete = in.readBoolean();
 		this.masterSignalToStartFineTunePhase = in.readBoolean();
 		int bytesToRead = in.readInt();
 		
