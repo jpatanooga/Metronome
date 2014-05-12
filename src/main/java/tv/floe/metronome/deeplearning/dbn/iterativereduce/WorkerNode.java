@@ -59,7 +59,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	double learningRate = 0.01;
 	int preTrainEpochs = 100;
 	int fineTuneEpochs = 100;
-	int totalTrainingDatasetSize = 20;	
+	int totalTrainingDatasetSize = 1;	
 	
 	int batchSize = 1;
 	boolean showNetworkStats = true;
@@ -73,6 +73,10 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	RandomGenerator rng = new MersenneTwister(123);
 	
 	MnistHDFSDataSetIterator hdfs_fetcher = null; //new MnistHDFSDataSetIterator( batchSize, totalNumExamples, txt_reader );
+	
+	StopWatch watch = new StopWatch();
+//	watch.start();
+
 	
 	/**
 	 * generates the local DBN parameter vector
@@ -92,15 +96,9 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		vector.preTrainPhaseComplete = this.preTrainPhaseComplete;
 		vector.dbn_payload = out.toByteArray();
 		
-		/*
-		if (this.lineParser.hasMoreRecords()) {
-			vector.IterationComplete = 0;
-		} else {
-			vector.IterationComplete = 1;
-		}
+		System.out.println( "----- GenerateParameterVectorUpdate -----" );
+		
 
-		vector.CurrentIteration = this.CurrentIteration;
-*/
 
 /*
 		vector.batchTimeMS = this.lastBatchTimeMS;
@@ -175,37 +173,13 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		// TODO: setup a cached vector system from hdfs for batches
 						
 		System.out.println("Worker > Compute()");
-/*		
-		int[] filter = { 0, 1 };
-		DataSet local_recordBatch = null;
-		try {
-			local_recordBatch = Test_DBN_Mnist_Dataset.filterDataset( filter, 20 );
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-*/		
-		// mini-batches through dataset
-//		MnistDataSetIterator fetcher = new MnistDataSetIterator( batchSize, totalNumExamples );
-		//DataSet hdfs_recordBatch = local_recordBatch; //this.hdfs_fetcher.next();
-		if (false == this.hdfs_fetcher.hasNext()) {
-			System.out.println( "Worker > Resetting HDFS Record Reader" );
-			this.hdfs_fetcher.reset();
-		}
-		
-		DataSet hdfs_recordBatch = this.hdfs_fetcher.next();
-				
-		//System.out.println("Injecting the local original filtered Dataset!");
-		
-		
+
 		
 		int recordsProcessed = 0;
 		
-		StopWatch watch = new StopWatch();
-		watch.start();
-		
 		StopWatch batchWatch = new StopWatch();
 		
+		DataSet hdfs_recordBatch = null; //this.hdfs_fetcher.next();
 		
 		
 //		if (hdfs_recordBatch.getFirst().numRows() > 0) {
@@ -213,50 +187,75 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		if ( TrainingState.PRE_TRAIN == this.currentTrainingState ) {
 		
-			// calc stats on number records processed
-			recordsProcessed += hdfs_recordBatch.getFirst().numRows();
+			if ( this.hdfs_fetcher.hasNext() ) {
+				
+				hdfs_recordBatch = this.hdfs_fetcher.next();
+				
+				if (hdfs_recordBatch.getFirst().numRows() > 0) {
+					
+					// calc stats on number records processed
+					recordsProcessed += hdfs_recordBatch.getFirst().numRows();
+					
+					//System.out.println( "PreTrain: Batch Size: " + hdfs_recordBatch.getFirst().numRows() );
+					
+					batchWatch.reset();
+					
+					batchWatch.start();
 			
-			//System.out.println( "PreTrain: Batch Size: " + hdfs_recordBatch.getFirst().numRows() );
-			System.out.println( "PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
+					this.dbn.preTrain( hdfs_recordBatch.getFirst(), 1, this.learningRate, this.preTrainEpochs);
+					
+					batchWatch.stop();
+	
+					System.out.println( "Worker > PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
+	
+					
+				} else {
+					
+					System.out.println( "Worker > PreTrain > Idle pass, nothing" );
+					
+				}
+				
+			}
 			
-			batchWatch.reset();
+			// check for completion of split, to signal master on state change
+			if (false == this.hdfs_fetcher.hasNext()) {
+				this.preTrainPhaseComplete = true;
+				System.out.println( "Worker > Completion of pre-train phase" );
+			}
 			
-			batchWatch.start();
-
-			this.dbn.preTrain( hdfs_recordBatch.getFirst(), 1, this.learningRate, this.preTrainEpochs);
-			
-			batchWatch.stop();
-			
-			
-			
-			
-			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
-
+					
+		
 		} else if ( TrainingState.FINE_TUNE == this.currentTrainingState) {
 			
 			//System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
 
-			System.out.println( "FineTune: Batch Mode, Processed Total " + recordsProcessed + ", Elapsed Time " + watch.toString() );
-			
-			
-			dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );			
-			
+			if ( this.hdfs_fetcher.hasNext() ) {
+				
+				hdfs_recordBatch = this.hdfs_fetcher.next();
+				
+				
+				batchWatch.reset();
+				
+				batchWatch.start();
+				
+				dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );
+				
+				batchWatch.stop();
+				
+				System.out.println( "Worker > FineTune > Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
+				
+			} else {
+				
+				System.out.println( "Worker > FineTune > [Split Complete, IDLE] > Total Time " + watch.toString() );
+				
+			}
+				
 		} else {
 			
 			System.err.println( "We're in some impossible training state for this worker" );
 			
 		}
-			
-/*			
-			if (fetcher.hasNext()) {
-				first = fetcher.next();
-			}
-			
-		} while (fetcher.hasNext());
-*/
-//		} // if
-		
-		watch.stop();
+
 /*		
 		try {
 			System.out.println(" ----------- Worker model Eval ---------- ");
@@ -266,9 +265,11 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			e.printStackTrace();
 		}
 */		
+		
 
 		// this is a clunky way to do this. dont judge me, working fast here.
 		DBNParameterVector dbn_update = new DBNParameterVector();
+		dbn_update.preTrainPhaseComplete = this.preTrainPhaseComplete;
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		this.dbn.write(out);
@@ -371,6 +372,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	    }
 	   		
 
+	    this.watch.start();
 	
 		
 	}
@@ -394,13 +396,28 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		// TODO: check the message for a state change
 		
-		if (true == master_update.masterSignalToStartFineTunePhase) {
+		if (true == master_update.masterSignalToStartFineTunePhase && TrainingState.PRE_TRAIN == this.currentTrainingState) {
 			
 			this.preTrainPhaseComplete = true;
 			this.fineTunePhaseComplete = false;
 			this.currentTrainingState = TrainingState.FINE_TUNE;
 			
+			System.out.println( "Worker > Moving into the FineTune phase based on master signal" );
+			
+			if (false == this.hdfs_fetcher.hasNext()) {
+				System.out.println( "\n\n\nWorker > Resetting HDFS Record Reader" );
+				this.hdfs_fetcher.reset();
+			} else {
+				
+				System.err.println("Worker > ERR > had more records to process in a state change? How?");
+				
+			}
+			
+			
 		}
+		
+		
+		
 	}
 	
 	
