@@ -126,7 +126,7 @@ public class DeepBeliefNetwork extends BaseMultiLayerNeuralNetworkVectorized {
 		
 		for (int i = 0; i < this.numberLayers; i++) {
 			
-			System.out.println("PreTrain > Layer " + i );
+		//	System.out.println("PreTrain > Layer " + i );
 			
 			if (i == 0) {
 				

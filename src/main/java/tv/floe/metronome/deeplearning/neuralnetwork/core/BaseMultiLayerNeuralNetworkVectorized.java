@@ -281,7 +281,7 @@ public abstract class BaseMultiLayerNeuralNetworkVectorized implements Serializa
             this.preTrainingLayers[ i ] = createPreTrainingLayer( layer_input,input_size, this.hiddenLayerSizes[i], this.hiddenLayers[i].connectionWeights, this.hiddenLayers[i].biasTerms, null, this.randomGenerator, i );
         }
 
-        System.out.println("Logistic Output Layer: Inputs: " + this.hiddenLayerSizes[this.numberLayers-1] + ", Output Classes: " + this.outputNeuronCount );
+        //System.out.println("Logistic Output Layer: Inputs: " + this.hiddenLayerSizes[this.numberLayers-1] + ", Output Classes: " + this.outputNeuronCount );
 
         this.logisticRegressionLayer = new LogisticRegression(layer_input, this.hiddenLayerSizes[this.numberLayers-1], this.outputNeuronCount );
 
