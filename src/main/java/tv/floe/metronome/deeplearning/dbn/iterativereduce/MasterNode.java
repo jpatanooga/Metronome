@@ -44,6 +44,7 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		
 		
 	}
+	
 
 	/**
 	 * Master::Compute
@@ -56,6 +57,8 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 			Collection<DBNParameterVectorUpdateable> workerUpdates,
 			Collection<DBNParameterVectorUpdateable> masterUpdates) {
 
+		System.out.println( "Master::Compute()" );
+		
 		DBNParameterVectorUpdateable masterReturnMsg = new DBNParameterVectorUpdateable();
 		
 		DBNParameterVectorUpdateable firstWorkerMsg = workerUpdates.iterator().next();
@@ -64,9 +67,13 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		
 		ArrayList<DeepBeliefNetwork> workerDBNs = new ArrayList<DeepBeliefNetwork>();
 		
+		boolean areAllWorkersDoneWithPreTrainPhase = true;
+		boolean areAllWorkersDoneWithCurrentDatasetEpoch = true;
+		
 	    for (DBNParameterVectorUpdateable dbn_worker : workerUpdates) {
 
 	    	ByteArrayInputStream baInputStream = new ByteArrayInputStream( dbn_worker.param_msg.dbn_payload );
+	    	//ByteArrayInputStream baInputStream = new ByteArrayInputStream( dbn_worker.param_msg. );
 	    	
 			DeepBeliefNetwork dbn_worker_deser = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
 			dbn_worker_deser.load( baInputStream );
@@ -79,7 +86,22 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 			}
 			
 			workerDBNs.add(dbn_worker_deser);
-	    		    	
+	    		    
+			// check the pre-train phase completion status
+			if (false == dbn_worker.param_msg.preTrainPhaseComplete) {
+				
+				// if any one worker is not yet done, we cant move on
+				areAllWorkersDoneWithPreTrainPhase = false;
+				
+			}
+			
+			if ( false == dbn_worker.param_msg.datasetPassComplete ) {
+				
+				areAllWorkersDoneWithCurrentDatasetEpoch = false;
+				
+			}
+			
+			
 	    }
 	    
 	    // init master w dummy params
@@ -89,9 +111,26 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	    this.dbn_averaged_master.computeAverageDBNParameterVector(workerDBNs);
 	    
 	    System.out.println("Master > Parameter Averaged! -------- ");
+	    if ( areAllWorkersDoneWithPreTrainPhase ) {
+	    	System.out.println( "############## All Workers Are Done w PreTrain" );
+	    } else {
+	    	System.out.println( "############## All Workers Are NOT Complete w PreTrain" );
+	    }
 	    
+	    if ( areAllWorkersDoneWithCurrentDatasetEpoch ) {
+	    	System.out.println( "############## All Workers Are Done w Current Dataset Epoch" );
+	    } else {
+	    	System.out.println( "############## All Workers Are NOT Done w Current Dataset Epoch" );
+	    }
 	    
 		DBNParameterVector dbn_update = new DBNParameterVector();
+
+		// if all workers are done, we signal all workers to move into finetune phase
+		// if not, stay the course!
+	    dbn_update.masterSignalToStartFineTunePhase = areAllWorkersDoneWithPreTrainPhase;
+
+	    dbn_update.masterSignalToStartNextDatasetPass = areAllWorkersDoneWithCurrentDatasetEpoch;
+		
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		this.dbn_averaged_master.write( out );

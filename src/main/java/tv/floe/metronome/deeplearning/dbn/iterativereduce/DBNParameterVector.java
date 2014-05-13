@@ -38,10 +38,15 @@ public class DBNParameterVector {
 	// signal from worker->to->master
 	public boolean preTrainPhaseComplete = false;
 	
+	// signal from worker->to->master
+	public boolean datasetPassComplete = false;
+	
 	// master see's that all workers have worker.preTrainPhaseComplete == true
 	// master responds with this flag
 	// signal: master->to->worker
 	public boolean masterSignalToStartFineTunePhase = false;
+	
+	public boolean masterSignalToStartNextDatasetPass = false;
 	
 	byte[] dbn_payload = null;
 	
@@ -60,8 +65,12 @@ public class DBNParameterVector {
 
 		//return this.dbn_payload;
 		
+		d.writeBoolean( this.datasetPassComplete );
 		d.writeBoolean( this.preTrainPhaseComplete );
+		
 		d.writeBoolean( this.masterSignalToStartFineTunePhase );
+		d.writeBoolean( this.masterSignalToStartNextDatasetPass );
+		
 		d.writeInt( this.dbn_payload.length );
 		out.write( this.dbn_payload );
 		
@@ -83,12 +92,12 @@ public class DBNParameterVector {
 
 		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
 		DataInput in = new DataInputStream(b);
-		
-		// we dont update our local pre-train flag
-		//this.preTrainPhaseComplete
-		// we just advance the reader by a boolean
+
+		this.datasetPassComplete = in.readBoolean();
 		this.preTrainPhaseComplete = in.readBoolean();
 		this.masterSignalToStartFineTunePhase = in.readBoolean();
+		this.masterSignalToStartNextDatasetPass = in.readBoolean();
+		
 		int bytesToRead = in.readInt();
 		
 		this.dbn_payload = new byte[ bytesToRead ];

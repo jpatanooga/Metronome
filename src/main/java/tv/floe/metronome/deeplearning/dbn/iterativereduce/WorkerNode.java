@@ -35,7 +35,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	private static final Log LOG = LogFactory.getLog(WorkerNode.class);
 	
 	  private enum TrainingState {
-		    PRE_TRAIN, FINE_TUNE
+		    PRE_TRAIN, FINE_TUNE, TRAINING_COMPLETE
 		  };
 	
 	private TrainingState currentTrainingState = TrainingState.PRE_TRAIN; // always start in PRE_TRAIN mode
@@ -51,14 +51,25 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	CachedVectorReader cachedVecReader = null; //new CachedVectorReader(lineParser, rec_factory); 
 
 	private boolean epochComplete = false;
-	private int currentEpoch = 0;
+	
+	private int completedDatasetEpochs = 0;
 	private int currentIteration = 0;
 	
 
 	int[] hiddenLayerSizes = { 500, 250, 100 };
 	double learningRate = 0.01;
+	
+	// epochs pertaining to a batch
 	int preTrainEpochs = 100;
 	int fineTuneEpochs = 100;
+	
+	// passes over dataset
+	int preTrainDatasetPasses = 1;
+	//int currentPreTrainDatasetPass = 0;
+	
+	int fineTuneDatasetPasses = 1;
+	
+	// not used --- or needs to be calc'd?
 	int totalTrainingDatasetSize = 1;	
 	
 	int batchSize = 1;
@@ -211,16 +222,18 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 					
 				} else {
 					
-					System.out.println( "Worker > PreTrain > Idle pass, nothing" );
+					System.out.println( "Worker > PreTrain > Idle pass, no records left to process in phase" );
 					
 				}
 				
 			}
 			
 			// check for completion of split, to signal master on state change
-			if (false == this.hdfs_fetcher.hasNext()) {
+			if (false == this.hdfs_fetcher.hasNext() && this.completedDatasetEpochs + 1 >= this.preTrainDatasetPasses ) {
+				
 				this.preTrainPhaseComplete = true;
 				System.out.println( "Worker > Completion of pre-train phase" );
+				
 			}
 			
 					
@@ -233,16 +246,25 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 				
 				hdfs_recordBatch = this.hdfs_fetcher.next();
 				
-				
-				batchWatch.reset();
-				
-				batchWatch.start();
-				
-				dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );
-				
-				batchWatch.stop();
-				
-				System.out.println( "Worker > FineTune > Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
+				if (hdfs_recordBatch.getFirst().numRows() > 0) {
+					
+					
+					batchWatch.reset();
+					
+					batchWatch.start();
+					
+					dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );
+					
+					batchWatch.stop();
+					
+					System.out.println( "Worker > FineTune > Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
+					
+				} else {
+					
+					System.out.println( "Worker > FineTune > Idle pass, no records left to process in phase" );
+					
+					
+				}
 				
 			} else {
 				
@@ -270,6 +292,16 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		// this is a clunky way to do this. dont judge me, working fast here.
 		DBNParameterVector dbn_update = new DBNParameterVector();
 		dbn_update.preTrainPhaseComplete = this.preTrainPhaseComplete;
+		
+		if (false == this.hdfs_fetcher.hasNext()) {
+
+			dbn_update.datasetPassComplete = true;
+			
+		} else {
+			
+			dbn_update.datasetPassComplete = false;
+			
+		}
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		this.dbn.write(out);
@@ -328,7 +360,11 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	      this.learningRate = Double.parseDouble(this.conf.get(
 		          "tv.floe.metronome.dbn.conf.LearningRate", "0.01"));
 	      
-	      this.batchSize = this.conf.getInt("tv.floe.metronome.dbn.conf.batchSize",  1);
+	      this.batchSize = this.conf.getInt( "tv.floe.metronome.dbn.conf.batchSize",  1);
+	      
+	      this.preTrainDatasetPasses = this.conf.getInt( "tv.floe.metronome.dbn.conf.pretrain.passes", 1 );
+	      
+	      this.fineTuneDatasetPasses = this.conf.getInt( "tv.floe.metronome.dbn.conf.finetune.passes", 1 );
 	      
 	      this.numIns = this.conf.getInt( "tv.floe.metronome.dbn.conf.numberInputs", 784);
 	      
@@ -395,6 +431,25 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		this.dbn.load(b);
 		
 		// TODO: check the message for a state change
+		
+		if ( true == master_update.datasetPassComplete ) {
+			
+			this.completedDatasetEpochs++;
+			this.hdfs_fetcher.reset();
+			
+			if ( this.completedDatasetEpochs >= this.fineTuneDatasetPasses ) {
+				
+				// we are done!
+				this.currentTrainingState = TrainingState.TRAINING_COMPLETE;
+				
+			} else if ( this.completedDatasetEpochs >= this.preTrainDatasetPasses ) {
+				
+				this.currentTrainingState = TrainingState.FINE_TUNE;
+				
+			}
+			
+			
+		}
 		
 		if (true == master_update.masterSignalToStartFineTunePhase && TrainingState.PRE_TRAIN == this.currentTrainingState) {
 			
