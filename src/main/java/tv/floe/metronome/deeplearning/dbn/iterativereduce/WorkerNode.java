@@ -228,6 +228,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 				
 			}
 			
+			System.out.println( "Worker > Check PreTrain completion > completedEpochs: " + this.completedDatasetEpochs + ", preTrainDatasetPasses: " + this.preTrainDatasetPasses );
+			
 			// check for completion of split, to signal master on state change
 			if (false == this.hdfs_fetcher.hasNext() && this.completedDatasetEpochs + 1 >= this.preTrainDatasetPasses ) {
 				
@@ -268,14 +270,14 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 				
 			} else {
 				
-				System.out.println( "Worker > FineTune > [Split Complete, IDLE] > Total Time " + watch.toString() );
+				System.out.println( "Worker > FineTune > Alt > [Split Complete, IDLE] > Total Time " + watch.toString() );
 				
 			}
 				
 		} else {
 			
-			System.err.println( "We're in some impossible training state for this worker" );
-			
+			// System.err.println( "We're in some impossible training state for this worker" );
+			System.out.println( "Worker > FineTune > Complete > [Split Complete, IDLE] > Total Time " + watch.toString() );
 		}
 
 /*		
@@ -295,10 +297,12 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		if (false == this.hdfs_fetcher.hasNext()) {
 
+			System.out.println( "Worker > Dataset Pass Complete" );
 			dbn_update.datasetPassComplete = true;
 			
 		} else {
 			
+			System.out.println( "Worker > Dataset Pass NOT Complete" );
 			dbn_update.datasetPassComplete = false;
 			
 		}
@@ -432,25 +436,36 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		// TODO: check the message for a state change
 		
-		if ( true == master_update.datasetPassComplete ) {
+		if ( true == master_update.masterSignalToStartNextDatasetPass ) {
 			
 			this.completedDatasetEpochs++;
 			this.hdfs_fetcher.reset();
 			
-			if ( this.completedDatasetEpochs >= this.fineTuneDatasetPasses ) {
+			System.out.println( "Worker > update > starting new data set pass: " + this.completedDatasetEpochs );
+			
+			if ( this.completedDatasetEpochs >= (this.fineTuneDatasetPasses + this.preTrainDatasetPasses) ) {
 				
 				// we are done!
 				this.currentTrainingState = TrainingState.TRAINING_COMPLETE;
+				System.out.println( "Worker > Completely done" );
 				
-			} else if ( this.completedDatasetEpochs >= this.preTrainDatasetPasses ) {
-				
+			} else if ( this.completedDatasetEpochs >= this.preTrainDatasetPasses && true == master_update.masterSignalToStartFineTunePhase && this.currentTrainingState == TrainingState.PRE_TRAIN ) {
+
+				this.preTrainPhaseComplete = true;
+				this.fineTunePhaseComplete = false;
+
 				this.currentTrainingState = TrainingState.FINE_TUNE;
+				System.out.println( "\n\nWorker > Signaled to move into fine tune phase\n" );
 				
 			}
 			
 			
+		} else {
+			
+			System.out.println( "Worker > update > not yet time to start next dataset pass" );
+			
 		}
-		
+		/*
 		if (true == master_update.masterSignalToStartFineTunePhase && TrainingState.PRE_TRAIN == this.currentTrainingState) {
 			
 			this.preTrainPhaseComplete = true;
@@ -470,7 +485,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			
 			
 		}
-		
+		*/
 		
 		
 	}
