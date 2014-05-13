@@ -15,5 +15,11 @@ public class MnistHDFSDataSetIterator extends BaseDatasetIterator {
 		
 		
 	}
+	
+	@Override
+	public boolean hasNext() {
+		return fetcher.hasMore();
+	}
+	
 
 }

@@ -167,12 +167,17 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 			
 			if (false == this.record_reader.hasMoreRecords()) {
 				
+				System.out.println( "early kickout of mnist hdfs data fetcher" );
 				break;
 				
 			}
 			
 			try {
 				result = this.record_reader.next(value);
+				if (false == result) {
+					System.out.println( "MNISTHDFSDataFetcher > hit no recs " );
+					break;
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
