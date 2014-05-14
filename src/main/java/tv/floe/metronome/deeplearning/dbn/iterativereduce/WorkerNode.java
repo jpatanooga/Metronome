@@ -202,23 +202,34 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 				
 				hdfs_recordBatch = this.hdfs_fetcher.next();
 				
+				
+				
 				if (hdfs_recordBatch.getFirst().numRows() > 0) {
 					
-					// calc stats on number records processed
-					recordsProcessed += hdfs_recordBatch.getFirst().numRows();
+					if (hdfs_recordBatch.getFirst().numRows() < this.batchSize) {
+						
+						System.out.println( "Worker > PreTrain: [Jagged End of Split: Skipped] Processed Total " + recordsProcessed + " Total Time " + watch.toString() );
+						
+						
+					} else {
+						
+						// calc stats on number records processed
+						recordsProcessed += hdfs_recordBatch.getFirst().numRows();
+						
+						//System.out.println( "PreTrain: Batch Size: " + hdfs_recordBatch.getFirst().numRows() );
+						
+						batchWatch.reset();
+						
+						batchWatch.start();
+				
+						this.dbn.preTrain( hdfs_recordBatch.getFirst(), 1, this.learningRate, this.preTrainEpochs);
+						
+						batchWatch.stop();
+		
+						System.out.println( "Worker > PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
+		
+					} // if
 					
-					//System.out.println( "PreTrain: Batch Size: " + hdfs_recordBatch.getFirst().numRows() );
-					
-					batchWatch.reset();
-					
-					batchWatch.start();
-			
-					this.dbn.preTrain( hdfs_recordBatch.getFirst(), 1, this.learningRate, this.preTrainEpochs);
-					
-					batchWatch.stop();
-	
-					System.out.println( "Worker > PreTrain: Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
-	
 					
 				} else {
 				
@@ -251,16 +262,23 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 				
 				if (hdfs_recordBatch.getFirst().numRows() > 0) {
 					
-					
-					batchWatch.reset();
-					
-					batchWatch.start();
-					
-					dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );
-					
-					batchWatch.stop();
-					
-					System.out.println( "Worker > FineTune > Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
+					if (hdfs_recordBatch.getFirst().numRows() < this.batchSize) {
+						
+						System.out.println( "Worker > FineTune: [Jagged End of Split: Skipped] Processed Total " + recordsProcessed + " Total Time " + watch.toString() );
+
+					} else {
+						
+						batchWatch.reset();
+						
+						batchWatch.start();
+						
+						dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );
+						
+						batchWatch.stop();
+						
+						System.out.println( "Worker > FineTune > Batch Mode, Processed Total " + recordsProcessed + ", Batch Time " + batchWatch.toString() + " Total Time " + watch.toString() );
+						
+					}
 					
 				} else {
 					
