@@ -183,7 +183,16 @@ public class MnistHDFSDataFetcher extends BaseDataFetcher implements DataSetFetc
 				e.printStackTrace();
 			}
 			
-			toConvert.add( this.convertMetronomeTextLineToMatrixInputPair( value.toString() ));
+			String valString = value.toString().trim();
+			if (valString.equals("")) {
+				
+				System.out.println( "MNISTHDFSDataFetcher > hit blank line " );
+				
+			} else {
+			
+				toConvert.add( this.convertMetronomeTextLineToMatrixInputPair( value.toString() ));
+				
+			}
 		}
 
 

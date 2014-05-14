@@ -198,7 +198,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		if ( TrainingState.PRE_TRAIN == this.currentTrainingState ) {
 		
-			if ( this.hdfs_fetcher.hasNext() ) {
+ 			if ( this.hdfs_fetcher.hasNext() ) {
 				
 				hdfs_recordBatch = this.hdfs_fetcher.next();
 				
@@ -221,8 +221,9 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	
 					
 				} else {
-					
-				//	System.out.println( "Worker > PreTrain > Idle pass, no records left to process in phase" );
+				
+					// in case we get a blank line
+					System.out.println( "Worker > PreTrain > Idle pass, no records left to process in phase" );
 					
 				}
 				
