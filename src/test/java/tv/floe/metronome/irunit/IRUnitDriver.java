@@ -234,6 +234,8 @@ public class IRUnitDriver<T> {
 				.getProperty("yarn.worker.main"));
 		
 		for (int x = 0; x < splits.length; x++) {
+			
+			System.out.println( "IRUnit > Split > " + splits[x].toString() );
 
 			ComputableWorker worker = null;
 			Class<?> worker_clazz;
