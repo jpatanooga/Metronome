@@ -183,7 +183,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		// TODO: setup a cached vector system from hdfs for batches
 						
-		System.out.println("Worker > Compute()");
+	//	System.out.println("Worker > Compute()");
 
 		
 		int recordsProcessed = 0;
@@ -222,19 +222,19 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 					
 				} else {
 					
-					System.out.println( "Worker > PreTrain > Idle pass, no records left to process in phase" );
+				//	System.out.println( "Worker > PreTrain > Idle pass, no records left to process in phase" );
 					
 				}
 				
 			}
 			
-			System.out.println( "Worker > Check PreTrain completion > completedEpochs: " + this.completedDatasetEpochs + ", preTrainDatasetPasses: " + this.preTrainDatasetPasses );
+		//	System.out.println( "Worker > Check PreTrain completion > completedEpochs: " + this.completedDatasetEpochs + ", preTrainDatasetPasses: " + this.preTrainDatasetPasses );
 			
 			// check for completion of split, to signal master on state change
 			if (false == this.hdfs_fetcher.hasNext() && this.completedDatasetEpochs + 1 >= this.preTrainDatasetPasses ) {
 				
 				this.preTrainPhaseComplete = true;
-				System.out.println( "Worker > Completion of pre-train phase" );
+			//	System.out.println( "Worker > Completion of pre-train phase" );
 				
 			}
 			
@@ -263,21 +263,22 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 					
 				} else {
 					
-					System.out.println( "Worker > FineTune > Idle pass, no records left to process in phase" );
+				//	System.out.println( "Worker > FineTune > Idle pass, no records left to process in phase" );
 					
 					
 				}
 				
 			} else {
 				
-				System.out.println( "Worker > FineTune > Alt > [Split Complete, IDLE] > Total Time " + watch.toString() );
+			//	System.out.println( "Worker > FineTune > Alt > [Split Complete, IDLE] > Total Time " + watch.toString() );
 				
 			}
 				
 		} else {
 			
 			// System.err.println( "We're in some impossible training state for this worker" );
-			System.out.println( "Worker > FineTune > Complete > [Split Complete, IDLE] > Total Time " + watch.toString() );
+		//	System.out.println( "Worker > FineTune > Complete > [Split Complete, IDLE] > Total Time " + watch.toString() );
+			
 		}
 
 /*		
@@ -297,12 +298,12 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		if (false == this.hdfs_fetcher.hasNext()) {
 
-			System.out.println( "Worker > Dataset Pass Complete" );
+		//	System.out.println( "Worker > Dataset Pass Complete" );
 			dbn_update.datasetPassComplete = true;
 			
 		} else {
 			
-			System.out.println( "Worker > Dataset Pass NOT Complete" );
+		//	System.out.println( "Worker > Dataset Pass NOT Complete" );
 			dbn_update.datasetPassComplete = false;
 			
 		}
@@ -441,13 +442,13 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			this.completedDatasetEpochs++;
 			this.hdfs_fetcher.reset();
 			
-			System.out.println( "Worker > update > starting new data set pass: " + this.completedDatasetEpochs );
+		//	System.out.println( "Worker > update > starting new data set pass: " + this.completedDatasetEpochs );
 			
 			if ( this.completedDatasetEpochs >= (this.fineTuneDatasetPasses + this.preTrainDatasetPasses) ) {
 				
 				// we are done!
 				this.currentTrainingState = TrainingState.TRAINING_COMPLETE;
-				System.out.println( "Worker > Completely done" );
+			//	System.out.println( "Worker > Completely done" );
 				
 			} else if ( this.completedDatasetEpochs >= this.preTrainDatasetPasses && true == master_update.masterSignalToStartFineTunePhase && this.currentTrainingState == TrainingState.PRE_TRAIN ) {
 
@@ -455,14 +456,14 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 				this.fineTunePhaseComplete = false;
 
 				this.currentTrainingState = TrainingState.FINE_TUNE;
-				System.out.println( "\n\nWorker > Signaled to move into fine tune phase\n" );
+			//	System.out.println( "\n\nWorker > Signaled to move into fine tune phase\n" );
 				
 			}
 			
 			
 		} else {
 			
-			System.out.println( "Worker > update > not yet time to start next dataset pass" );
+		//	System.out.println( "Worker > update > not yet time to start next dataset pass" );
 			
 		}
 		/*

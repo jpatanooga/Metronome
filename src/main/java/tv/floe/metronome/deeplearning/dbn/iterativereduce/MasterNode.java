@@ -57,7 +57,7 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 			Collection<DBNParameterVectorUpdateable> workerUpdates,
 			Collection<DBNParameterVectorUpdateable> masterUpdates) {
 
-		System.out.println( "Master::Compute()" );
+		System.out.println( "--------------- Master::Compute() -------------- " );
 		
 		DBNParameterVectorUpdateable masterReturnMsg = new DBNParameterVectorUpdateable();
 		
@@ -110,17 +110,17 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	    this.dbn_averaged_master.initBasedOn( workerDBNs.get( 0 ) );
 	    this.dbn_averaged_master.computeAverageDBNParameterVector(workerDBNs);
 	    
-	    System.out.println("Master > Parameter Averaged! -------- ");
+//	    System.out.println("Master > Parameter Averaged! -------- ");
 	    if ( areAllWorkersDoneWithPreTrainPhase ) {
-	    	System.out.println( "############## All Workers Are Done w PreTrain" );
+//	    	System.out.println( "############## All Workers Are Done w PreTrain" );
 	    } else {
-	    	System.out.println( "############## All Workers Are NOT Complete w PreTrain" );
+//	    	System.out.println( "############## All Workers Are NOT Complete w PreTrain" );
 	    }
 	    
 	    if ( areAllWorkersDoneWithCurrentDatasetEpoch ) {
-	    	System.out.println( "############## All Workers Are Done w Current Dataset Epoch" );
+//	    	System.out.println( "############## All Workers Are Done w Current Dataset Epoch" );
 	    } else {
-	    	System.out.println( "############## All Workers Are NOT Done w Current Dataset Epoch" );
+//	    	System.out.println( "############## All Workers Are NOT Done w Current Dataset Epoch" );
 	    }
 	    
 		DBNParameterVector dbn_update = new DBNParameterVector();
