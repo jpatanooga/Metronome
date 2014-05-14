@@ -193,6 +193,55 @@ public class Test_DBN_IR_MNIST {
 		
 	}	
 	
+	@Test
+	public void testIR_DBN_MNIST_TwoWorker_TwoLabels_UnevenSplits() throws Exception {
+
+		// setup the two input files
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.smallsplit.properties";
+		
+		// run the simulator
+		IRUnitDriver polr_ir = new IRUnitDriver( yarn_props_file );
+		polr_ir.Setup();
+
+		polr_ir.SimulateRun();
+
+		
+		// evaluate the saved model
+		ModelTester.evaluateModel( yarn_props_file, 20, 20 );
+		
+		
+		
+	}	
+	
+	/**
+	 * Batch size is 10 records
+	 * One split is 20 records,
+	 * Other split is 11 records
+	 * 
+	 *  - forces to worker to have a batch that is less than the standard batch size
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testIR_DBN_MNIST_TwoWorker_TwoLabels_JaggedSplits() throws Exception {
+
+		// setup the two input files
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.jaggedsplit.properties";
+		
+		// run the simulator
+		IRUnitDriver polr_ir = new IRUnitDriver( yarn_props_file );
+		polr_ir.Setup();
+
+		polr_ir.SimulateRun();
+
+		
+		// evaluate the saved model
+		ModelTester.evaluateModel( yarn_props_file, 20, 20 );
+		
+		
+		
+	}		
+	
 	
 	@Test
 	public void evaluateIR_DBN_TwoLabel_ScoreSavedModel() throws Exception {
