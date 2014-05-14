@@ -26,6 +26,8 @@ information, see the file `LICENSE' included with this distribution. */
 	 return a position of higher value.
  */
 
+import java.util.logging.Level;
+
 import org.apache.commons.math3.util.FastMath;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.Matrix;

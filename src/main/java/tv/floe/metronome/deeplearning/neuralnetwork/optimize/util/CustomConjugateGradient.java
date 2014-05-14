@@ -71,6 +71,7 @@ public class CustomConjugateGradient  implements Optimizer {
 		// Alternative:
 		//this.lineMaximizer = new GradientBracketLineOptimizer (function);
 
+		logger.setLevel(Level.OFF);
 	}
 
 	public CustomConjugateGradient(Optimizable.ByGradientValue function) {

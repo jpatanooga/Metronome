@@ -123,8 +123,9 @@ public class VectorizedNonZeroStoppingConjugateGradient implements OptimizerMatr
 
 //			if(listener != null)
 //				listener.epochDone(iterationCount);
-			logger.info(myName + " ConjugateGradient: At iteration " + iterations + ", cost = " + fp + " -"
-					+ (curr - last));
+
+			//			logger.info(myName + " ConjugateGradient: At iteration " + iterations + ", cost = " + fp + " -"
+//					+ (curr - last));
 			last = curr;
 			try {
 				step = lineMaximizer.optimize(xi, step);
@@ -137,8 +138,8 @@ public class VectorizedNonZeroStoppingConjugateGradient implements OptimizerMatr
 
 			// This termination provided by "Numeric Recipes in C".
 			if ((0 < tolerance) && (2.0 * Math.abs(fret - fp) <= tolerance * (Math.abs(fret) + Math.abs(fp) + eps))) {
-				logger.info("ConjugateGradient converged: old value= " + fp + " new value= " + fret + " tolerance="
-						+ tolerance);
+//				logger.info("ConjugateGradient converged: old value= " + fp + " new value= " + fret + " tolerance="
+//						+ tolerance);
 				converged = true;
 				return true;
 			}
@@ -149,8 +150,8 @@ public class VectorizedNonZeroStoppingConjugateGradient implements OptimizerMatr
 			double twoNorm = MathUtils.norm2( xi );
 			
 			if (twoNorm < gradientTolerance) {
-				logger.info("ConjugateGradient converged: gradient two norm " + twoNorm + ", less than "
-						+ gradientTolerance);
+//				logger.info("ConjugateGradient converged: gradient two norm " + twoNorm + ", less than "
+//						+ gradientTolerance);
 				converged = true;
 				return true;
 			}
