@@ -371,6 +371,7 @@ public class Test_DBN_Mnist_Dataset {
 		
 		int recordsProcessed = 0;
 		
+		
 		StopWatch watch = new StopWatch();
 		watch.start();
 		
@@ -390,7 +391,7 @@ public class Test_DBN_Mnist_Dataset {
 			
 			System.out.println( "Batch Training Elapsed Time " + batchWatch.toString() );
 
-			//System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
+			System.out.println( "DBN Network Stats:\n" + dbn.generateNetworkSizeReport() );
 
 /*			
 			if (fetcher.hasNext()) {
