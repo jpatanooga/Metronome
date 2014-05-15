@@ -240,6 +240,36 @@ public class Test_DBN_IR_MNIST {
 		
 		
 		
+	}	
+	
+
+	/**
+	 * Batch size is 10 records
+	 * One split is 20 records,
+	 * Other split is 8 records
+	 * 
+	 *  - forces to worker to have a batch that is less than the standard batch size
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testIR_DBN_MNIST_TwoWorker_TwoLabels_JaggedSplitsSmall() throws Exception {
+
+		// setup the two input files
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.jaggedsplit_small.properties";
+		
+		// run the simulator
+		IRUnitDriver polr_ir = new IRUnitDriver( yarn_props_file );
+		polr_ir.Setup();
+
+		polr_ir.SimulateRun();
+
+		
+		// evaluate the saved model
+		ModelTester.evaluateModel( yarn_props_file, 20, 20 );
+		
+		
+		
 	}		
 	
 	
