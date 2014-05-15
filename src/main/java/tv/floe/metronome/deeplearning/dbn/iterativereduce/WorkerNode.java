@@ -85,6 +85,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	
 	MnistHDFSDataSetIterator hdfs_fetcher = null; //new MnistHDFSDataSetIterator( batchSize, totalNumExamples, txt_reader );
 	
+	
 	StopWatch watch = new StopWatch();
 //	watch.start();
 
@@ -192,6 +193,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		DataSet hdfs_recordBatch = null; //this.hdfs_fetcher.next();
 		
+		System.out.println("Iteration: " + this.currentIteration );
 		
 //		if (hdfs_recordBatch.getFirst().numRows() > 0) {
 //		do  {
@@ -201,8 +203,24 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
  			if ( this.hdfs_fetcher.hasNext() ) {
 				
 				hdfs_recordBatch = this.hdfs_fetcher.next();
-				
-				
+
+				// check for the straggler batch condition
+				if (0 == this.currentIteration && hdfs_recordBatch.getFirst().numRows() > 0 && hdfs_recordBatch.getFirst().numRows() < this.batchSize) {
+					
+					// ok, only in this situation do we lower the batch size
+					this.batchSize = hdfs_recordBatch.getFirst().numRows();
+
+					// re-setup the dataset iterator
+					try {
+						this.hdfs_fetcher = new MnistHDFSDataSetIterator( this.batchSize, this.totalTrainingDatasetSize, (TextRecordParser)lineParser );
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					System.out.println( "Worker > PreTrain: Setting up for a straggler split... (sub batch size)" );					
+					System.out.println( "New batch size: " + this.batchSize );
+				}
 				
 				if (hdfs_recordBatch.getFirst().numRows() > 0) {
 					
@@ -358,6 +376,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	@Override
 	public void setRecordParser(RecordParser lineParser) {
 
+		this.lineParser = (TextRecordParser) lineParser;
+		
 		try {
 			// Q: is totalTrainingDatasetSize actually used anymore?
 			this.hdfs_fetcher = new MnistHDFSDataSetIterator( this.batchSize, this.totalTrainingDatasetSize, (TextRecordParser)lineParser );
