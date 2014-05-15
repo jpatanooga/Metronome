@@ -170,7 +170,7 @@ public class ModelTester {
 		
 	}
 	
-	public static void evaluateModel(String propsFilepath, int batchSize, int totalNumExamples) throws Exception {
+	public static void evaluateModel(String propsFilepath, int batchSize ) throws Exception {
 
 		
 		parsePropertiesFile(propsFilepath);
@@ -201,7 +201,7 @@ public class ModelTester {
 					
 
 	    
-		MnistHDFSDataSetIterator hdfs_fetcher = new MnistHDFSDataSetIterator( batchSize, totalNumExamples, txt_reader );
+		MnistHDFSDataSetIterator hdfs_fetcher = new MnistHDFSDataSetIterator( batchSize, 1, txt_reader );
 		DataSet hdfs_recordBatch = hdfs_fetcher.next();
 		
 		Matrix hdfs_input = hdfs_recordBatch.getFirst();
