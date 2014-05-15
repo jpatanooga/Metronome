@@ -256,6 +256,10 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 					
 				}
 				
+			} else {
+				
+				System.out.println( "Worker > PreTrain > Idle pass, no records left to process in phase" );
+				
 			}
 			
 		//	System.out.println( "Worker > Check PreTrain completion > completedEpochs: " + this.completedDatasetEpochs + ", preTrainDatasetPasses: " + this.preTrainDatasetPasses );
