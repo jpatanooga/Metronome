@@ -6,27 +6,28 @@ app.jar.path=Metronome-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 # Comma separated list of other JAR's required for depenedencies
 #app.lib.jar.path=avro-1.7.1.jar,avro-ipc-1.7.1.jar
-app.lib.jar.path=
+app.lib.jar.path=/home/cloudera/metronome/avro-1.7.1.jar,/home/cloudera/metronome/avro-ipc-1.7.1.jar
+
 
 # Input file(s) to process
-#app.input.path=src/test/resources/data/iris/threeworkers/
 app.input.path=/user/cloudera/metronome/dbn/mnist/mnist_filtered_conversion_test.metronome
 
 # Output results to
-#app.output.path=hdfs:///user/yarn/kboar/output
 app.output.path=hdfs:///user/cloudera/metronome/dbn/models/dbn.mnist.one.worker.twolabels.dl_model
 
 # Number of iterations
-app.iteration.count=3
+app.iteration.count=4
 
-app.name=IR_DBN_MNIST_SINGLE_WORKER_TEST
+app.name=IR_DBN_MNIST_SINGLE_WORKER_UserTest
 
 # Requested memory for YARN clients
 yarn.memory=512
 # The main() class/entry for the AppMaster
 yarn.master.main=tv.floe.metronome.deeplearning.dbn.iterativereduce.MasterNode
+
 # Any extra command-line args
-yarn.master.args=
+yarn.master.args=-cp `yarn classpath`:./iterativereduce-0.1-SNAPSHOT.jar:./Metronome-1.0-SNAPSHOT-jar-with-dependencies.jar:./avro-1.7.1.jar:./avro-ipc-1.7.1.jar
+
 
 # The main() class/entry for the AppWorker
 yarn.worker.main=tv.floe.metronome.deeplearning.dbn.iterativereduce.WorkerNode
@@ -41,9 +42,8 @@ tv.floe.metronome.dbn.conf.LearningRate=0.01
 
 tv.floe.metronome.dbn.conf.hiddenLayerSizes=500,250,100
 
-tv.floe.metronome.dbn.conf.batchSize=20
+tv.floe.metronome.dbn.conf.batchSize=10
+tv.floe.metronome.dbn.conf.pretrain.passes=2
+tv.floe.metronome.dbn.conf.finetune.passes=1
 
 tv.floe.metronome.evaluate.dataset.path=/tmp/mnist_filtered_conversion_test.metronome
-
-
-
