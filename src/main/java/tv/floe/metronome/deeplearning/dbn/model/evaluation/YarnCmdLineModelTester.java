@@ -36,6 +36,10 @@ public class YarnCmdLineModelTester extends Configured implements Tool {
 				: args[0];
 		Properties props = new Properties();
 		Configuration conf = getConf();
+		
+		// TODO: let them pass this in
+		// let's assume we're not going through a hadoop/yarn bash script
+		conf.addResource( new Path("/etc/hadoop/conf/core-site.xml") );
 
 		try {
 			FileInputStream fis = new FileInputStream(configFile);
@@ -62,15 +66,20 @@ public class YarnCmdLineModelTester extends Configured implements Tool {
 		Path p = new Path(props.getProperty(ConfigFields.APP_INPUT_PATH));
 		FileSystem fs = FileSystem.get(conf);
 
-		if (!fs.exists(p))
+		if (!fs.exists(p)) {
 			throw new FileNotFoundException("Input path not found: "
 					+ p.toString() + " (in " + fs.getUri() + ")");
+		} else {
+			
+			System.out.println( "Using FS at: " + conf.get("fs.defaultFS") );
+			
+		}
 
 		LOG.info("Using input path: " + p.toString());
 		
 		
 		
-		ModelTester.evaluateModel( configFile, 20 );
+		ModelTester.evaluateModel( configFile, conf, 20 );
 		
 		
 		

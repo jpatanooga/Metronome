@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.FileInputFormat;
@@ -170,7 +172,7 @@ public class ModelTester {
 		
 	}
 	
-	public static void evaluateModel(String propsFilepath, int batchSize ) throws Exception {
+	public static void evaluateModel(String propsFilepath, Configuration hadoopConf, int batchSize ) throws Exception {
 
 		
 		parsePropertiesFile(propsFilepath);
@@ -182,6 +184,9 @@ public class ModelTester {
 		// setup splits ala HDFS style -------------------
 		
 	    JobConf job = new JobConf(defaultConf);
+	    if (null != hadoopConf ) {
+	    	job = new JobConf( hadoopConf );
+	    }
 	    
 	    Path workDir = new Path( test_input_data_path );
 		
@@ -193,10 +198,70 @@ public class ModelTester {
 	    
 	    TextRecordParser txt_reader = new TextRecordParser();
 
-	    long len = Integer.parseInt(splits[0].toString().split(":")[2]
-	        .split("\\+")[1]);
+	    // drop the fully qualified host
+	    //String minus_host = splits[0].toString().split( "" )
+	    
+	    long len = 0;
+	    String path = "";
+	    
+	    if ( splits[0].toString().startsWith( "file://" ) ) {
+	    	
+	    	path = splits[0].toString().replaceFirst("file://", "");
+	    	
+	    	len = splits[0].getLength();
+	    
+	    
+	    } else if ( splits[0].toString().substring(1).equals( "/" ) ) {
+	    
+	    	// we have something like:
+	    	// /user/cloudera/metronome/dbn/mnist/mnist_filtered_conversion_test.metronome:0+20908
+	    	
+	    	len = Integer.parseInt(splits[0].toString().split(":")[2]
+	    			.split("\\+")[1]);
+	    	
+	    	System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
+	    	
+	    	path = splits[0].toString().split(":")[1];
+	    	
+	    } else if (splits[0].toString().substring(8).equals( "hdfs:///" ) ) {
+	    	
+	    	// we have something like:
+	    	// hdfs:///user/cloudera/metronome/dbn/mnist/mnist_filtered_conversion_test.metronome:0+20908
+	    	
+	    	
+	    	len = Integer.parseInt(splits[0].toString().split(":")[2]
+	    			.split("\\+")[1]);
 
-	    txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);		
+	    	System.out.println( "number of slices from ':' " + splits[0].toString().split(":").length );
+	    	
+	    	System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
+	    	
+	    	path = splits[0].toString().split(":")[1];
+	    	
+	    } else {
+	    	
+	    	// we have something like:
+	    	// hdfs://localhost.localdomain:8020/user/cloudera/metronome/dbn/mnist/mnist_filtered_conversion_test.metronome:0+20908
+	    	
+	    	len = Integer.parseInt(splits[0].toString().split(":")[3]
+	    			.split("\\+")[1]);
+
+	    	System.out.println( "number of slices from ':' " + splits[0].toString().split(":").length );
+	    	
+	    	System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
+	    	
+	    	String[] parts = splits[0].toString().split(":");
+	    	
+	    	path = parts[0] + ":" + parts[1] + ":" + parts[2];
+	    	
+	    	
+	    }
+	    
+	    System.out.println("raw path: " + path);
+	    
+
+	  //  txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);		
+	    txt_reader.setFile( path, 0, len);
 		
 					
 
@@ -218,11 +283,22 @@ public class ModelTester {
 		
 		System.out.println("Evaluating DBN Model Saved at: " + model_path );
 		
-		FileInputStream oFileInputStream = new FileInputStream( model_path );
+		Path modelInputPath = new Path( model_path );
+		
+	//	System.out.println("Evaluating DBN Model Saved at: " + modelInputPath.getName() );
+	//	System.out.println("Evaluating DBN Model Saved at: " + modelInputPath.toString() );
+	//	System.out.println("Evaluating DBN Model Saved at: " + modelInputPath.toUri().toString() );
+		
+//		FileInputStream oFileInputStream = new FileInputStream( modelInputPath.toUri().toString().replaceAll( "hdfs:///" , "hdfs://localhost.localdomain:8020/" ) );
+		
+		Path model_new_path = new Path( model_path );
+	    FileSystem fs = model_new_path.getFileSystem( hadoopConf );
+	    FSDataInputStream inputStream = fs.open( model_new_path);		
 		
 		
 		DeepBeliefNetwork dbn_deserialize = new DeepBeliefNetwork(1, hiddenLayerSizes, 1, hiddenLayerSizes.length, null ); //, Matrix input, Matrix labels);
-		dbn_deserialize.load(oFileInputStream);
+		//dbn_deserialize.load(oFileInputStream);
+		dbn_deserialize.load( inputStream );
 		
 		evaluateModel( hdfs_input, hdfs_labels, dbn_deserialize );
 			
