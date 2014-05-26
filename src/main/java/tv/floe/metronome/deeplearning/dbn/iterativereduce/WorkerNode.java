@@ -184,7 +184,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		// TODO: setup a cached vector system from hdfs for batches
 						
-	//	System.out.println("Worker > Compute()");
+		System.out.println("Worker > Compute() -------------------------- ");
 
 		
 		int recordsProcessed = 0;
@@ -200,12 +200,20 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		
 		if ( TrainingState.PRE_TRAIN == this.currentTrainingState ) {
 		
+			System.out.println("Worker > PRE TRAIN! " );
+			
  			if ( this.hdfs_fetcher.hasNext() ) {
 				
+ 				
+ 				
 				hdfs_recordBatch = this.hdfs_fetcher.next();
 
+				System.out.println("Worker > Has Next! > Recs: " + hdfs_recordBatch.getFirst().numRows() );
+				
 				// check for the straggler batch condition
 				if (0 == this.currentIteration && hdfs_recordBatch.getFirst().numRows() > 0 && hdfs_recordBatch.getFirst().numRows() < this.batchSize) {
+					
+					System.out.println( "Worker > Straggler Batch Condition!" );
 					
 					// ok, only in this situation do we lower the batch size
 					this.batchSize = hdfs_recordBatch.getFirst().numRows();
@@ -220,6 +228,10 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 					System.out.println( "Worker > PreTrain: Setting up for a straggler split... (sub batch size)" );					
 					System.out.println( "New batch size: " + this.batchSize );
+				} else {
+					
+					System.out.println( "Worker > NO Straggler Batch Condition!" );
+					
 				}
 				
 				if (hdfs_recordBatch.getFirst().numRows() > 0) {
@@ -230,6 +242,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 						
 						
 					} else {
+						
+						System.out.println( "Worker > Normal Processing!" );
 						
 						// calc stats on number records processed
 						recordsProcessed += hdfs_recordBatch.getFirst().numRows();
@@ -318,7 +332,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		} else {
 			
 			// System.err.println( "We're in some impossible training state for this worker" );
-		//	System.out.println( "Worker > FineTune > Complete > [Split Complete, IDLE] > Total Time " + watch.toString() );
+			System.out.println( "Worker > FineTune > Complete > [Split Complete, IDLE] > Total Time " + watch.toString() );
 			
 		}
 
@@ -382,6 +396,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 		this.lineParser = (TextRecordParser) lineParser;
 		
+		System.out.println("Worker::setRecordParser()");
+		
 		try {
 			// Q: is totalTrainingDatasetSize actually used anymore?
 			this.hdfs_fetcher = new MnistHDFSDataSetIterator( this.batchSize, this.totalTrainingDatasetSize, (TextRecordParser)lineParser );
@@ -399,6 +415,8 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	@Override
 	public void setup(Configuration c) {
 
+		System.out.println( "Worker::setup()" );
+		
 	    this.conf = c;
 	    
 	    String useRegularization = "false";
