@@ -186,6 +186,8 @@ public class ModelTester {
 	    JobConf job = new JobConf(defaultConf);
 	    if (null != hadoopConf ) {
 	    	job = new JobConf( hadoopConf );
+	    } else {
+	    	hadoopConf = defaultConf;
 	    }
 	    
 	    Path workDir = new Path( test_input_data_path );
@@ -204,12 +206,26 @@ public class ModelTester {
 	    long len = 0;
 	    String path = "";
 	    
-	    if ( splits[0].toString().startsWith( "file://" ) ) {
+	    // YES, more clever regex here would be clever.
+	    // I'm on a plane right now and lazy. sue me.
+
+	    if ( splits[0].toString().startsWith( "file:///" ) ) {
 	    	
-	    	path = splits[0].toString().replaceFirst("file://", "");
+	    	path = splits[0].toString().replaceFirst("file:///", "/").split(":")[0];
 	    	
 	    	len = splits[0].getLength();
+	    	
+	    } else if ( splits[0].toString().startsWith( "file://" ) ) {
+		    	
+		    	path = splits[0].toString().replaceFirst("file://", "/").split(":")[0];
+		    	
+		    	len = splits[0].getLength();
 	    
+	    } else if ( splits[0].toString().startsWith( "file:/" ) ) {
+	    	
+	    	path = splits[0].toString().replaceFirst("file:/", "/").split(":")[0];
+	    	
+	    	len = splits[0].getLength();
 	    
 	    } else if ( splits[0].toString().substring(1).equals( "/" ) ) {
 	    
@@ -221,7 +237,7 @@ public class ModelTester {
 	    	
 	    	System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
 	    	
-	    	path = splits[0].toString().split(":")[1];
+	    	path = splits[0].toString().split(":")[0];
 	    	
 	    } else if (splits[0].toString().substring(8).equals( "hdfs:///" ) ) {
 	    	
