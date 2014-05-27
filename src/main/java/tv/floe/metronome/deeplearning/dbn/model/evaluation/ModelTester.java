@@ -235,7 +235,7 @@ public class ModelTester {
 	    	len = Integer.parseInt(splits[0].toString().split(":")[2]
 	    			.split("\\+")[1]);
 	    	
-	    	System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
+	    	//System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
 	    	
 	    	path = splits[0].toString().split(":")[0];
 	    	
@@ -248,9 +248,9 @@ public class ModelTester {
 	    	len = Integer.parseInt(splits[0].toString().split(":")[2]
 	    			.split("\\+")[1]);
 
-	    	System.out.println( "number of slices from ':' " + splits[0].toString().split(":").length );
+	    	//System.out.println( "number of slices from ':' " + splits[0].toString().split(":").length );
 	    	
-	    	System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
+	    	//System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
 	    	
 	    	path = splits[0].toString().split(":")[1];
 	    	
@@ -262,9 +262,9 @@ public class ModelTester {
 	    	len = Integer.parseInt(splits[0].toString().split(":")[3]
 	    			.split("\\+")[1]);
 
-	    	System.out.println( "number of slices from ':' " + splits[0].toString().split(":").length );
+	    	//System.out.println( "number of slices from ':' " + splits[0].toString().split(":").length );
 	    	
-	    	System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
+	    	//System.out.println("Split Length: " + len + ", versus method: " + splits[0].getLength() );
 	    	
 	    	String[] parts = splits[0].toString().split(":");
 	    	
@@ -273,7 +273,7 @@ public class ModelTester {
 	    	
 	    }
 	    
-	    System.out.println("raw path: " + path);
+	    //System.out.println("raw path: " + path);
 	    
 
 	  //  txt_reader.setFile(splits[0].toString().split(":")[1], 0, len);		

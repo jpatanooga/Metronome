@@ -71,7 +71,7 @@ public class YarnCmdLineModelTester extends Configured implements Tool {
 					+ p.toString() + " (in " + fs.getUri() + ")");
 		} else {
 			
-			System.out.println( "Using FS at: " + conf.get("fs.defaultFS") );
+			//System.out.println( "Using FS at: " + conf.get("fs.defaultFS") );
 			
 		}
 
