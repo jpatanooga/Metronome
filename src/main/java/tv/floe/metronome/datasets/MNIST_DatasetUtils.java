@@ -835,8 +835,9 @@ public class MNIST_DatasetUtils {
 		MNIST_DatasetUtils util = new MNIST_DatasetUtils( "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFileLabelsFilename_unzipped, "/tmp/" + LOCAL_DIR_NAME + "/" + trainingFilesFilename_unzipped );
 		//util.scanIDXFiles();
 		int[] filter = { 0, 1 };
-		util.convertFromBinaryFormatToMetronome(100000, "/tmp/mnist_full_dataset.metronome");
-		//util.convertAndFilterMetronomeMNISTDatasetByLabel(20, filter, "/tmp/mnist_filtered_conversion_test.metronome");
+		//util.convertFromBinaryFormatToMetronome(100000, "/tmp/mnist_full_dataset.metronome");
+		//util.convertAndFilterMetronomeMNISTDatasetByLabel(100, filter, "/tmp/mnist_filtered_012_conversion_test.100.metronome");
+		util.convertAndFilterMetronomeMNISTDatasetByLabel(20, filter, "/tmp/mnist_filtered_conversion_test.metronome");
 		
 		
 	}
