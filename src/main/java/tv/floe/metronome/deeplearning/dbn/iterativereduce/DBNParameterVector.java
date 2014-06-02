@@ -48,6 +48,8 @@ public class DBNParameterVector {
 	
 	public boolean masterSignalToStartNextDatasetPass = false;
 	
+	public int iteration = 0;
+	
 	byte[] dbn_payload = null;
 	
 	
@@ -64,6 +66,8 @@ public class DBNParameterVector {
 		// this.dbn.write(out);
 
 		//return this.dbn_payload;
+		
+		d.writeInt( this.iteration );
 		
 		d.writeBoolean( this.datasetPassComplete );
 		d.writeBoolean( this.preTrainPhaseComplete );
@@ -93,6 +97,8 @@ public class DBNParameterVector {
 		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
 		DataInput in = new DataInputStream(b);
 
+		this.iteration = in.readInt();
+		
 		this.datasetPassComplete = in.readBoolean();
 		this.preTrainPhaseComplete = in.readBoolean();
 		this.masterSignalToStartFineTunePhase = in.readBoolean();
