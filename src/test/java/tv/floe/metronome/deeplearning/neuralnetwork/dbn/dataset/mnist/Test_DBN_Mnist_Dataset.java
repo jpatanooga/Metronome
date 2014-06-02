@@ -191,11 +191,11 @@ public class Test_DBN_Mnist_Dataset {
 		return new DataSet( inputFiltered, labelsFiltered );
 	}
 	
-	
+/*	
 	@Test
 	public void testMnistConversionToMetronomeFormatIsValid() throws IOException {
 		
-		String vectors_filename = "/tmp/mnist_conversion_test.metronome";
+		String vectors_filename = "src/test/resources/data/MNIST/twolabels/eval_dataset/mnist_filtered_conversion_test.metronome";
 		
 		int batchSize = 5;
 		int totalNumExamples = 10;
@@ -270,21 +270,10 @@ public class Test_DBN_Mnist_Dataset {
 		
 		assertEquals( true, MatrixUtils.elementwiseSame(stock_labels, hdfs_labels) );
 		
-		/*
-		
-		
-		for ( int x = 0; x < batchSize; x++ ) {
-			
-			
-			
-			this.metronomeVectorMatchesMatrixEntry(metronome_vec, input.viewRow(x) );
-			
-		}
-		
-		*/
+
 		
 	}
-	
+*/	
 	
 	@Test
 	public void testFilterDataset() throws IOException {
