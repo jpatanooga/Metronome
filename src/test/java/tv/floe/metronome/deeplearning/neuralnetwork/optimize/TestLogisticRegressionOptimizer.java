@@ -238,43 +238,7 @@ public class TestLogisticRegressionOptimizer {
 		
 		
 	}
-	
-	@Test
-	public void testTrainOnIrisDataset() throws IOException {
-		
-		double learningRate = 0.001;
-		
-		Pair<Matrix, Matrix> data_set = IrisDatasetUtils.getIrisAsDataset();
-		
-		MatrixUtils.debug_print(data_set.getFirst());
-		MatrixUtils.debug_print(data_set.getSecond());
-		
-		Matrix input = data_set.getFirst();
-		Matrix labels = data_set.getSecond();
-		
-		LogisticRegression logRegression = new LogisticRegression( input, input.numCols(), labels.numCols()); 
-		logRegression.labels = labels;
-		
-		LogisticRegressionOptimizer opt = new LogisticRegressionOptimizer( logRegression, learningRate );
-		CustomConjugateGradient g = new CustomConjugateGradient(opt);
-		//NonZeroStoppingConjugateGradient g = new NonZeroStoppingConjugateGradient(opt);
-		g.optimize();
 
-		
-		Matrix predict = logRegression.predict(input);
-		
-		MatrixUtils.debug_print(predict);
-
-		Evaluation eval = new Evaluation();
-		eval.eval(labels, predict);
-		System.out.println( eval.stats() );
-
-		System.out.println( "Total Correct: " + eval.correctScores() + " out of " + labels.numRows() );
-		
-		assertEquals( 0.95, eval.f1(), 0.02 );
-		
-		
-	}	
 	
 	@Test
 	public void testTrainOnCovTypeDataset() throws Exception {
