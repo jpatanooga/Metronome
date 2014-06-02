@@ -19,7 +19,7 @@ public class TestSaveLoadModel {
 
 	
 		
-		int[] hiddenLayerSizes = { 600, 600, 600 };
+		int[] hiddenLayerSizes = { 400, 200, 100 };
 		double learningRate = 0.005;
 		int preTrainEpochs = 5;
 		int fineTuneEpochs = 5;
