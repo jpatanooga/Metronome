@@ -17,6 +17,7 @@ import tv.floe.metronome.deeplearning.datasets.DataSet;
 import tv.floe.metronome.deeplearning.datasets.iterator.impl.MnistHDFSDataSetIterator;
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
 import tv.floe.metronome.deeplearning.dbn.model.evaluation.ModelTester;
+import tv.floe.metronome.deeplearning.dbn.util.DBNDebuggingUtil;
 import tv.floe.metronome.io.records.CachedVectorReader;
 
 import com.cloudera.iterativereduce.ComputableWorker;
@@ -104,23 +105,16 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 		this.dbn.write(out);
 		
+		vector.iteration = this.currentIteration;
 		
 		vector.preTrainPhaseComplete = this.preTrainPhaseComplete;
 		vector.dbn_payload = out.toByteArray();
 		
-		System.out.println( "----- GenerateParameterVectorUpdate -----" );
-		
+//		System.out.println( "Worker > Debug > GenerateParameterVectorUpdate > Iteration: " + this.currentIteration + " -----" );
+
+	//	DBNDebuggingUtil.printDebugLayers(this.dbn, 2);
 
 
-/*
-		vector.batchTimeMS = this.lastBatchTimeMS;
-
-		vector.AvgError = (new Double(metrics.AvgError * 100))
-				.floatValue();
-		vector.TrainedRecords = (new Long(metrics.TotalRecordsProcessed))
-				.intValue();
-		
-*/
 		return vector;
 
 	}	
@@ -213,7 +207,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 				// check for the straggler batch condition
 				if (0 == this.currentIteration && hdfs_recordBatch.getFirst().numRows() > 0 && hdfs_recordBatch.getFirst().numRows() < this.batchSize) {
 					
-					System.out.println( "Worker > Straggler Batch Condition!" );
+				//	System.out.println( "Worker > Straggler Batch Condition!" );
 					
 					// ok, only in this situation do we lower the batch size
 					this.batchSize = hdfs_recordBatch.getFirst().numRows();
@@ -226,11 +220,11 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 						e.printStackTrace();
 					}
 
-					System.out.println( "Worker > PreTrain: Setting up for a straggler split... (sub batch size)" );					
-					System.out.println( "New batch size: " + this.batchSize );
+				//	System.out.println( "Worker > PreTrain: Setting up for a straggler split... (sub batch size)" );					
+				//	System.out.println( "New batch size: " + this.batchSize );
 				} else {
 					
-					System.out.println( "Worker > NO Straggler Batch Condition!" );
+				//	System.out.println( "Worker > NO Straggler Batch Condition!" );
 					
 				}
 				
@@ -238,12 +232,12 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 					
 					if (hdfs_recordBatch.getFirst().numRows() < this.batchSize) {
 						
-						System.out.println( "Worker > PreTrain: [Jagged End of Split: Skipped] Processed Total " + recordsProcessed + " Total Time " + watch.toString() );
+					//	System.out.println( "Worker > PreTrain: [Jagged End of Split: Skipped] Processed Total " + recordsProcessed + " Total Time " + watch.toString() );
 						
 						
 					} else {
 						
-						System.out.println( "Worker > Normal Processing!" );
+					//	System.out.println( "Worker > Normal Processing!" );
 						
 						// calc stats on number records processed
 						recordsProcessed += hdfs_recordBatch.getFirst().numRows();
@@ -300,7 +294,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 					
 					if (hdfs_recordBatch.getFirst().numRows() < this.batchSize) {
 						
-						System.out.println( "Worker > FineTune: [Jagged End of Split: Skipped] Processed Total " + recordsProcessed + " Total Time " + watch.toString() );
+					//	System.out.println( "Worker > FineTune: [Jagged End of Split: Skipped] Processed Total " + recordsProcessed + " Total Time " + watch.toString() );
 
 					} else {
 						
@@ -308,7 +302,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 						
 						batchWatch.start();
 						
-						dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );
+						this.dbn.finetune( hdfs_recordBatch.getSecond(), learningRate, fineTuneEpochs );
 						
 						batchWatch.stop();
 						
@@ -366,9 +360,16 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		this.dbn.write(out);
 		dbn_update.dbn_payload = out.toByteArray();
+		dbn_update.iteration = this.currentIteration;
 		
 		DBNParameterVectorUpdateable updateable = new DBNParameterVectorUpdateable();
 		updateable.param_msg = dbn_update;
+		
+		// DEBUG Stuff
+		
+		// TODO: make a util entry to print and compare stuff.....
+		
+	//	DBNDebuggingUtil.printDebugLayers(dbn, 2);
 		
 		return updateable;
 	}
@@ -396,7 +397,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 
 		this.lineParser = (TextRecordParser) lineParser;
 		
-		System.out.println("Worker::setRecordParser()");
+		//System.out.println("Worker::setRecordParser()");
 		
 		try {
 			// Q: is totalTrainingDatasetSize actually used anymore?
@@ -415,7 +416,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	@Override
 	public void setup(Configuration c) {
 
-		System.out.println( "Worker::setup()" );
+		//System.out.println( "Worker::setup()" );
 		
 	    this.conf = c;
 	    
@@ -489,6 +490,9 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 	@Override
 	public void update(DBNParameterVectorUpdateable master_update_updateable) {
 
+		//System.out.println( "Worker > Update ------------------------" );
+		
+		
 		DBNParameterVector master_update = master_update_updateable.get();
 		
 		ByteArrayInputStream b = new ByteArrayInputStream( master_update.dbn_payload );
@@ -497,6 +501,7 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 		this.dbn.load(b);
 		
 		// TODO: check the message for a state change
+		//System.out.println( "Worker > Debug > Update id: " + master_update.iteration );
 		
 		if ( true == master_update.masterSignalToStartNextDatasetPass ) {
 			
@@ -548,6 +553,13 @@ public class WorkerNode implements ComputableWorker<DBNParameterVectorUpdateable
 			
 		}
 		*/
+		
+		
+		
+
+		//DBNDebuggingUtil.printDebugLayers(this.dbn, 2);
+		
+		
 		
 		
 	}
