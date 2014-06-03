@@ -101,7 +101,7 @@ public class Test_DBN_IR_MNIST {
 		return hdfs_recordBatch;
 	}
 	
-	
+/*	
 	@Test
 	public void testIR() throws Exception {
 		
@@ -111,7 +111,7 @@ public class Test_DBN_IR_MNIST {
 		polr_ir.SimulateRun();
 
 	}
-
+*/
 	
 	@Test
 	public void testIR_DBN_MNIST_OneWorker_TwoLabels() throws Exception {
@@ -136,10 +136,9 @@ public class Test_DBN_IR_MNIST {
 	@Test
 	public void eval_IR_DBN_MNIST_OneWorker_TwoLabels() throws Exception {
 
-		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_labels.properties";
+		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_labels.properties"; 
 		
 		ModelTester.evaluateModel( yarn_props_file, null, 20  );
-		
 		
 	}
 	
@@ -149,22 +148,16 @@ public class Test_DBN_IR_MNIST {
 		// setup the two input files
 		String yarn_props_file = "src/test/resources/run_profiles/unit_tests/dbn/mnist/app.unit_test.dbn.mnist.two_workers.two_labels.properties";
 		
-		
 		// run the simulator
-		
 		IRUnitDriver polr_ir = new IRUnitDriver( yarn_props_file );
 		polr_ir.Setup();
 
 		polr_ir.SimulateRun();
 
-		
 		// evaluate the saved model
 		// - read the saved model location from the yarn props file
 		// - read the input test vectors
-		
 		ModelTester.evaluateModel( yarn_props_file, null, 20 );
-		
-		
 		
 	}
 	
