@@ -62,37 +62,6 @@ public class TestRestrictedBoltzmannMachine {
 	
 
 	
-	@Test 
-	public void testMatrixSizingOnInputTimes() {
-		
-//		DoubleMatrix inputTimesPhSample =  this.input.transpose().mmul(ph.getSecond());
-// TODO: look at how the training dataset x hiddenSample works out wrt matrix sizes
-//		Matrix trainingDataTimesHiddenStates = this.trainingDataset.transpose().times(hidden_sample_init);
-		
-		
-		Matrix input = buildTestInputDataset();
-		
-		Matrix c = input.clone();
-		MatrixUtils.debug_print(c);
-		
-		RestrictedBoltzmannMachine rbm = new RestrictedBoltzmannMachine(6, 2, null); 
-		
-		Pair<Matrix, Matrix> hiddenProbsAndSample = rbm.sampleHiddenGivenVisible( input );
-
-		Matrix hidden_sample_init = hiddenProbsAndSample.getSecond();
-		
-		//System.out.println( "hidden_sample_init size: " + hidden_sample_init.numRows() + " x " + hidden_sample_init.numCols() );
-		//MatrixUtils.debug_print(hidden_sample_init);
-		
-		Matrix out = input.transpose().times(hidden_sample_init);
-		
-		//System.out.println( "input size: " + input.transpose().numRows() + " x " + input.transpose().numCols() );
-		
-		
-		
-		//MatrixUtils.debug_print( out );
-		
-	}
 	
 	/**
 	 * Will return a Matrix of size [ inputRowCount, HiddenNeuronCount ]
@@ -459,7 +428,7 @@ public class TestRestrictedBoltzmannMachine {
 
 		assertEquals( true, MatrixUtils.elementwiseSame(rbm.connectionWeights, rbm_deser.connectionWeights ) );
 		assertEquals( true, MatrixUtils.elementwiseSame(rbm.hiddenBiasNeurons, rbm_deser.hiddenBiasNeurons ) );
-		assertEquals( true, MatrixUtils.elementwiseSame(rbm.trainingDataset, rbm_deser.trainingDataset ) );
+		
 		assertEquals( true, MatrixUtils.elementwiseSame(rbm.visibleBiasNeurons, rbm_deser.visibleBiasNeurons ) );
 		
 		
