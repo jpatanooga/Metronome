@@ -57,8 +57,7 @@ public class TestCoreLinearRegression {
 	
 	
 //	QuickTestConfig qtf = new QuickTestConfig("src/test/resources/data/synth/R_synth_multi_4coef_test.csv", 5, 10, 5 );
-	
-	@Test
+//	@Test
 	public void test() throws Exception {
 		
 		ParallelOnlineLinearRegression polr = new ParallelOnlineLinearRegression(
