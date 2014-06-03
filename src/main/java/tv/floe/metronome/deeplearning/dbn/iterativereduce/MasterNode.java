@@ -11,6 +11,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 
 import tv.floe.metronome.deeplearning.dbn.DeepBeliefNetwork;
+import tv.floe.metronome.deeplearning.dbn.util.DBNDebuggingUtil;
 
 import com.cloudera.iterativereduce.ComputableMaster;
 import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
@@ -18,6 +19,7 @@ import com.cloudera.iterativereduce.yarn.appmaster.ApplicationMaster;
 
 public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable> {
 
+	DBNParameterVectorUpdateable lastMasterUpdate = null;
 	DeepBeliefNetwork dbn_averaged_master = null;
 	double trainingErrorThreshold = 0;
 	boolean hasHitThreshold = false;
@@ -58,6 +60,8 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 			Collection<DBNParameterVectorUpdateable> masterUpdates) {
 
 		System.out.println( "--------------- Master::Compute() -------------- " );
+	//	System.out.println("worker update count: " + workerUpdates.size() );
+	//	System.out.println("master update count: " + masterUpdates.size() );
 		
 		DBNParameterVectorUpdateable masterReturnMsg = new DBNParameterVectorUpdateable();
 		
@@ -69,6 +73,7 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		
 		boolean areAllWorkersDoneWithPreTrainPhase = true;
 		boolean areAllWorkersDoneWithCurrentDatasetEpoch = true;
+		int currentIteration = firstWorkerMsg.param_msg.iteration;
 		
 	    for (DBNParameterVectorUpdateable dbn_worker : workerUpdates) {
 
@@ -77,6 +82,10 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	    	
 			DeepBeliefNetwork dbn_worker_deser = new DeepBeliefNetwork(1, hiddenLayerSizesTmp, 1, hiddenLayerSizesTmp.length, null); //1, , 1, hiddenLayerSizes.length, rng );
 			dbn_worker_deser.load( baInputStream );
+			
+		//	System.out.println("Master > Printing incoming msg dbn: "); 
+		//	System.out.println("Master > Worker Iteration: " + dbn_worker.param_msg.iteration ); 
+		//	DBNDebuggingUtil.printDebugLayers(dbn_worker_deser, 2);
 			
 			try {
 				baInputStream.close();
@@ -135,15 +144,16 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		this.dbn_averaged_master.write( out );
 		dbn_update.dbn_payload = out.toByteArray();
+		dbn_update.iteration = currentIteration; // this is just for debugging 
 		
 		//DBNParameterVectorUpdateable updateable = new DBNParameterVectorUpdateable();
 		masterReturnMsg.param_msg = dbn_update;
 	    
 	    // THIS NEEDS TO BE DONE, probably automated!
 	    workerUpdates.clear();
-	    masterUpdates.clear();		
+	    //masterUpdates.clear();		
 		
-		
+		this.lastMasterUpdate = masterReturnMsg;
 		
 		return masterReturnMsg;
 	}
@@ -153,8 +163,8 @@ public class MasterNode implements ComputableMaster<DBNParameterVectorUpdateable
 	@Override
 	public DBNParameterVectorUpdateable getResults() {
 		
-		System.out.println("Master >>> getResults() - null!!!");
-		return null;
+	//	System.out.println("\n\nMaster > getResults() -----------------------------------\n\n");
+		return this.lastMasterUpdate;
 		
 	}
 
