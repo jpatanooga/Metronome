@@ -117,7 +117,7 @@ public class TestMultiLayerPerceptronNetwork {
 	    System.out.println("\n");
 	    
 	  }	
-	
+/*	
 	@Test
 	public void testIrisDatasetRun() throws Exception {
 		
@@ -165,12 +165,7 @@ public class TestMultiLayerPerceptronNetwork {
 				    //double actual = factory.processLineAlt(line, vec);
 					parseCSVRecord(vec_inputs, num_inputs, vec_outputs, num_outputs, line);
 
-					/*
-					PrintVector( vec_inputs );
-					PrintVector( vec_outputs );
-					
-					System.out.println(" ----------------- " );
-					*/
+
 					
 					assertEquals( num_inputs, vec_inputs.size() );
 					
@@ -241,7 +236,8 @@ public class TestMultiLayerPerceptronNetwork {
 				
 		
 	}
-	
+*/
+	  
 	@Test
 	public void testSerde() {
 		

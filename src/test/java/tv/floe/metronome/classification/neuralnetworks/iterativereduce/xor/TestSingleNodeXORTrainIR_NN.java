@@ -110,7 +110,7 @@ public class TestSingleNodeXORTrainIR_NN {
 		//Utils.PrintVector( master.polr.getBeta().viewRow(0) );
 		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
 
-		this.scoreNeuralNetworkXor( master.master_nn );
+//		this.scoreNeuralNetworkXor( master.master_nn );
 		
 	}
 }

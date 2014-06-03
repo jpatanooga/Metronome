@@ -25,7 +25,7 @@ public class TestFiveWorkersXOR_IR_NN {
 		System.out.println("\n\nComplete: ");
 		
 		System.out.println("Gobal Results");
-		XOR_DatasetTestUtils.scoreNeuralNetworkXor( master.master_nn );
+//		XOR_DatasetTestUtils.scoreNeuralNetworkXor( master.master_nn );
 		
 	}
 }

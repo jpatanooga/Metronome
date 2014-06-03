@@ -26,7 +26,7 @@ public class TestThreeWorkersXOR_IR_NN {
 		
 		System.out.println("\n\nComplete: ");
 
-		TestTwoWorkersXOR_IR_NN.scoreNeuralNetworkXor( master.master_nn );
+//		TestTwoWorkersXOR_IR_NN.scoreNeuralNetworkXor( master.master_nn );
 		
 		
 		

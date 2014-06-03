@@ -95,7 +95,7 @@ public class TestParallelNeuralNetworkLearningIR {
 		System.out.println("\n\nComplete: ");
 		//Utils.PrintVector( master.polr.getBeta().viewRow(0) );
 
-		this.scoreNeuralNetworkXor( master.master_nn );
+//		this.scoreNeuralNetworkXor( master.master_nn );
 		
 	}
 	

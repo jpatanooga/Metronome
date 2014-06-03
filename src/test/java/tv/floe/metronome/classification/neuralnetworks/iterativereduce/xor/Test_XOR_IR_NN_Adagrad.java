@@ -21,7 +21,7 @@ public class Test_XOR_IR_NN_Adagrad {
 		
 		System.out.println("\n\nComplete: ");
 
-		XOR_DatasetTestUtils.scoreNeuralNetworkXor( master.master_nn );
+//		XOR_DatasetTestUtils.scoreNeuralNetworkXor( master.master_nn );
 		
 	}
 }

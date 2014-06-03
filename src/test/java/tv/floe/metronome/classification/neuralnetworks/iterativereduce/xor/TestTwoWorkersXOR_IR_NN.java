@@ -133,7 +133,7 @@ public class TestTwoWorkersXOR_IR_NN {
 		System.out.println("\n\nComplete: ");
 		//Utils.PrintVector( master.polr.getBeta().viewRow(0) );
 
-		this.scoreNeuralNetworkXor( master.master_nn );
+//		this.scoreNeuralNetworkXor( master.master_nn );
 		
 		System.out.println("w1 > RMSE: " + singleWorker.lastRMSE );
 		System.out.println("w2 > RMSE: " + secondWorker.lastRMSE );
