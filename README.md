@@ -7,7 +7,6 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
     * Parallel K-means
     * Restricted Boltzmann Machines
     * Parallel Deep Belief Networks 
-        * (Layers of RBMs with a discriminitive layer)
         * Developed directly in concert with [Adam Gibson and the DL4J project] (http://deeplearning4j.org)
         * [Running Deep Learning with Metronome on Hadoop] (https://github.com/jpatanooga/Metronome/wiki/Running-Deep-Learning-on-Metronome)
         * [Fundamental Architecture of our Deep Learning Library over at DL4J] (http://deeplearning4j.org/overview.html)
