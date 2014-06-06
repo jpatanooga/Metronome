@@ -35,6 +35,7 @@ Hadoop Summit 2014 (San Jose) - [Slides for Intro To Deep Learning on Hadoop] (h
 Deep Learning Coverage in Wired Magazine
 
 [Wired - Google Data Center AI] (http://www.wired.com/2014/05/google-data-center-ai/)
+
 [Wired - Skymind Deep Learning] (http://www.wired.com/2014/06/skymind-deep-learning/)
 
 
