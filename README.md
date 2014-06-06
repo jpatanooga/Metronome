@@ -10,6 +10,7 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
         * (Layers of RBMs with a discriminitive layer)
         * Developed directly in concert with [Adam Gibson and the DL4J project] (http://deeplearning4j.org)
         * [Running Deep Learning with Metronome on Hadoop] (https://github.com/jpatanooga/Metronome/wiki/Running-Deep-Learning-on-Metronome)
+        * [Fundamental Architecture of our Deep Learning Library over at DL4J] (http://deeplearning4j.org/overview.html)
 * Scales linearly with input size
 * Built on top of BSP-style computation framework "Iterative Reduce" (Hadoop / YARN)
 * Packaged in a new suite of parallel iterative algorithms called Metronome on [IterativeReduce] (https://github.com/emsixteeen/IterativeReduce)
