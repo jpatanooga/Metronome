@@ -58,10 +58,13 @@ Deep Learning Coverage in Wired Magazine
 
 # Contributors and Special Thanks
 * Adam Gibson
+    * [Github] (https://github.com/agibsonccc/) 
 * Michael Katzenellenbollen
+    * [Github] (https://github.com/emsixteeen)
 * Dr. Jason Baldridge
 * Dr. James Scott
 * Paul Wilkinson
 * David Kale
+    * Professional Hipster / Hobbit
 
 
