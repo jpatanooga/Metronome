@@ -9,6 +9,7 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
     * Parallel Deep Belief Networks 
         * (Layers of RBMs with a discriminitive layer)
         * Developed directly in concert with [Adam Gibson and the DL4J project] (http://deeplearning4j.org)
+        * [Running Deep Learning with Metronome on Hadoop] (https://github.com/jpatanooga/Metronome/wiki/Running-Deep-Learning-on-Metronome)
 * Scales linearly with input size
 * Built on top of BSP-style computation framework "Iterative Reduce" (Hadoop / YARN)
 * Packaged in a new suite of parallel iterative algorithms called Metronome on [IterativeReduce] (https://github.com/emsixteeen/IterativeReduce)
@@ -49,9 +50,10 @@ Deep Learning Coverage in Wired Magazine
 
 # Resources
 * [General guide on running yarn jobs] (https://github.com/jpatanooga/Metronome/wiki/Running-Jobs-on-YARN-Clusters)
+* [Running Deep Learning with Metronome on Hadoop] (https://github.com/jpatanooga/Metronome/wiki/Running-Deep-Learning-on-Metronome)
 * [IterativeReduce Programming Model] (https://github.com/emsixteeen/IterativeReduce/wiki/Iterative-Reduce-Programming-Guide)
 * Using IRUnit - the IterativeReduce Unit Testing Framework
-* [Running parallel linear regression with IRUnit on synthetic test data](https://github.com/jpatanooga/Metronome/wiki/Running-Parallel-Linear-Regression)
+* [Running parallel linear regression with IRUnit on synthetic test data] (https://github.com/jpatanooga/Metronome/wiki/Running-Parallel-Linear-Regression)
 
 # Contributors and Special Thanks
 * Adam Gibson
