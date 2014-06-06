@@ -14,6 +14,11 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
 * Packaged in a new suite of parallel iterative algorithms called Metronome on [IterativeReduce] (https://github.com/emsixteeen/IterativeReduce)
     * 100% Java, ASF 2.0 Licensed, on github
 
+# Project Next Steps
+
+* 6/5/2014 - we're working on cutting a 0.1 tag and download for the current project snapshot for both
+    * IterativeReduce
+    * Metronome
 
 # Presentations
 
