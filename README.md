@@ -28,15 +28,17 @@ BigDataTechCon 2013
 
 MLConf 2013
 
-http://www.slideshare.net/jpatanooga/metronome-ml-confnov2013v20131113
+* [Slides] (http://www.slideshare.net/jpatanooga/metronome-ml-confnov2013v20131113)
 
-Hadoop Summit 2014 (San Jose) - [Slides for Intro To Deep Learning on Hadoop] (http://www.slideshare.net/jpatanooga/hadoop-summit-2014-san-jose-introduction-to-deep-learning-on-hadoop)
+Hadoop Summit 2014 (San Jose)
+
+* [Slides for Intro To Deep Learning on Hadoop] (http://www.slideshare.net/jpatanooga/hadoop-summit-2014-san-jose-introduction-to-deep-learning-on-hadoop)
 
 Deep Learning Coverage in Wired Magazine
 
-[Wired - Google Data Center AI] (http://www.wired.com/2014/05/google-data-center-ai/)
+* [Wired - Google Data Center AI] (http://www.wired.com/2014/05/google-data-center-ai/)
 
-[Wired - Skymind Deep Learning] (http://www.wired.com/2014/06/skymind-deep-learning/)
+* [Wired - Skymind Deep Learning] (http://www.wired.com/2014/06/skymind-deep-learning/)
 
 
 
