@@ -25,11 +25,13 @@ Metronome is a suite of parallel iterative algorithms that run natively on Hadoo
 
 Hadoop Summit EU 2013
 
-<iframe src="http://www.slideshare.net/slideshow/embed_code/17636499" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="http://www.slideshare.net/jpatanooga/hadoop-summit-eu-2013-parallel-linear-regression-iterativereduce-and-yarn" title="Hadoop Summit EU 2013: Parallel Linear Regression, IterativeReduce, and YARN" target="_blank">Hadoop Summit EU 2013: Parallel Linear Regression, IterativeReduce, and YARN</a> </strong> from <strong><a href="http://www.slideshare.net/jpatanooga" target="_blank">Josh Patterson</a></strong> </div>
+* [Hadoop Summit EU 2013: Parallel Linear Regression, IterativeReduce, and YARN]  (http://www.slideshare.net/jpatanooga/hadoop-summit-eu-2013-parallel-linear-regression-iterativereduce-and-yarn)
 
-[Video of Presentation from Hadoop Summit EU 2013](http://www.youtube.com/watch?feature=player_embedded&v=rwiy_YhbxiI)
+* [Video of Presentation from Hadoop Summit EU 2013] (http://www.youtube.com/watch?feature=player_embedded&v=rwiy_YhbxiI)
 
 BigDataTechCon 2013
+
+* Slides soon
 
 
 MLConf 2013
@@ -39,6 +41,7 @@ MLConf 2013
 Hadoop Summit 2014 (San Jose)
 
 * [Slides for Intro To Deep Learning on Hadoop] (http://www.slideshare.net/jpatanooga/hadoop-summit-2014-san-jose-introduction-to-deep-learning-on-hadoop)
+
 * [Video of Hadoop Summit Talk] (https://www.youtube.com/watch?v=h2Ixpfn-DTg&list=PLSAiKuajRe2k0Aw_njj74rIlbdk3JTQ8Y)
 
 Deep Learning Coverage in Wired Magazine
