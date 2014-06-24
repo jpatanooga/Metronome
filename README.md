@@ -36,7 +36,7 @@ BigDataTechCon 2013
 
 MLConf 2013
 
-* [Slides] (http://www.slideshare.net/jpatanooga/metronome-ml-confnov2013v20131113)
+* [Parallel Neural Networks on Hadoop Slides] (http://www.slideshare.net/jpatanooga/metronome-ml-confnov2013v20131113)
 
 Hadoop Summit 2014 (San Jose)
 
