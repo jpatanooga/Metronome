@@ -39,6 +39,7 @@ MLConf 2013
 Hadoop Summit 2014 (San Jose)
 
 * [Slides for Intro To Deep Learning on Hadoop] (http://www.slideshare.net/jpatanooga/hadoop-summit-2014-san-jose-introduction-to-deep-learning-on-hadoop)
+* [Video of Hadoop Summit Talk] (https://www.youtube.com/watch?v=h2Ixpfn-DTg&list=PLSAiKuajRe2k0Aw_njj74rIlbdk3JTQ8Y)
 
 Deep Learning Coverage in Wired Magazine
 
